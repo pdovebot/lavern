@@ -1,0 +1,57 @@
+# .gitleaks.toml — Lavern secret-scan configuration.
+# Extends the default gitleaks v8 ruleset. We do NOT redefine rules — only
+# allowlist known false positives.
+#
+# Run locally:
+#   gitleaks detect --config .gitleaks.toml --log-opts="--all" --no-banner
+#   npm run protect      # scans staged changes only
+
+title = "Lavern gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Lavern-specific allowlists for documented false positives"
+
+paths = [
+  # Seed corpus — legal text from public datasets that trips entropy rules.
+  '''scripts/seed-knowledge-base\.ts''',
+  '''scripts/seed-data/.*''',
+
+  # Eval fixtures — SEC EDGAR public-domain contract excerpts.
+  '''evals/jv/.*\.txt''',
+
+  # Env example — contains commented placeholder strings like sk-ant-...
+  '''\.env\.example''',
+
+  # Docker compose header comments document required env var formats.
+  '''docker-compose\.yml''',
+
+  # Test fixtures use literal 'fake'/'abc123' values for auth flow coverage.
+  '''tests/.*\.(ts|js)''',
+  '''src/.*\.test\.(ts|js)''',
+
+  # The audit report references redacted findings.
+  '''docs/SECURITY_AUDIT_.*\.md''',
+
+  # This config itself.
+  '''\.gitleaks\.toml''',
+]
+
+# Regex stopwords — if a candidate match contains any of these, skip it.
+# Defense-in-depth against placeholder-shaped strings anywhere in the tree.
+regexes = [
+  '''(?i)fake[-_]?(secret|key|token|password)''',
+  '''(?i)example[-_]?(secret|key|token|password)''',
+  '''(?i)placeholder''',
+  '''sk-ant-\.\.\.''',
+  '''sk_test_\.\.\.''',
+  '''whsec_\.\.\.''',
+  '''re_\.\.\.''',
+  '''your[-_]?(api[-_]?key|secret|token)''',
+]
+
+# Per-commit allowlists, if any benign-but-detected commits need a precise
+# pin. Empty by default; populate only after triage.
+commits = []

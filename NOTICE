@@ -1,0 +1,102 @@
+Lavern — An Agentic Legal Architecture ("The Shem")
+Copyright (c) 2025-2026 Antti Innanen
+
+Lavern is distributed under the MIT License. See LICENSE at the repo root
+for the full text.
+
+This file aggregates third-party attribution requirements that the MIT
+License itself does not impose — the legal datasets and fonts bundled with
+Lavern carry their own licenses, and those licenses require attribution
+regardless of how Lavern is licensed.
+
+If you redistribute Lavern with these datasets or fonts included, keep this
+NOTICE intact.
+
+────────────────────────────────────────────────────────────────────────────
+LEGAL DATASETS (seeded via scripts/seed-knowledge-base.ts)
+────────────────────────────────────────────────────────────────────────────
+
+  CUAD — Contract Understanding Atticus Dataset
+  510 contracts, 41 clause types
+  License: CC BY 4.0
+  Source: https://www.atticusprojectai.org/cuad
+
+  MAUD — Merger Agreement Understanding Dataset
+  152 merger agreements, 92 deal points
+  License: CC BY 4.0
+  Source: https://www.atticusprojectai.org/maud
+
+  ACORD — Atticus Clause Retrieval Dataset
+  126K+ expert-rated clause retrieval pairs
+  License: CC BY 4.0
+  Source: https://www.atticusprojectai.org/acord
+
+  UNFAIR-ToS — Unfair Terms of Service Dataset (LexGLUE)
+  5.5K sentences, 8 unfair clause types
+  License: CC BY-SA 4.0
+  Source: https://github.com/coastalcph/lex-glue
+
+  LEDGAR — SEC Contract Provisions (LexGLUE)
+  60K provisions, 98 clause types
+  License: CC BY-SA 4.0
+  Source: https://github.com/coastalcph/lex-glue
+
+  ContractNLI — NOT INCLUDED
+  Its CC BY-NC-SA 4.0 license (non-commercial + share-alike) is incompatible
+  with Lavern's permissive (MIT) distribution license. The seeder no longer
+  fetches ContractNLI. Users who specifically want it can pull it directly
+  from https://stanfordnlp.github.io/contract-nli/ and accept its terms
+  separately.
+
+  Note on CC BY-SA 4.0: The two ShareAlike datasets above are usable inside
+  Lavern, but anyone redistributing those specific datasets in a modified
+  form inherits ShareAlike obligations. Lavern's own code remains MIT.
+
+────────────────────────────────────────────────────────────────────────────
+FONTS
+────────────────────────────────────────────────────────────────────────────
+
+  Inter — Rasmus Andersson
+  License: SIL Open Font License 1.1
+
+  Cormorant Garamond — Christian Thalmann
+  License: SIL Open Font License 1.1
+
+  JetBrains Mono — JetBrains
+  License: SIL Open Font License 1.1
+
+────────────────────────────────────────────────────────────────────────────
+PHOTOGRAPHY
+────────────────────────────────────────────────────────────────────────────
+
+  Lavern's landing page and marketing surfaces use stock photography
+  obtained under royalty-free licenses from:
+
+  Unsplash — https://unsplash.com
+  License: Unsplash License (royalty-free, no attribution required, but
+  attribution provided here as a courtesy and to document provenance)
+
+  Pexels — https://www.pexels.com
+  License: Pexels License (royalty-free, no attribution required, but
+  attribution provided here as a courtesy and to document provenance)
+
+  Photographs ship in viz/public/ as photo-*.avif and premium_photo-*.avif
+  files. Original photographers retain copyright; the above licenses grant
+  Lavern (and downstream redistributors of Lavern) free commercial use.
+
+────────────────────────────────────────────────────────────────────────────
+THIRD-PARTY CODE
+────────────────────────────────────────────────────────────────────────────
+
+  Lavern depends on a number of npm packages, each carrying its own license.
+  See package.json + package-lock.json (and viz/package.json + viz/package-
+  lock.json) for the authoritative list. Every dependency is OSI-approved
+  and compatible with MIT distribution. No GPL or AGPL code is bundled.
+
+────────────────────────────────────────────────────────────────────────────
+DISCLAIMER
+────────────────────────────────────────────────────────────────────────────
+
+  This software assists with document analysis and legal design.
+  It does not provide legal advice. Always verify outputs with
+  qualified legal professionals before relying on them.

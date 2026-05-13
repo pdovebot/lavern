@@ -1,0 +1,79 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Runtime data — NEVER COMMIT (PII, password hashes, session contents).
+# Root-anchored with leading slash — without it, `data/` matches subtrees like
+# `viz/src/briefing/data/` and excludes legitimate source code.
+/audit-logs/
+/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+/test-results/
+
+# User-level Lavern state (filesystem watcher, profiles, deliveries)
+.lavern/
+
+# Repo-local runtime state (precedents, institutional memory, sessions)
+.shem/
+
+# One-off salvage / recovery scripts (use scripts/ for permanent ones)
+salvage-*.ts
+
+# Marketing / inspiration images (do not commit large binaries to repo)
+Test images/
+
+# Environment backups
+.env.save
+.env.cloud-backup
+.env.real-bak
+*.bak
+
+# Local Claude Code memory (per-project)
+.claude/projects/
+
+# Distribution tarballs (build artefacts, may contain dev DB)
+dist/lavern-*.tar.gz
+
+# Claude Code
+.claude/
+
+# Proprietary/test documents (do not commit)
+Test material/
+Pictures/
+Boris.docx
+*.pdf
+!site/**/*.pdf
+
+# Demo videos (too large for git)
+site/demo.mp4
+site/demo.mov
+
+# OS
+Thumbs.db
+london
