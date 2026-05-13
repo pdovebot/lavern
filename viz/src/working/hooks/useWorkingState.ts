@@ -137,8 +137,10 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
     } else if (event.type === 'gate_decided') {
       setPendingGate(null);
     } else if (event.type === 'error') {
-      // Detect fatal session errors (orchestrator, assembler, or session-level failures)
-      const fatalSources = ['orchestrator', 'session', 'document-assembler'];
+      // Detect fatal session errors. Document-assembler failures are NOT fatal —
+      // the session still emits session_end and the user can retry assembly
+      // from the delivery view.
+      const fatalSources = ['orchestrator', 'session'];
       if (event.source && fatalSources.includes(event.source)) {
         setSessionFailed(true);
       }
@@ -324,9 +326,22 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
         const steps = data.workflow?.completedSteps ?? [];
         const isDelivered = step === 'delivered' || steps.includes('delivered');
 
-        // Always sync visible state (step progress, cost) while on Working screen
-        if (data.workflow?.currentStep) setCurrentStep(data.workflow.currentStep);
-        if (data.workflow?.completedSteps?.length) setCompletedSteps(data.workflow.completedSteps);
+        // Always sync visible state (step progress, cost) while on Working screen.
+        // Never regress past 'delivered' — once the client has seen session_end
+        // (or a workflow_step → delivered), a stale backend currentStep must not
+        // stomp us back to an earlier step.
+        if (data.workflow?.currentStep) {
+          setCurrentStep(prev => prev === 'delivered' ? prev : data.workflow.currentStep);
+        }
+        if (data.workflow?.completedSteps?.length) {
+          setCompletedSteps(prev => {
+            const incoming: WorkflowStep[] = data.workflow.completedSteps;
+            if (prev.includes('delivered') && !incoming.includes('delivered')) {
+              return Array.from(new Set([...incoming, ...prev]));
+            }
+            return incoming;
+          });
+        }
         if (data.cost) setCost({ accumulated: data.cost.accumulated, budget: data.cost.budget });
 
         if (isDelivered) {

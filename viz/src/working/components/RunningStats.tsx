@@ -19,6 +19,8 @@ interface RunningStatsProps {
   certaintyPct: number | undefined;
   /** Remaining billable hours (optional). */
   billableHours?: number;
+  /** Freeze the elapsed timer (e.g. once the session is delivered). */
+  frozen?: boolean;
 }
 
 function formatElapsed(ms: number): string {
@@ -34,18 +36,20 @@ export function RunningStats({
   cost,
   certaintyPct,
   billableHours,
+  frozen,
 }: RunningStatsProps) {
   const [elapsed, setElapsed] = useState('0:00');
 
-  // Live ticker — updates every second
+  // Live ticker — updates every second; stops when frozen (session delivered).
   useEffect(() => {
     if (!sessionStartTime) return;
     const start = new Date(sessionStartTime).getTime();
     const update = () => setElapsed(formatElapsed(Date.now() - start));
     update();
+    if (frozen) return;
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
-  }, [sessionStartTime]);
+  }, [sessionStartTime, frozen]);
 
   return (
     <div style={styles.container}>

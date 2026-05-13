@@ -292,6 +292,29 @@ export async function runMistralWorkflow(
     });
   }
 
+  // Advance workflow state so the polling sync doesn't reset the UI back to
+  // 'intake' after session_end (mirror of local-executor.ts).
+  const previousStep = session.workflow.currentStep;
+  if (!session.workflow.completedSteps.includes(previousStep)) {
+    session.workflow.completedSteps.push(previousStep);
+  }
+  session.workflow.currentStep = 'delivered';
+  session.workflow.lastTransitionAt = new Date().toISOString();
+  if (session.genericWorkflow) {
+    const gwPrevious = session.genericWorkflow.currentStep;
+    if (!session.genericWorkflow.completedSteps.includes(gwPrevious)) {
+      session.genericWorkflow.completedSteps.push(gwPrevious);
+    }
+    session.genericWorkflow.currentStep = 'delivered';
+    session.genericWorkflow.lastTransitionAt = new Date().toISOString();
+  }
+  session.events.emitEvent({
+    type: 'workflow_step',
+    step: 'delivered',
+    previousStep,
+    timestamp: eventTimestamp(),
+  });
+
   // Emit session_end — assembly is complete
   session.events.emitEvent({
     type: 'session_end',

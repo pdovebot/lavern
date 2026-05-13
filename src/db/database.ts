@@ -427,6 +427,15 @@ function runMigrations(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_ut_expires ON user_tokens(expires_at);
     CREATE INDEX IF NOT EXISTS idx_ut_type ON user_tokens(type);
   `);
+
+  // Local-mode bootstrap: ensure the synthetic 'local-user' row exists so that
+  // session_archive / matters / etc. FK constraints don't fail in dev.
+  // Auth middleware injects userId='local-user' unconditionally in local mode.
+  const nowIso = new Date().toISOString();
+  db.prepare(`
+    INSERT OR IGNORE INTO users (id, email, password_hash, display_name, firm_name, profile_json, created_at, updated_at)
+    VALUES ('local-user', 'local@localhost', '', 'Local User', '', '{}', ?, ?)
+  `).run(nowIso, nowIso);
 }
 
 // ── Password Hashing ─────────────────────────────────────────────────────

@@ -292,6 +292,34 @@ export async function runLocalWorkflow(
     });
   }
 
+  // Advance workflow state so the polling sync doesn't reset the UI back to
+  // 'intake' after session_end. The local path doesn't emit per-step
+  // workflow_step events, so currentStep would otherwise stay at its initial
+  // 'intake' value forever.
+  const previousStep = session.workflow.currentStep;
+  if (!session.workflow.completedSteps.includes(previousStep)) {
+    session.workflow.completedSteps.push(previousStep);
+  }
+  session.workflow.currentStep = 'delivered';
+  session.workflow.lastTransitionAt = new Date().toISOString();
+  // /api/sessions/:id reads `genericWorkflow?.currentStep ?? workflow.currentStep`,
+  // so if the agent ever initialized genericWorkflow we must advance it too —
+  // otherwise the polling sync overrides the WS-driven 'delivered' state.
+  if (session.genericWorkflow) {
+    const gwPrevious = session.genericWorkflow.currentStep;
+    if (!session.genericWorkflow.completedSteps.includes(gwPrevious)) {
+      session.genericWorkflow.completedSteps.push(gwPrevious);
+    }
+    session.genericWorkflow.currentStep = 'delivered';
+    session.genericWorkflow.lastTransitionAt = new Date().toISOString();
+  }
+  session.events.emitEvent({
+    type: 'workflow_step',
+    step: 'delivered',
+    previousStep,
+    timestamp: eventTimestamp(),
+  });
+
   // Emit session_end — assembly is complete
   session.events.emitEvent({
     type: 'session_end',
