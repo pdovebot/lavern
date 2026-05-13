@@ -4,7 +4,7 @@
 **Auditor:** Antti Innanen <antti@wearelegit.ai>
 **Repository:** `AnttiHero/lavern` (new public repository, initialized fresh at v0.15.0)
 **Predecessor:** Private development repository `AnttiHero/Marble`, archived after this audit.
-**Target launch:** Week of 18 May 2026 (public OSS, MIT)
+**Target launch:** Week of 18 May 2026 (public OSS, Apache 2.0)
 
 ---
 
@@ -93,14 +93,14 @@ External contributors are credited in [`AUTHORS.md`](../AUTHORS.md) by name and 
 
 ## 5. License & Attribution Compliance
 
-- **LICENSE.** MIT, single-author copyright "(c) 2025-2026 Antti Innanen". Verified at repo root.
+- **LICENSE.** Apache 2.0, single-author copyright "(c) 2025-2026 Antti Innanen". Verified at repo root.
 - **NOTICE.** Covers:
   - 5 legal datasets (CUAD, MAUD, ACORD as CC BY 4.0; UNFAIR-ToS, LEDGAR as CC BY-SA 4.0) — verified verbatim attribution per each license.
   - 3 fonts (Inter, Cormorant Garamond, JetBrains Mono — all SIL OFL 1.1).
   - Photography (Unsplash + Pexels) — courtesy attribution; neither license requires it.
 - **AUTHORS.md.** Credits Antti as maintainer plus three external contributors with GitHub handles. Acknowledges AI co-authorship with Claude (Anthropic).
-- **ContractNLI** confirmed excluded. CC BY-NC-SA 4.0 incompatible with MIT redistribution. The seeder (`scripts/seed-knowledge-base.ts`) excludes it with an in-code comment explaining the license incompatibility.
-- **CC BY-SA propagation.** The seeder stores datasets verbatim with light metadata (chunking by clause type; appending deal-point answers in MAUD). No schema reshaping, no field trimming, no derivative-work creation. Share-alike obligations therefore do not propagate to Lavern's MIT code.
+- **ContractNLI** confirmed excluded. CC BY-NC-SA 4.0 incompatible with Apache 2.0 redistribution. The seeder (`scripts/seed-knowledge-base.ts`) excludes it with an in-code comment explaining the license incompatibility.
+- **CC BY-SA propagation.** The seeder stores datasets verbatim with light metadata (chunking by clause type; appending deal-point answers in MAUD). No schema reshaping, no field trimming, no derivative-work creation. Share-alike obligations therefore do not propagate to Lavern's Apache 2.0 code.
 - **Dependencies.** All npm deps OSI-approved per `package-lock.json` spot check (Apache-2.0, MIT, BSD predominantly; no GPL/AGPL bundled).
 
 ## 6. Supply-Chain Posture

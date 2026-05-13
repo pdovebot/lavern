@@ -1,6 +1,6 @@
 # Lavern
 
-**The driverless law firm.** Open source. MIT.
+**The driverless law firm.** Open source. Apache 2.0.
 
 Lavern is a team of 67 AI agents that reviews documents, debates risks, and delivers defensible outputs — every finding cited, every decision auditable, every critical call gated by a human. Run it interactively (brief it; it works), or autonomously: **Clawern** mode watches a folder, reviews documents overnight, and pings your phone when something matters.
 
@@ -176,6 +176,6 @@ Found a vulnerability? See [SECURITY.md](SECURITY.md). Email `security@lavern.ai
 
 ## License
 
-[MIT](LICENSE) — Copyright (c) 2025-2026 Antti Innanen.
+[Apache 2.0](LICENSE) — Copyright (c) 2025-2026 Antti Innanen.
 
 See [NOTICE](NOTICE) for third-party attributions and dataset licenses.

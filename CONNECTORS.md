@@ -64,7 +64,7 @@ Seeded by `scripts/seed-knowledge-base.ts` into the FTS5 knowledge base. Availab
 | **ACORD** | 126K+ expert-rated clause retrieval pairs | CC BY 4.0 | [Atticus Project](https://www.atticusprojectai.org/acord) |
 | **UNFAIR-ToS** | 5.5K sentences, 8 unfair-clause types | CC BY-SA 4.0 | [LexGLUE / coastalcph](https://github.com/coastalcph/lex-glue) |
 | **LEDGAR** | 60K SEC contract provisions, 98 clause types | CC BY-SA 4.0 | [LexGLUE / coastalcph](https://github.com/coastalcph/lex-glue) |
-| **ContractNLI** | — | CC BY-NC-SA 4.0 (incompatible with MIT) | *Not bundled.* Fetch independently from [stanfordnlp.github.io/contract-nli](https://stanfordnlp.github.io/contract-nli/) and accept its non-commercial terms. |
+| **ContractNLI** | — | CC BY-NC-SA 4.0 (incompatible with Apache 2.0) | *Not bundled.* Fetch independently from [stanfordnlp.github.io/contract-nli](https://stanfordnlp.github.io/contract-nli/) and accept its non-commercial terms. |
 
 Attribution requirements per dataset license live in [NOTICE](NOTICE).
 

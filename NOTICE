@@ -1,13 +1,15 @@
 Lavern — An Agentic Legal Architecture ("The Shem")
 Copyright (c) 2025-2026 Antti Innanen
 
-Lavern is distributed under the MIT License. See LICENSE at the repo root
-for the full text.
+Licensed under the Apache License, Version 2.0 (the "License"). See LICENSE
+at the repo root for the full text. You may obtain a copy at:
 
-This file aggregates third-party attribution requirements that the MIT
-License itself does not impose — the legal datasets and fonts bundled with
-Lavern carry their own licenses, and those licenses require attribution
-regardless of how Lavern is licensed.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+This NOTICE file is required by Apache 2.0 §4(d) and aggregates third-party
+attribution requirements. The legal datasets and fonts bundled with Lavern
+carry their own licenses, which require attribution regardless of how
+Lavern itself is licensed.
 
 If you redistribute Lavern with these datasets or fonts included, keep this
 NOTICE intact.

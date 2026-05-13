@@ -23,8 +23,8 @@
  *
  * NOTE: ContractNLI (kiddothe2b/contract-nli) was previously seeded here but
  * has been removed because its CC BY-NC-SA 4.0 license (non-commercial +
- * share-alike) is incompatible with Lavern's permissive MIT distribution
- * license. Anyone wanting to use ContractNLI alongside Lavern can fetch it
+ * share-alike) is incompatible with Lavern's permissive Apache 2.0
+ * distribution license. Anyone wanting to use ContractNLI alongside Lavern can fetch it
  * independently from HuggingFace and accept its non-commercial-share-alike
  * terms separately.
  */

@@ -2,7 +2,7 @@
   "name": "lavern",
   "version": "0.15.0",
   "description": "Lavern — An agentic legal architecture. A law firm staffed with AI agents.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Antti Innanen (https://lavern.ai)",
   "homepage": "https://lavern.ai",
   "repository": {
