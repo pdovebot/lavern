@@ -79,11 +79,20 @@ export function createDebateBoardTools(session: SessionState) {
       ]).describe('Type of finding'),
       content: z.string().describe('The finding content — what was discovered'),
       severity: z.enum(['RED', 'YELLOW', 'GREEN']).describe('Severity classification'),
-      evidence: z.array(z.string()).describe('Specific quotes or references from the document as evidence'),
+      evidence: z.array(z.string().min(1)).min(1)
+        .describe('Specific quotes or references from the document as evidence. At least one citation is required — findings without evidence cannot be posted.'),
       confidence: z.number().min(0).max(1).optional()
         .describe('Confidence in this finding (0.0-1.0). Based on evidence strength, not self-assessment. Default: 0.8'),
     },
     async (args) => {
+      // Runtime guard: schema validation is enforced at the MCP boundary, but mirror it here
+      // so direct handler invocation (tests, future callers) cannot bypass the invariant.
+      const cleanedEvidence = args.evidence.filter(e => e.trim().length > 0);
+      if (cleanedEvidence.length === 0) {
+        return {
+          content: [{ type: 'text' as const, text: 'Error: evidence is required. Every finding must cite at least one specific quote or reference from the document.' }],
+        };
+      }
       const sanitizedContent = sanitizeFindingContent(args.content);
       const finding: Finding = {
         id: `F-${String(++counters.finding).padStart(3, '0')}`,
@@ -91,7 +100,7 @@ export function createDebateBoardTools(session: SessionState) {
         findingType: args.finding_type,
         content: sanitizedContent,
         severity: args.severity,
-        evidence: args.evidence,
+        evidence: cleanedEvidence,
         confidence: args.confidence ?? 0.8,
         timestamp: eventTimestamp(),
         resolved: false,
@@ -106,7 +115,7 @@ export function createDebateBoardTools(session: SessionState) {
         severity: args.severity,
         confidence: finding.confidence,
         content: sanitizedContent,
-        evidence: args.evidence,
+        evidence: cleanedEvidence,
         timestamp: eventTimestamp(),
       });
 
@@ -164,7 +173,8 @@ export function createDebateBoardTools(session: SessionState) {
       challenger_role: z.string().describe('The role of the agent issuing the challenge'),
       target_finding_id: z.string().describe('The ID of the finding being challenged (e.g., "F-001")'),
       challenge_text: z.string().describe('The challenge — why this finding is questioned'),
-      evidence: z.array(z.string()).describe('Evidence supporting the challenge'),
+      evidence: z.array(z.string().min(1)).min(1)
+        .describe('Counter-evidence supporting the challenge — at least one specific quote or reference. Challenges without evidence are rejected.'),
     },
     async (args) => {
       const targetFinding = state.findings.find(f => f.id === args.target_finding_id);
@@ -174,12 +184,20 @@ export function createDebateBoardTools(session: SessionState) {
         };
       }
 
+      // Runtime guard: mirror the schema constraint for direct handler callers.
+      const cleanedEvidence = args.evidence.filter(e => e.trim().length > 0);
+      if (cleanedEvidence.length === 0) {
+        return {
+          content: [{ type: 'text' as const, text: `Error: evidence is required. Every challenge must cite at least one counter-quote or reference.` }],
+        };
+      }
+
       const challenge: Challenge = {
         id: `C-${String(++counters.challenge).padStart(3, '0')}`,
         challengerRole: args.challenger_role as Challenge['challengerRole'],
         targetFindingId: args.target_finding_id,
         challengeText: args.challenge_text,
-        evidence: args.evidence,
+        evidence: cleanedEvidence,
         timestamp: eventTimestamp(),
         resolved: false,
       };
@@ -191,7 +209,7 @@ export function createDebateBoardTools(session: SessionState) {
         challenger: args.challenger_role,
         targetFindingId: args.target_finding_id,
         challengeText: args.challenge_text,
-        evidence: args.evidence,
+        evidence: cleanedEvidence,
         timestamp: eventTimestamp(),
       });
 

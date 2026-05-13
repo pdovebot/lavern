@@ -1673,7 +1673,7 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
         style={{ ...PILL_STYLE, padding: '16px 28px', flex: isMobile ? undefined : '0 0 auto' }}
         onMouseEnter={pillEnter} onMouseLeave={pillLeave}>Contact us</button>
       <button
-        onClick={() => window.open('https://lavern.ai/claw/how-it-works.html', '_blank')}
+        onClick={() => window.open('https://lavern.ai/architecture/', '_blank')}
         style={{ ...PILL_STYLE, padding: '16px 28px', flex: isMobile ? undefined : '0 0 auto' }}
         onMouseEnter={pillEnter} onMouseLeave={pillLeave}>Go deeper →</button>
     </div>

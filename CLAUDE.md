@@ -165,7 +165,7 @@ Static single-page site deployed via Netlify drag-and-drop. Dark cinematic desig
   - **Mobile (≤768px)**: Single-screen hero + footer only — all mid-sections hidden, no scroll, mist preserved
   - **Desktop**: Full scrolling experience with all sections
 - `site/claw/index.html` — Clawern landing page (dark cinematic, crab hero, 65% grain, 3-step setup)
-- `site/claw/how-it-works.html` — Comprehensive visual architecture explainer (Lavern + Clawern technical deep-dive with SVG diagrams)
+- `site/architecture/index.html` — Comprehensive visual architecture explainer (Lavern + Clawern technical deep-dive with SVG diagrams)
 - `site/terms/index.html` — Terms of Service (static HTML, dark cinematic design)
 - `site/privacy/index.html` — Privacy Policy (static HTML, dark cinematic design)
 - `site/img/` — Static assets (logo, OG image)

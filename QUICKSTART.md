@@ -16,15 +16,19 @@ cd lavern
 # 2. Install (backend + dashboard)
 npm install
 (cd viz && npm install)
-
-# 3. Start — demo mode, no API key required
-npm run dev -- --serve
-
-# 4. Open the dashboard
-open http://localhost:3000
 ```
 
-You should see Lavern's landing page within a few seconds of step 3.
+Then run two processes:
+
+```bash
+# Terminal 1 — API server on :3000 (demo mode, no API key required)
+npm run serve:dev
+
+# Terminal 2 — dashboard on :5173 (Vite, hot reload)
+cd viz && npm run dev
+```
+
+Open <http://localhost:5173>. You should see Lavern's landing page within a few seconds.
 
 ## ⚠️ Add your Anthropic key to actually process documents
 
@@ -32,7 +36,7 @@ Demo mode gets you the full UI — landing page, auth, Clawern dashboard, agent 
 
 1. Copy `.env.example` to `.env` (this happens automatically on first run).
 2. Open `.env` and set `ANTHROPIC_API_KEY=sk-ant-...`.
-3. Restart `npm run dev -- --serve`.
+3. Restart Terminal 1 (`npm run serve:dev`).
 
 EU teams: set `LAVERN_PROVIDER=mistral` and `MISTRAL_API_KEY=...` to route through Mistral instead of Anthropic. Data never leaves the EU.
 
@@ -91,7 +95,7 @@ Customize:
 
 **67 agents** · **21 MCP tools** · **9 workflows** · **5 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · LEDGAR) · **2 LLM providers** (Claude · Mistral EU) · **1,695 tests** across 108 files.
 
-Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/claw/how-it-works.html](https://lavern.ai/claw/how-it-works.html).
+Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/architecture/](https://lavern.ai/architecture/).
 
 ## Stuck?
 

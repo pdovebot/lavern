@@ -6,7 +6,7 @@ Lavern is a team of 67 AI agents that reviews documents, debates risks, and deli
 
 > **Disclaimer:** Lavern assists with document analysis and legal design. It does not provide legal advice. Always verify outputs with qualified legal professionals.
 
-**[Quick Start →](QUICKSTART.md)** · **[Architecture deep-dive →](https://lavern.ai/claw/how-it-works.html)** · **[lavern.ai](https://lavern.ai)**
+**[Quick Start →](QUICKSTART.md)** · **[Architecture deep-dive →](https://lavern.ai/architecture/)** · **[lavern.ai](https://lavern.ai)**
 
 ## What's in the box
 

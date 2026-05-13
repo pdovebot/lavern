@@ -62,7 +62,7 @@ describe('Debate Board', () => {
         finding_type: 'score',
         content: 'Test',
         severity: 'GREEN',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       expect(session.debate.findings[0].confidence).toBe(0.8);
@@ -74,7 +74,7 @@ describe('Debate Board', () => {
         finding_type: 'score',
         content: 'Test',
         severity: 'GREEN',
-        evidence: [],
+        evidence: ['quote'],
         confidence: 0.95,
       });
 
@@ -87,10 +87,37 @@ describe('Debate Board', () => {
         finding_type: 'score',
         content: 'Test',
         severity: 'RED',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       expect(session.debate.findings[0].resolved).toBe(false);
+    });
+
+    it('should reject findings posted without evidence', async () => {
+      const result = await postFinding.handler({
+        agent_role: 'design-reviewer',
+        finding_type: 'score',
+        content: 'A claim with no citation',
+        severity: 'RED',
+        evidence: [],
+      });
+
+      expect(result.content[0].text).toContain('Error');
+      expect(result.content[0].text.toLowerCase()).toContain('evidence');
+      expect(session.debate.findings).toHaveLength(0);
+    });
+
+    it('should reject findings whose evidence is all whitespace', async () => {
+      const result = await postFinding.handler({
+        agent_role: 'design-reviewer',
+        finding_type: 'score',
+        content: 'Another empty-cite attempt',
+        severity: 'RED',
+        evidence: ['   ', '\t', ''],
+      });
+
+      expect(result.content[0].text).toContain('Error');
+      expect(session.debate.findings).toHaveLength(0);
     });
   });
 
@@ -122,11 +149,32 @@ describe('Debate Board', () => {
         challenger_role: 'ethics-auditor',
         target_finding_id: 'F-999',
         challenge_text: 'This does not exist',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       expect(result.content[0].text).toContain('Error');
       expect(result.content[0].text).toContain('F-999');
+      expect(session.debate.challenges).toHaveLength(0);
+    });
+
+    it('should reject challenges posted without evidence', async () => {
+      await postFinding.handler({
+        agent_role: 'design-reviewer',
+        finding_type: 'score',
+        content: 'Original finding',
+        severity: 'GREEN',
+        evidence: ['Section 3'],
+      });
+
+      const result = await postChallenge.handler({
+        challenger_role: 'ethics-auditor',
+        target_finding_id: 'F-001',
+        challenge_text: 'I disagree, vibes',
+        evidence: [],
+      });
+
+      expect(result.content[0].text).toContain('Error');
+      expect(result.content[0].text.toLowerCase()).toContain('evidence');
       expect(session.debate.challenges).toHaveLength(0);
     });
   });
@@ -138,7 +186,7 @@ describe('Debate Board', () => {
         finding_type: 'score',
         content: 'Test',
         severity: 'GREEN',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       const result = await resolveDebate.handler({
@@ -165,7 +213,7 @@ describe('Debate Board', () => {
         finding_type: 'score',
         content: 'Test',
         severity: 'RED',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       expect(session.debate.findings[0].resolved).toBe(false);
@@ -190,7 +238,7 @@ describe('Debate Board', () => {
         finding_type: 'dark-pattern',
         content: 'Unclear pattern',
         severity: 'RED',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       const result = await resolveDebate.handler({
@@ -222,7 +270,7 @@ describe('Debate Board', () => {
         finding_type: 'dark-pattern',
         content: 'Manipulative modal',
         severity: 'RED',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       const result = await getUnresolvedDebates.handler({});
@@ -238,7 +286,7 @@ describe('Debate Board', () => {
         finding_type: 'dark-pattern',
         content: 'Manipulative modal',
         severity: 'RED',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       await resolveDebate.handler({
@@ -263,14 +311,14 @@ describe('Debate Board', () => {
         finding_type: 'score',
         content: 'All clear',
         severity: 'GREEN',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       await postChallenge.handler({
         challenger_role: 'ethics-auditor',
         target_finding_id: 'F-001',
         challenge_text: 'I disagree',
-        evidence: [],
+        evidence: ['quote'],
       });
 
       const result = await getUnresolvedDebates.handler({});
