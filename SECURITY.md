@@ -71,7 +71,7 @@ Lavern does **not** protect against:
 
 ## What we do not yet do (roadmap)
 
-- DNS-rebinding protection (resolve once, lock the IP for the fetch). Tracked in [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
+- DNS-rebinding protection (resolve once, lock the IP for the fetch).
 - PDF/DOCX parsing in a worker-thread sandbox with memory + wall-clock caps
 - Helmet-equivalent default security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy)
 - CSRF tokens on cookie-authed mutations beyond OAuth callbacks
