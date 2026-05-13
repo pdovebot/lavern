@@ -215,107 +215,14 @@ export function createAuthMiddleware(
   publicPaths: string[] = ['/health', '/'],
 ): (request: FastifyRequest, reply: FastifyReply) => Promise<void | FastifyReply> {
   return async (request: FastifyRequest, reply: FastifyReply) => {
-    const urlPath = request.url.split('?')[0];
-
-    const isPublic = publicPaths.some(p => {
-      // Method-specific: "GET /api/sessions" or "GET /api/sessions/*"
-      const spaceIdx = p.indexOf(' ');
-      if (spaceIdx > 0) {
-        const method = p.slice(0, spaceIdx);
-        const path = p.slice(spaceIdx + 1);
-        if (request.method !== method) return false;
-        // Wildcard prefix: "GET /api/sessions/*" matches /api/sessions/abc/events
-        // but NOT the base path itself (e.g., /api/sessions).
-        if (path.endsWith('/*')) {
-          const prefix = path.slice(0, -1); // "/api/sessions/"
-          return urlPath.startsWith(prefix);
-        }
-        return urlPath === path;
-      }
-      // Prefix match: paths ending with / (longer than 1 char)
-      if (p.endsWith('/') && p.length > 1) {
-        return urlPath.startsWith(p);
-      }
-      // Exact match
-      return urlPath === p;
-    });
-    if (isPublic) {
-      // Bug fix: even on public routes, opportunistically populate
-      // request.userId from the cookie (or Bearer) so that PER-ROUTE
-      // ownership checks can work. Previously the early return meant
-      // a logged-in user hitting `GET /api/sessions/:id/download` (a
-      // public capability-token route) had request.userId === undefined,
-      // and any `checkSessionOwnership()` call would 404 even with a
-      // valid cookie. We try both auth paths and silently ignore any
-      // failure — the route is public; auth is best-effort here.
-      const authHeader = request.headers.authorization;
-      if (authHeader?.startsWith('Bearer ')) {
-        const apiKey = authHeader.slice(7).trim();
-        if (apiKey) {
-          const client = registry.authenticate(apiKey);
-          if (client) {
-            (request as FastifyRequest & { client?: ClientIdentity; userId?: string }).client = client;
-            (request as FastifyRequest & { userId?: string }).userId = client.id;
-          }
-        }
-      } else {
-        const cookieToken = parseCookieToken(request.headers.cookie);
-        if (cookieToken) {
-          try {
-            const user = dbGetUserByToken(cookieToken);
-            if (user) {
-              (request as FastifyRequest & { userId?: string; user?: { id: string; email: string; displayName: string } }).userId = user.id;
-              (request as FastifyRequest & { user?: { id: string; email: string; displayName: string } }).user = {
-                id: user.id,
-                email: user.email,
-                displayName: user.display_name,
-              };
-            }
-          } catch {
-            // Public route — auth failure is fine, fall through.
-          }
-        }
-      }
-      return;
-    }
-
-    // Path 1: Bearer token auth (API clients / agents)
-    const authHeader = request.headers.authorization;
-    if (authHeader?.startsWith('Bearer ')) {
-      const apiKey = authHeader.slice(7).trim();
-      if (apiKey) {
-        const client = registry.authenticate(apiKey);
-        if (client) {
-          (request as FastifyRequest & { client?: ClientIdentity; userId?: string }).client = client;
-          (request as FastifyRequest & { userId?: string }).userId = client.id;
-          return;
-        }
-      }
-    }
-
-    // Path 2: Cookie-based auth (browser users)
-    const cookieToken = parseCookieToken(request.headers.cookie);
-    if (cookieToken) {
-      try {
-        const user = dbGetUserByToken(cookieToken);
-        if (user) {
-          (request as FastifyRequest & { userId?: string; user?: { id: string; email: string; displayName: string } }).userId = user.id;
-          (request as FastifyRequest & { user?: { id: string; email: string; displayName: string } }).user = {
-            id: user.id,
-            email: user.email,
-            displayName: user.display_name,
-          };
-          return;
-        }
-      } catch {
-        // DB not ready yet or token invalid — fall through to 401
-      }
-    }
-
-    // Neither auth method succeeded
-    const err = new Error('Authentication required. Provide: Authorization: Bearer <api_key> or login via /api/auth/login');
-    (err as Error & { statusCode: number }).statusCode = 401;
-    throw err;
+    // LOCAL MODE: bypass all auth, inject synthetic local user
+    (request as FastifyRequest & { userId?: string }).userId = 'local-user';
+    (request as FastifyRequest & { user?: { id: string; email: string; displayName: string } }).user = {
+      id: 'local-user',
+      email: 'local@localhost',
+      displayName: 'Local User',
+    };
+    // Original auth logic (Bearer token + cookie) removed — see git history
   };
 }
 

@@ -128,14 +128,9 @@ export default function FoyerView({ onPartner, onQuickStart, onMyPage, onLogin, 
         zIndex: 10,
         animation: 'foyerFade 0.8s ease 0.6s both',
       }}>
-        {isLoggedIn ? (
-          <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-            <NavLink onClick={onMyPage}>My Page</NavLink>
-            <NavLink onClick={() => userCtx!.logout()}>Logout</NavLink>
-          </div>
-        ) : (
-          <NavLink onClick={onLogin ?? (() => {})}>Log In</NavLink>
-        )}
+        <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+          <NavLink onClick={onMyPage}>My Page</NavLink>
+        </div>
       </div>
 
       {/* Center — headline + CTA */}
@@ -169,7 +164,7 @@ export default function FoyerView({ onPartner, onQuickStart, onMyPage, onLogin, 
             display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center',
             animation: 'foyerFade 0.8s ease 1.6s both',
           }}>
-            <PrimaryButton onClick={onPartner}>Speak to a Partner</PrimaryButton>
+            <PrimaryButton onClick={onDemo ?? (() => {})}>Talk is cheap.</PrimaryButton>
             <GhostButton onClick={onQuickStart}>Step In</GhostButton>
           </div>
         ) : (

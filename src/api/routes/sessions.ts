@@ -37,7 +37,7 @@ import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 import { DERIVATIVE_TYPES, DERIVATIVE_TYPE_LIST, buildFullContext } from '../derivatives/derivative-types.js';
 import { agentProfiles } from '../../agents/profiles.js';
 import { getOrchestratorForWorkflow } from '../../workflows/orchestrator-mapping.js';
-import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchivedSessionById, getRecentArchivedSessions, getUserById, logAuditEvent, holdBillableHours, debitBillableHours } from '../../db/database.js';
+import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchivedSessionById, getRecentArchivedSessions, getUserById, logAuditEvent, holdBillableHours, debitBillableHours, updateArchiveUserId } from '../../db/database.js';
 import type { Moment, Audience, Jurisdiction } from '../../types/index.js';
 import type { ClientIdentity } from '../../types/client.js';
 import { config } from '../../config.js';
@@ -189,11 +189,8 @@ export function registerSessionRoutes(
     const client = (request as typeof request & { client?: ClientIdentity }).client;
     const isAgent = client?.type === 'agent';
 
-    // v26: All session creation requires authentication
+    // LOCAL MODE: auth check removed — all sessions allowed
     const userId = (request as typeof request & { userId?: string }).userId;
-    if (!userId && !isAgent) {
-      return reply.status(401).send({ error: 'Authentication required. Please sign in to start a session.' });
-    }
 
     // Global daily spend cap — protect the founder's wallet
     const spendCheck = checkDailySpendCap();
@@ -224,48 +221,7 @@ export function registerSessionRoutes(
     // v21: Per-user monthly budget cap enforcement
     let sessionBudget = body.options?.budget ?? config.defaultBudgetUsd;
 
-    if (userId) {
-      const budgetCheck = canStartSession(userId);
-      if (!budgetCheck.allowed) {
-        return reply.status(402).send({
-          error: 'No billable hours remaining',
-          detail: budgetCheck.reason,
-          remainingHours: 0,
-        });
-      }
-      // Cap session budget to remaining monthly budget and plan limit
-      const planLimits = getPlanLimits((await import('../../db/database.js')).getUserPlan(userId)?.plan ?? 'free');
-      sessionBudget = Math.min(sessionBudget, budgetCheck.remainingBudget, planLimits.maxSessionBudget);
-    }
-
-    // Mass-action detection — flag or block bulk legal document generation
-    const workflowId = body.workflow ?? 'default';
-    const requestText = body.request?.requestText ?? '';
-    let massActionFlagReason: string | undefined;
-    if (userId) {
-      const massCheck = massActionGuard.check(userId, workflowId, requestText);
-      if (massCheck.flagged) {
-        massActionFlagReason = massCheck.reason;
-        logger.warn('Mass-action pattern detected', {
-          userId,
-          reason: massCheck.reason,
-          templateCount: massCheck.templateCount,
-          similarCount: massCheck.similarCount,
-        });
-        logAuditEvent({
-          userId,
-          action: 'mass_action_detected',
-          resource: `template:${workflowId} count:${massCheck.templateCount}`,
-        });
-        if (!massCheck.allowed) {
-          return reply.status(429).send({
-            error: 'Mass-action pattern detected',
-            detail: massCheck.reason,
-            message: 'This looks like bulk document generation. If this is legitimate, please contact support.',
-          });
-        }
-      }
-    }
+    // LOCAL MODE: billing + mass-action checks removed
 
     const gateResolver = yoloMode
       ? new AutoApproveGateResolver()
@@ -282,21 +238,13 @@ export function registerSessionRoutes(
     // Audit: session creation
     logAuditEvent({ userId: userId || undefined, action: 'session_create', resource: `session:${session.id}`, ip: request.ip, userAgent: request.headers['user-agent'] });
 
-    // Store mass-action flag so ethics-reviewer can see it in session context
-    if (massActionFlagReason) {
-      (session as unknown as Record<string, unknown>).massActionFlagged = massActionFlagReason;
-    }
-
     // v14: Attach user identity for session archiving
     if (userId) {
       session.userId = userId;
+      // Update the early-archive row with the user ID
+      try { updateArchiveUserId(session.id, userId); } catch { /* non-fatal */ }
 
-      // v25: Place hold on billable hours to prevent TOCTOU race between balance check and debit
-      const holdHours = sessionBudget / config.billableHours.rate;
-      if (!holdBillableHours(userId, holdHours, session.id)) {
-        sessionManager.destroySession(session.id, 'Insufficient billable hours');
-        return reply.status(402).send({ error: 'Insufficient billable hours', remainingHours: 0 });
-      }
+      // LOCAL MODE: billable hours hold removed
 
       // v17: Load soul from user profile
       try {

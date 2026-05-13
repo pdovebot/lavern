@@ -18,9 +18,16 @@ interface Props {
 }
 
 export function AuthGate({ children }: Props) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  // In standalone mode, skip auth check — render children immediately
-  const [checking, setChecking] = useState(!IS_STANDALONE);
+  // LOCAL MODE: synthetic user, no auth check
+  const [user, setUser] = useState<AuthUser | null>({
+    id: 'local-user',
+    email: 'local@localhost',
+    displayName: 'Local User',
+    firmName: '',
+    profile: {},
+    emailVerified: true,
+  });
+  const [checking, setChecking] = useState(false);
 
   // Check for existing session on mount (API mode only)
   useEffect(() => {

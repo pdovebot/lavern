@@ -14,7 +14,7 @@
 
 import { SessionState } from './session-state.js';
 import type { GateResolver } from '../gates/gate-resolver.js';
-import { archiveSession, releaseHold } from '../db/database.js';
+import { archiveSession, releaseHold, earlyArchiveSession } from '../db/database.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 import { captureError } from '../utils/sentry.js';
@@ -68,6 +68,14 @@ export class SessionManager {
       // Reset TTL warning so it can fire again if session goes idle later
       entry.ttlWarned = false;
     });
+
+    // Persist a minimal row immediately so the session survives server restarts.
+    // The row is updated with findings/deliverable on session_end.
+    try {
+      earlyArchiveSession(session);
+    } catch (err) {
+      log.warn(`[SESSION] Failed to early-archive session ${session.id}:`, err);
+    }
 
     // Archive to SQLite when session completes (guard against double archival)
     session.events.on('session_end', () => {

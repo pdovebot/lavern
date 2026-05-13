@@ -160,30 +160,18 @@ export default function LobbyView({ onEnter, onMyPage, onLogin, onAgentDocs, onD
         className="absolute top-0 left-0 right-0 flex justify-between p-4 sm:p-5 lg:px-9 lg:py-7 z-10"
         style={{ animation: 'lobbyFadeIn 0.8s ease 2.4s both' }}
       >
-        {isLoggedIn ? (
-          <>
-            {onAgentDocs && (
-              <ShimmerButton onClick={onAgentDocs}>
-                Agent API {'\u2192'}
-              </ShimmerButton>
-            )}
-            <div className="flex gap-2 sm:gap-2.5 items-center">
-              <ShimmerButton onClick={onMyPage}>
-                My Page
-              </ShimmerButton>
-              <ShimmerButton onClick={() => { userCtx!.logout(); }}>
-                Logout
-              </ShimmerButton>
-            </div>
-          </>
-        ) : (
-          <>
-            <div />
-            <ShimmerButton onClick={onLogin ?? (() => {})}>
-              Sign In
+        <>
+          {onAgentDocs && (
+            <ShimmerButton onClick={onAgentDocs}>
+              Agent API {'\u2192'}
             </ShimmerButton>
-          </>
-        )}
+          )}
+          <div className="flex gap-2 sm:gap-2.5 items-center">
+            <ShimmerButton onClick={onMyPage}>
+              My Page
+            </ShimmerButton>
+          </div>
+        </>
       </div>
 
       {/* ── Center — firm name ──────────────────────────────────── */}

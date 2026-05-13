@@ -74,7 +74,7 @@ export const YOLO_CONFIGS: Record<YoloTier, YoloConfig> = {
     tier: 'elite',
     label: 'Full Bench',
     workflowId: 'full-bench',
-    requestType: 'transformative_engagement',
+    requestType: 'general',
     intensity: 'maximum',
     effort: 'max',
     budgetUsd: 125,

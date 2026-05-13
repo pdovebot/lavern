@@ -720,6 +720,39 @@ export interface ArchivedSession {
   duration_ms: number;
 }
 
+/**
+ * Write a minimal archive row at session creation so it appears in My Cases
+ * even if the session never reaches completion (crash, restart, error).
+ * Uses INSERT OR IGNORE so it's safe to call multiple times.
+ */
+export function earlyArchiveSession(session: SessionState): void {
+  const db = getDb();
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT OR IGNORE INTO session_archive
+    (id, user_id, title, status, workflow_id, team_roles, findings_count,
+     resolutions_count, cost_usd, budget_usd, final_output, assembled_document,
+     summary_json, created_at, completed_at, duration_ms)
+    VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, ?, NULL, NULL, '{}', ?, NULL, NULL)
+  `).run(
+    session.id,
+    session.userId ?? null,
+    'Untitled Analysis',
+    'running',
+    session.workflowTemplateId ?? null,
+    JSON.stringify(session.selectedTeam ?? []),
+    session.budgetUsd,
+    now,
+  );
+}
+
+/**
+ * Update the early-archive row with the user ID (set after session creation).
+ */
+export function updateArchiveUserId(sessionId: string, userId: string): void {
+  getDb().prepare(`UPDATE session_archive SET user_id = ? WHERE id = ? AND user_id IS NULL`).run(userId, sessionId);
+}
+
 export function archiveSession(session: SessionState, userId: string | null): void {
   const db = getDb();
   const now = new Date().toISOString();
@@ -756,11 +789,11 @@ export function archiveSession(session: SessionState, userId: string | null): vo
 
   // Wrap everything in a transaction so usage/debit/archive stay consistent
   db.transaction(() => {
-    // Guard against double-archival: check if this session was already archived before debiting.
-    // Without this check, INSERT OR IGNORE silently skips the row insert while the debit/usage
-    // increments still execute, causing double charges.
-    const alreadyArchived = db.prepare(`SELECT 1 FROM session_archive WHERE id = ?`).get(session.id);
-    if (alreadyArchived) return;
+    // Guard against double-archival: only debit/bill once.
+    // The row may already exist from earlyArchiveSession() — that's fine,
+    // we UPDATE it below. But if status is already 'completed' we skip billing.
+    const existing = db.prepare(`SELECT status FROM session_archive WHERE id = ?`).get(session.id) as { status: string } | undefined;
+    if (existing?.status === 'completed') return;
 
     // NOTE: Daily spend tracking happens in real time via session.updateCost()
     // (which calls recordSpend() with each delta). Do NOT record again here —
@@ -794,12 +827,28 @@ export function archiveSession(session: SessionState, userId: string | null): vo
       }
     }
 
+    // Upsert: update the early-archive row (or insert if it doesn't exist)
     db.prepare(`
-      INSERT OR IGNORE INTO session_archive
+      INSERT INTO session_archive
       (id, user_id, title, status, workflow_id, team_roles, findings_count,
        resolutions_count, cost_usd, budget_usd, final_output, assembled_document,
        summary_json, created_at, completed_at, duration_ms)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        user_id = excluded.user_id,
+        title = excluded.title,
+        status = excluded.status,
+        workflow_id = excluded.workflow_id,
+        team_roles = excluded.team_roles,
+        findings_count = excluded.findings_count,
+        resolutions_count = excluded.resolutions_count,
+        cost_usd = excluded.cost_usd,
+        budget_usd = excluded.budget_usd,
+        final_output = excluded.final_output,
+        assembled_document = excluded.assembled_document,
+        summary_json = excluded.summary_json,
+        completed_at = excluded.completed_at,
+        duration_ms = excluded.duration_ms
     `).run(
       session.id,
       userId,
@@ -891,7 +940,7 @@ export function updateArchivedDocument(
 export function getSessionArchive(userId: string, limit = 50): ArchivedSession[] {
   return getDb().prepare(`
     SELECT * FROM session_archive WHERE user_id = ?
-    ORDER BY completed_at DESC LIMIT ?
+    ORDER BY COALESCE(completed_at, created_at) DESC LIMIT ?
   `).all(userId, limit) as ArchivedSession[];
 }
 
