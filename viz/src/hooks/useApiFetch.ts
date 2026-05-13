@@ -57,15 +57,28 @@ async function interceptResponse(res: Response, url: string): Promise<void> {
   if (!url.startsWith('/api/')) return;
 
   if (res.status === 401) {
+    return; // LOCAL MODE: no auth expiration
     // Skip ALL auth-related endpoints — a 401 here means "not logged in",
     // not "session expired". AuthGate handles this silently.
     if (url.startsWith('/api/auth/')) return;
     // Only show "expired" if the user was actually logged in. If there's
     // no evidence of a prior session, this is just an unauthenticated
     // visit hitting a protected endpoint — not an expiration event.
-    const hadSession = document.cookie.includes('lavern_token') ||
-      sessionStorage.getItem('shem-session-id') !== null;
+    // Note: lavern_token is HttpOnly so document.cookie can't see it —
+    // check sessionStorage and also verify with the server before
+    // triggering a destructive logout.
+    const hadSession = sessionStorage.getItem('shem-session-id') !== null;
     if (!hadSession) return;
+    // Verify session is truly expired before destructive logout.
+    // A transient 401 (DB hiccup, race condition) should not permanently
+    // delete the user's auth token.
+    try {
+      const verifyRes = await originalFetchRef('/api/auth/me', { credentials: 'include' });
+      if (verifyRes.ok) return; // Session is actually fine — skip logout
+    } catch {
+      // Network error during verification — don't logout on connectivity issues
+      return;
+    }
     dispatchApiError('auth-expired', 'Your session has expired. Please sign in again.', 401);
     return;
   }
@@ -98,6 +111,9 @@ async function interceptResponse(res: Response, url: string): Promise<void> {
 // ── Global fetch interceptor (install once at startup) ────────────────
 
 let installed = false;
+// Reference to the un-patched fetch so interceptResponse can verify
+// session status without going through the interceptor (avoids recursion).
+let originalFetchRef: typeof window.fetch = window.fetch.bind(window);
 
 /**
  * Install a global fetch interceptor that monitors all responses to /api/* URLs.
@@ -109,6 +125,7 @@ export function installApiInterceptor(): void {
   installed = true;
 
   const originalFetch = window.fetch.bind(window);
+  originalFetchRef = originalFetch;
 
   window.fetch = async function interceptedFetch(
     input: RequestInfo | URL,

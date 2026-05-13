@@ -23,7 +23,7 @@
  * - Evaluator Gate: Automated quality checking for specialist deliverables
  */
 
-import { createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
+import { createSdkMcpServer, type SdkMcpToolDefinition } from '@anthropic-ai/claude-agent-sdk';
 import { createDebateBoardTools } from './tools/debate-board.js';
 import { scoringEngineTools } from './tools/scoring-engine.js';
 import { createApprovalTools } from './tools/approval-gate.js';
@@ -57,6 +57,55 @@ import type { WorkflowTemplate } from '../types/workflow.js';
 import { config } from '../config.js';
 
 /**
+ * Builds the full Shem tool array for a session. This is the canonical
+ * source of truth for the tools every provider exposes — the Anthropic
+ * path wraps it in `createSdkMcpServer` below, while the Mistral / local
+ * paths consume the array directly via `tool-converter.ts` (they don't
+ * have a usable SDK MCP wrapper).
+ *
+ * Keeping this as a separate exported function means a new tool gets
+ * added in one place and reaches every provider automatically.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function buildShemTools(session: SessionState, template?: WorkflowTemplate): Array<SdkMcpToolDefinition<any>> {
+  // Use generic workflow engine for non-legal-design templates
+  const workflowTools = template && template.id !== 'legal-design'
+    ? createGenericWorkflowTools(session, template)
+    : createWorkflowTools(session);
+
+  return [
+    ...createDebateBoardTools(session),
+    ...scoringEngineTools,  // Stateless — no session needed
+    ...createApprovalTools(session),
+    ...workflowTools,
+    ...createVerificationTools(session),
+    ...createMemoryTools(session),
+    // v4: Learning & Testing
+    ...createReportCardTools(session),
+    ...createFeedbackLoopTools(session),
+    ...createBaselineTools(session),
+    ...createLegalMdTools(session),
+    ...createReplayTestingTools(session),
+    // v5: Evaluator Gate
+    ...createEvaluatorGateTools(session),
+    // v6: Risk Pricing
+    ...createRiskPricingTools(session),
+    // v8: Pre-Engagement
+    ...createPreEngagementTools(session),
+    // v11: Quality Check Iteration Loops
+    ...createQualityCheckTools(session),
+    // v12: Document Reader
+    ...createDocumentReaderTools(session),
+    // v15: Knowledge Base — searchable reference document collections
+    ...createKnowledgeBaseTools(session),
+    // Handoff Templates — structured phase-transition summaries
+    ...createHandoffTools(session),
+    // v16: Document Structure & Formatting Checks
+    ...createDocumentCheckTools(session),
+  ];
+}
+
+/**
  * Creates the Shem MCP server.
  *
  * @param session - The session state
@@ -64,43 +113,9 @@ import { config } from '../config.js';
  *                   uses generic workflow tools instead of hardcoded workflow engine.
  */
 export function createShemMcpServer(session: SessionState, template?: WorkflowTemplate) {
-  // Use generic workflow engine for non-legal-design templates
-  const workflowTools = template && template.id !== 'legal-design'
-    ? createGenericWorkflowTools(session, template)
-    : createWorkflowTools(session);
-
   return createSdkMcpServer({
     name: 'shem',
     version: config.version,
-    tools: [
-      ...createDebateBoardTools(session),
-      ...scoringEngineTools,  // Stateless — no session needed
-      ...createApprovalTools(session),
-      ...workflowTools,
-      ...createVerificationTools(session),
-      ...createMemoryTools(session),
-      // v4: Learning & Testing
-      ...createReportCardTools(session),
-      ...createFeedbackLoopTools(session),
-      ...createBaselineTools(session),
-      ...createLegalMdTools(session),
-      ...createReplayTestingTools(session),
-      // v5: Evaluator Gate
-      ...createEvaluatorGateTools(session),
-      // v6: Risk Pricing
-      ...createRiskPricingTools(session),
-      // v8: Pre-Engagement
-      ...createPreEngagementTools(session),
-      // v11: Quality Check Iteration Loops
-      ...createQualityCheckTools(session),
-      // v12: Document Reader
-      ...createDocumentReaderTools(session),
-      // v15: Knowledge Base — searchable reference document collections
-      ...createKnowledgeBaseTools(session),
-      // Handoff Templates — structured phase-transition summaries
-      ...createHandoffTools(session),
-      // v16: Document Structure & Formatting Checks
-      ...createDocumentCheckTools(session),
-    ],
+    tools: buildShemTools(session, template),
   });
 }

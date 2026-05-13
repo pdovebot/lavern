@@ -130,6 +130,7 @@ export function HeartbeatBand({
         cost={cost}
         certaintyPct={certaintyPct}
         billableHours={billableHours}
+        frozen={currentStep === 'delivered' || completedSteps.includes('delivered')}
       />
     </nav>
   );

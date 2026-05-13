@@ -89,7 +89,7 @@ export const config = {
 
   // ── API ────────────────────────────────────────────────────────────────
   port: safeInt(process.env.SHEM_PORT, 3000),
-  host: process.env.SHEM_HOST ?? '0.0.0.0',
+  host: process.env.SHEM_HOST ?? '127.0.0.1',
   corsOrigins: process.env.SHEM_CORS_ORIGINS ?? 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000',
   baseUrl: process.env.SHEM_BASE_URL ?? 'http://localhost:3000',
   trustProxy: process.env.SHEM_TRUST_PROXY === 'true',

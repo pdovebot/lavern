@@ -16,14 +16,14 @@
  * tool calls rather than subprocess spawning.
  */
 
-import { createShemMcpServer } from '../mcp/server.js';
+import { buildShemTools } from '../mcp/server.js';
 import { agentProfiles } from '../agents/profiles.js';
 import { getOrchestratorForWorkflow } from '../workflows/orchestrator-mapping.js';
 import { eventTimestamp } from '../events/event-bus.js';
 import { handleSessionError } from '../utils/error-recovery.js';
 import { config } from '../config.js';
 import { mistralChat } from './mistral.js';
-import { buildToolRegistry, type McpServer } from './tool-converter.js';
+import { buildToolRegistry } from './tool-converter.js';
 import { assembleMistralDocument } from './mistral-assembler.js';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
@@ -123,12 +123,12 @@ export async function runMistralWorkflow(
   // ── Build user prompt (reuse existing logic) ──────────────────────
   const userPrompt = buildPromptFromRequest(request, template, classification, session);
 
-  // ── Build tool registry from MCP server ───────────────────────────
-  // The SDK MCP server type is structurally compatible with our McpServer
-  // interface (listTools + callTool), but TypeScript can't verify this
-  // across SDK boundaries — hence the explicit cast via unknown.
-  const mcpServer: McpServer = createShemMcpServer(session, template) as unknown as McpServer;
-  const toolRegistry = await buildToolRegistry(mcpServer);
+  // ── Build tool registry from raw tool array ───────────────────────
+  // The SDK's createSdkMcpServer returns an opaque `{ type, name, instance }`
+  // envelope, not a callable MCP server — we build the registry directly
+  // from the same tool array that the Anthropic path wraps. See the
+  // `buildShemTools` exporter in src/mcp/server.ts.
+  const toolRegistry = buildToolRegistry(buildShemTools(session, template));
 
   // ── Initialize conversation ───────────────────────────────────────
   const messages: ChatMessage[] = [
@@ -291,6 +291,29 @@ export async function runMistralWorkflow(
       timestamp: eventTimestamp(),
     });
   }
+
+  // Advance workflow state so the polling sync doesn't reset the UI back to
+  // 'intake' after session_end (mirror of local-executor.ts).
+  const previousStep = session.workflow.currentStep;
+  if (!session.workflow.completedSteps.includes(previousStep)) {
+    session.workflow.completedSteps.push(previousStep);
+  }
+  session.workflow.currentStep = 'delivered';
+  session.workflow.lastTransitionAt = new Date().toISOString();
+  if (session.genericWorkflow) {
+    const gwPrevious = session.genericWorkflow.currentStep;
+    if (!session.genericWorkflow.completedSteps.includes(gwPrevious)) {
+      session.genericWorkflow.completedSteps.push(gwPrevious);
+    }
+    session.genericWorkflow.currentStep = 'delivered';
+    session.genericWorkflow.lastTransitionAt = new Date().toISOString();
+  }
+  session.events.emitEvent({
+    type: 'workflow_step',
+    step: 'delivered',
+    previousStep,
+    timestamp: eventTimestamp(),
+  });
 
   // Emit session_end — assembly is complete
   session.events.emitEvent({

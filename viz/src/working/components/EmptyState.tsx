@@ -66,7 +66,7 @@ export function EmptyState({ isConnected, team }: EmptyStateProps) {
 
       {isConnected && (
         <p style={styles.reassurance}>
-          This is completely normal \u2014 sit back and watch the magic happen {'\u2728'}
+          This is completely normal {'\u2014'} sit back and watch the magic happen {'\u2728'}
         </p>
       )}
     </div>

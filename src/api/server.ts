@@ -73,6 +73,7 @@ export async function startApiServer(port: number): Promise<void> {
   const isProd = config.isProduction;
   const fastify = Fastify({
     trustProxy: config.trustProxy,
+    disableRequestLogging: true,
     logger: {
       level: config.logLevel === 'debug' ? 'debug' : 'info',
       ...(isProd ? {} : {
@@ -85,6 +86,18 @@ export async function startApiServer(port: number): Promise<void> {
         },
       }),
     },
+  });
+
+  fastify.addHook('onResponse', (request, reply, done) => {
+    if (reply.statusCode >= 400) {
+      request.log.warn({
+        method: request.method,
+        url: request.url,
+        statusCode: reply.statusCode,
+        responseTime: reply.elapsedTime,
+      }, 'request failed');
+    }
+    done();
   });
 
   // ── Plugins ──────────────────────────────────────────────────────────
@@ -259,6 +272,7 @@ export async function startApiServer(port: number): Promise<void> {
   const publicPaths: string[] = [
     '/health',
     '/health/capacity',
+    '/api/health',
     '/',
     // Session access — individual session detail/WS is public (session ID is a capability token).
     // Archive endpoints (GET /api/sessions/archive[/...]) explicitly enforce
@@ -429,6 +443,13 @@ export async function startApiServer(port: number): Promise<void> {
   });
 
   // ── Routes ───────────────────────────────────────────────────────────
+
+  // HEAD /health + /api/health — for liveness probes (curl -I, uptime checks, menubar app) that only care about the status code.
+  const headHealth = async (_request: unknown, reply: { code: (n: number) => { send: () => void } }) => {
+    reply.code(200).send();
+  };
+  fastify.head('/health', headHealth);
+  fastify.head('/api/health', headHealth);
 
   // Health check — shallow (fast, for load balancers) + deep (checks dependencies)
   fastify.get('/health', async (request) => {

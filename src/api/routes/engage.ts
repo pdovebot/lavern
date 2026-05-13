@@ -417,19 +417,8 @@ export function registerEngageRoutes(
     const intensity: IntensityLevel = body.constraints?.intensity ?? 'standard';
     let budgetUsd = body.constraints?.maxBudgetUsd ?? defaultBudgetForIntensity(intensity);
 
-    // v23: Budget enforcement — same check as sessions.ts POST /api/sessions
+    // LOCAL MODE: billing enforcement removed
     const userId = (request as FastifyRequest & { userId?: string }).userId;
-    if (userId) {
-      const budgetCheck = canStartSession(userId);
-      if (!budgetCheck.allowed) {
-        return reply.status(402).send({
-          error: 'No billable hours remaining',
-          detail: budgetCheck.reason,
-          remainingHours: 0,
-        });
-      }
-      budgetUsd = Math.min(budgetUsd, budgetCheck.remainingBudget);
-    }
 
     // Select gate resolver based on mode and client config
     const gateResolver = body.mode === 'webhook' && body.callbackUrl
@@ -442,13 +431,8 @@ export function registerEngageRoutes(
       budgetUsd,
     });
 
-    // v25: Place hold on billable hours to prevent TOCTOU race
+    // LOCAL MODE: billable hours hold removed
     if (userId) {
-      const holdHours = budgetUsd / config.billableHours.rate;
-      if (!holdBillableHours(userId, holdHours, session.id)) {
-        sessionManager.destroySession(session.id, 'Insufficient billable hours');
-        return reply.status(402).send({ error: 'Insufficient billable hours', remainingHours: 0 });
-      }
       session.userId = userId;
     }
 

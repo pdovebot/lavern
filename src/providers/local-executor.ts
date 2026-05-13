@@ -16,15 +16,15 @@
  * tool calls rather than subprocess spawning.
  */
 
-import { createShemMcpServer } from '../mcp/server.js';
+import { buildShemTools } from '../mcp/server.js';
 import { agentProfiles } from '../agents/profiles.js';
 import { getOrchestratorForWorkflow } from '../workflows/orchestrator-mapping.js';
 import { eventTimestamp } from '../events/event-bus.js';
 import { handleSessionError } from '../utils/error-recovery.js';
 import { config } from '../config.js';
 import { localChat } from './local.js';
-import { buildToolRegistry, type McpServer } from './tool-converter.js';
-import { assembleMistralDocument } from './mistral-assembler.js';
+import { buildToolRegistry } from './tool-converter.js';
+import { assembleLocalDocument } from './local-assembler.js';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import type { SessionState } from '../session/session-state.js';
@@ -123,12 +123,12 @@ export async function runLocalWorkflow(
   // ── Build user prompt (reuse existing logic) ──────────────────────
   const userPrompt = buildPromptFromRequest(request, template, classification, session);
 
-  // ── Build tool registry from MCP server ───────────────────────────
-  // The SDK MCP server type is structurally compatible with our McpServer
-  // interface (listTools + callTool), but TypeScript can't verify this
-  // across SDK boundaries — hence the explicit cast via unknown.
-  const mcpServer: McpServer = createShemMcpServer(session, template) as unknown as McpServer;
-  const toolRegistry = await buildToolRegistry(mcpServer);
+  // ── Build tool registry from raw tool array ───────────────────────
+  // The SDK's createSdkMcpServer returns an opaque `{ type, name, instance }`
+  // envelope, not a callable MCP server — we build the registry directly
+  // from the same tool array that the Anthropic path wraps. See the
+  // `buildShemTools` exporter in src/mcp/server.ts.
+  const toolRegistry = buildToolRegistry(buildShemTools(session, template));
 
   // ── Initialize conversation ───────────────────────────────────────
   const messages: ChatMessage[] = [
@@ -272,7 +272,7 @@ export async function runLocalWorkflow(
 
   // ── Document assembly (via Local) ─────────────────────────────────
   try {
-    session.assembledDocument = await assembleMistralDocument(session, request);
+    session.assembledDocument = await assembleLocalDocument(session, request);
 
     if (!session.assembledDocument) {
       session.events.emitEvent({
@@ -291,6 +291,34 @@ export async function runLocalWorkflow(
       timestamp: eventTimestamp(),
     });
   }
+
+  // Advance workflow state so the polling sync doesn't reset the UI back to
+  // 'intake' after session_end. The local path doesn't emit per-step
+  // workflow_step events, so currentStep would otherwise stay at its initial
+  // 'intake' value forever.
+  const previousStep = session.workflow.currentStep;
+  if (!session.workflow.completedSteps.includes(previousStep)) {
+    session.workflow.completedSteps.push(previousStep);
+  }
+  session.workflow.currentStep = 'delivered';
+  session.workflow.lastTransitionAt = new Date().toISOString();
+  // /api/sessions/:id reads `genericWorkflow?.currentStep ?? workflow.currentStep`,
+  // so if the agent ever initialized genericWorkflow we must advance it too —
+  // otherwise the polling sync overrides the WS-driven 'delivered' state.
+  if (session.genericWorkflow) {
+    const gwPrevious = session.genericWorkflow.currentStep;
+    if (!session.genericWorkflow.completedSteps.includes(gwPrevious)) {
+      session.genericWorkflow.completedSteps.push(gwPrevious);
+    }
+    session.genericWorkflow.currentStep = 'delivered';
+    session.genericWorkflow.lastTransitionAt = new Date().toISOString();
+  }
+  session.events.emitEvent({
+    type: 'workflow_step',
+    step: 'delivered',
+    previousStep,
+    timestamp: eventTimestamp(),
+  });
 
   // Emit session_end — assembly is complete
   session.events.emitEvent({

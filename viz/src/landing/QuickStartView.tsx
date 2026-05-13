@@ -284,7 +284,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           {/* Billable Hours — pricing */}
           {onPricing && (
             <div className="flex items-center gap-2">
-              <button
+              {/* <button
                 onClick={onPricing}
                 className="cursor-pointer bg-transparent border-none transition-all duration-300 ease-in-out"
                 style={{
@@ -301,7 +301,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
                 onMouseLeave={() => setPricingHovered(false)}
               >
                 The Billable Hours
-              </button>
+              </button> */}
               {billableBalance != null && billableBalance <= 0 && (
                 <button
                   onClick={onPricing}
@@ -373,15 +373,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           <ShimmerButton onClick={() => { window.location.hash = '#/my-page'; }} className="px-[14px] py-1.5 text-[10px]">
             My Page
           </ShimmerButton>
-          {!isLoggedIn ? (
-            <ShimmerButton onClick={() => { window.location.hash = '#/login'; }} className="px-[14px] py-1.5 text-[10px]">
-              Sign In
-            </ShimmerButton>
-          ) : (
-            <ShimmerButton onClick={() => { userCtx!.logout(); }} className="px-[14px] py-1.5 text-[10px]">
-              Sign Out
-            </ShimmerButton>
-          )}
+          {/* LOCAL MODE: auth buttons removed */}
         </div>
       </div>
 
