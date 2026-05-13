@@ -50,7 +50,10 @@ const SessionOptionsSchema = z.object({
   budget: z.number().min(0.01).max(500).optional(),
   model: z.string().min(1).max(100).optional(),
   maxTurns: z.number().int().min(1).max(500).optional(),
-  intensity: z.enum(['quick', 'standard', 'thorough', 'maximal', 'maximum']).optional(),
+  intensity: z
+    .enum(['quick', 'standard', 'thorough', 'maximal', 'maximum'])
+    .transform((v) => (v === 'maximum' ? 'maximal' : v))
+    .optional(),
   /** Claude API effort — overrides intensity-derived effort when set explicitly. */
   effort: z.enum(['low', 'medium', 'high', 'max']).optional(),
   yoloMode: z.boolean().optional(),
