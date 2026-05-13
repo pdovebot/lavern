@@ -9,10 +9,19 @@ git clone https://github.com/AnttiHero/lavern.git
 cd lavern
 npm install
 (cd viz && npm install)
-npm run dev -- --serve
 ```
 
-The dashboard opens at `http://localhost:3000`. Demo mode works without an API key — see [QUICKSTART.md](QUICKSTART.md) for the full first-engagement walkthrough.
+Then run two processes — the API server and the dashboard:
+
+```bash
+# Terminal 1 — API server on :3000 (demo mode, no API key required)
+npm run serve:dev
+
+# Terminal 2 — dashboard on :5173 (Vite, hot reload)
+cd viz && npm run dev
+```
+
+The dashboard opens at <http://localhost:5173>. Demo mode works without an API key — see [QUICKSTART.md](QUICKSTART.md) for the full first-engagement walkthrough.
 
 ## Design principle: every agent must be challengeable
 
@@ -116,6 +125,14 @@ echo "npm run protect" > .husky/pre-commit
 ```
 
 The allowlist for known-benign test-fixture matches lives in [`.gitleaks.toml`](.gitleaks.toml) at repo root. If a new false positive surfaces, add a tight path or regex entry there rather than disabling the rule globally.
+
+## Licensing of contributions
+
+Lavern is distributed under the [Apache License, Version 2.0](LICENSE). When you submit a contribution — code, docs, agent prompts, anything in this repo — you agree that it will be licensed under those same terms. This follows from Apache 2.0 §5 ("Submission of Contributions"), which states that any contribution intentionally submitted for inclusion is licensed under the Apache License unless you explicitly say otherwise. By opening a pull request, you confirm that you have the right to make the contribution and to license it this way.
+
+If your contribution includes patented techniques you hold, the Apache 2.0 license grants users a license to those patents for use within the work — but only to the extent of your contribution. The patent-retaliation clause (§3) protects everyone: anyone who initiates patent litigation against the project loses their patent license.
+
+We don't require a separate CLA. The license itself is the agreement.
 
 ## Questions
 

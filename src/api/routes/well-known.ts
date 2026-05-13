@@ -115,6 +115,11 @@ function buildOpenApiSpec() {
       description: 'Structured legal intelligence for AI agents. Submit tasks, receive analysis.',
       version: config.version,
       contact: { email: 'agents@lavern.ai' },
+      license: {
+        name: 'Apache License, Version 2.0',
+        identifier: 'Apache-2.0',
+        url: 'https://www.apache.org/licenses/LICENSE-2.0',
+      },
     },
     servers: [
       { url: config.baseUrl, description: 'Lavern API' },
