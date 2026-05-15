@@ -442,6 +442,44 @@ function runMigrations(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_ut_type ON user_tokens(type);
   `);
 
+  // v0.14.3 backfill: rename placeholder titles ('Untitled', 'Untitled
+  // Analysis', 'Session Results') on existing rows. We don't keep the original
+  // request/document name in the archive, so the best we can do for old rows
+  // is workflow label + creation date — at least each row becomes
+  // distinguishable in My Cases.
+  try {
+    const placeholders = ['Untitled', 'Untitled Analysis', 'Session Results'];
+    const stale = db.prepare(
+      `SELECT id, workflow_id, created_at FROM session_archive
+       WHERE title IS NULL OR title = '' OR title IN (${placeholders.map(() => '?').join(',')})`,
+    ).all(...placeholders) as Array<{ id: string; workflow_id: string | null; created_at: string }>;
+    if (stale.length > 0) {
+      const labels: Record<string, string> = {
+        counsel: 'Counsel',
+        review: 'Review',
+        roundtable: 'Full Bench',
+        'legal-design': 'Full Bench',
+        adversarial: 'Research',
+        'full-bench': 'Full Bench',
+        verification: 'Verification',
+        tabulate: 'Tabulate',
+        'pre-engagement': 'Intake',
+      };
+      const update = db.prepare(`UPDATE session_archive SET title = ? WHERE id = ?`);
+      const tx = db.transaction((rows: typeof stale) => {
+        for (const r of rows) {
+          const label = (r.workflow_id && labels[r.workflow_id]) || 'Session';
+          let dateStr = '';
+          try {
+            dateStr = new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          } catch { /* leave blank */ }
+          update.run(dateStr ? `${label} — ${dateStr}` : label, r.id);
+        }
+      });
+      tx(stale);
+    }
+  } catch { /* non-fatal */ }
+
   // Local-mode bootstrap: ensure the synthetic 'local-user' row exists so that
   // session_archive / matters / etc. FK constraints don't fail in dev.
   // Auth middleware injects userId='local-user' unconditionally in local mode.
@@ -760,6 +798,8 @@ function completedStepsCount(session: SessionState): number {
  * "Session Results" (the same fallback the live UI used to compute on render).
  */
 function deriveSessionTitle(session: SessionState): string {
+  const explicit = session.title?.trim();
+  if (explicit) return explicit;
   const matterTitle = session.matterRecord?.title?.trim();
   if (matterTitle) return matterTitle;
   const firstDoc = session.documents[0]?.name?.trim();
@@ -794,6 +834,18 @@ export function earlyArchiveSession(session: SessionState): void {
  */
 export function updateArchiveUserId(sessionId: string, userId: string): void {
   getDb().prepare(`UPDATE session_archive SET user_id = ? WHERE id = ? AND user_id IS NULL`).run(userId, sessionId);
+}
+
+/**
+ * Overwrite the title on an existing archive row. Called from the session
+ * create path once we know the matter / requestText / first document name —
+ * without it, the row keeps the fallback "Session Results" forever and My
+ * Cases lists every past session as the same string.
+ */
+export function updateArchiveTitle(sessionId: string, title: string): void {
+  const trimmed = title.trim();
+  if (!trimmed) return;
+  getDb().prepare(`UPDATE session_archive SET title = ? WHERE id = ?`).run(trimmed.slice(0, 120), sessionId);
 }
 
 export function archiveSession(session: SessionState, userId: string | null): void {
@@ -947,7 +999,7 @@ export function preArchiveSessionRow(session: SessionState, userId: string | nul
   `).run(
     session.id,
     userId,
-    session.matterRecord?.title ?? 'Untitled Analysis',
+    deriveSessionTitle(session),
     'assembling',
     session.workflowTemplateId ?? null,
     JSON.stringify(session.selectedTeam),

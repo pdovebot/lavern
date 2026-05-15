@@ -37,7 +37,7 @@ import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 import { DERIVATIVE_TYPES, DERIVATIVE_TYPE_LIST, buildFullContext } from '../derivatives/derivative-types.js';
 import { agentProfiles } from '../../agents/profiles.js';
 import { getOrchestratorForWorkflow } from '../../workflows/orchestrator-mapping.js';
-import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchivedSessionById, getUserById, logAuditEvent, holdBillableHours, debitBillableHours, updateArchiveUserId } from '../../db/database.js';
+import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchivedSessionById, getUserById, logAuditEvent, holdBillableHours, debitBillableHours, updateArchiveUserId, updateArchiveTitle } from '../../db/database.js';
 import type { Moment, Audience, Jurisdiction } from '../../types/index.js';
 import type { ClientIdentity } from '../../types/client.js';
 import { config } from '../../config.js';
@@ -93,6 +93,36 @@ function lavernFilename(sessionId: string, suffix: string): string {
   const tag = isBareExt ? 'WorkProduct' : '';
   const parts = ['Lavern', tag, today, shortId].filter(Boolean);
   return `${parts.join('-')}.${tail}`.replace('..', '.');
+}
+
+/**
+ * Pick a human-readable title for the session_archive row at create time.
+ * Order: matter title → request text (first sentence) → first uploaded doc
+ * (sans extension) → legacy documentPath basename. Returns '' when nothing
+ * usable is available — caller leaves the early-archive default in place.
+ */
+function deriveCreateTitle(body: CreateSessionBody, session: SessionState): string {
+  const matterTitle = session.matterRecord?.title?.trim();
+  if (matterTitle) return matterTitle;
+
+  const requestText = body.request?.requestText?.trim();
+  if (requestText) {
+    const oneLine = requestText.replace(/\s+/g, ' ');
+    const sentenceEnd = oneLine.search(/[.?!]\s/);
+    const cut = sentenceEnd > 0 ? oneLine.slice(0, sentenceEnd + 1) : oneLine;
+    return cut.length > 100 ? cut.slice(0, 97).trimEnd() + '…' : cut;
+  }
+
+  const firstDoc = session.documents[0]?.name?.trim();
+  if (firstDoc) return firstDoc.replace(/\.[^.]+$/, '');
+
+  const legacyPath = body.documentPath?.trim();
+  if (legacyPath) {
+    const base = legacyPath.split(/[/\\]/).pop() ?? legacyPath;
+    return base.replace(/\.[^.]+$/, '');
+  }
+
+  return '';
 }
 
 /** Check if the requesting user owns the session (or session has no owner). */
@@ -297,6 +327,20 @@ export function registerSessionRoutes(
     // v18: Per-session provider selection
     if (body.options?.provider) {
       session.provider = body.options.provider;
+    }
+
+    // Overwrite the early-archive title now that documents / matter / request
+    // are attached. Without this, every row in My Cases collapses to the
+    // "Session Results" fallback set at sessionManager.createSession() time
+    // (long before this handler sees the body).
+    try {
+      const derivedTitle = deriveCreateTitle(body, session);
+      if (derivedTitle) {
+        session.title = derivedTitle;
+        updateArchiveTitle(session.id, derivedTitle);
+      }
+    } catch (err) {
+      logger.warn('Failed to set session title', { sessionId: session.id, error: err });
     }
 
     if (body.request) {

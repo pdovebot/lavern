@@ -317,6 +317,12 @@ export class SessionState {
   public reportsDir = config.reportsDir;
   public baselinesDir = config.baselinesDir;
 
+  // ── Display Title ──
+  /** Human-readable title for My Cases. Set at session-create time from the
+   *  matter / requestText / first document name. When unset, derivers fall
+   *  back to matter title → first doc → "Session Results". */
+  public title?: string;
+
   // ── v8: Pre-Engagement & Team Staffing State ──
   public matterRecord?: MatterRecord;
   public selectedTeam: string[] = [];
