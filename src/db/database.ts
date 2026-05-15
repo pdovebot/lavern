@@ -819,20 +819,6 @@ export function archiveSession(session: SessionState, userId: string | null): vo
       const debited = debitBillableHours(userId, hoursUsed, `Session ${session.id}`, session.id);
       if (!debited) {
         logger.warn('insufficient_hours', { userId, sessionId: session.id, hoursUsed: hoursUsed.toFixed(2) });
-      } else {
-        // v23: Check if balance is low — schedule warning email (dedup via low_balance_warned_at)
-        const newBalance = getUserBillableHours(userId);
-        if (newBalance < config.auth.lowBalanceThresholdHours && !getLowBalanceWarnedAt(userId)) {
-          setLowBalanceWarnedAt(userId);
-          // Fire email after transaction (imported lazily to avoid circular deps)
-          const user = getUserById(userId);
-          if (user) {
-            import('../email/send.js').then(({ sendLowBalanceEmail }) => {
-              sendLowBalanceEmail(user.email, { balance: newBalance, threshold: config.auth.lowBalanceThresholdHours })
-                .catch(err => logger.error('low_balance_email_failed', err));
-            }).catch(err => logger.error('email_module_import_failed', err));
-          }
-        }
       }
     }
 

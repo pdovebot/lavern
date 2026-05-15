@@ -139,27 +139,6 @@ export const config = {
   /** When true, signup endpoints return 503 (waitlist-only mode). */
   signupDisabled: process.env.LAVERN_SIGNUP_DISABLED === 'true',
 
-  // ── Payment (x402 — USDC on Base) ───────────────────────────────────
-  x402Enabled: process.env.SHEM_X402_ENABLED === 'true',
-  x402RecipientAddress: process.env.SHEM_X402_RECIPIENT ?? '',
-
-  // ── Stripe Billing ────────────────────────────────────────────────────
-  stripe: {
-    secretKey: process.env.STRIPE_SECRET_KEY ?? '',
-    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY ?? '',
-    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
-    /** URL to redirect to after successful checkout */
-    successUrl: process.env.STRIPE_SUCCESS_URL ?? 'http://localhost:5173/?billing=success',
-    /** URL to redirect to if checkout is cancelled */
-    cancelUrl: process.env.STRIPE_CANCEL_URL ?? 'http://localhost:5173/?billing=cancelled',
-    /** Plans: price ID → plan name mapping. Set via env or use defaults. */
-    plans: {
-      starter:      { monthlyCapUsd: 50,  maxSessionBudget: 10, label: 'Starter' },
-      professional: { monthlyCapUsd: 200, maxSessionBudget: 25, label: 'Professional' },
-      enterprise:   { monthlyCapUsd: 1000, maxSessionBudget: 50, label: 'Enterprise' },
-    },
-  },
-
   // ── Email (Resend) ─────────────────────────────────────────────────────
   email: {
     resendApiKey: process.env.RESEND_API_KEY ?? '',
@@ -375,12 +354,6 @@ export function validateProductionConfig(): void {
   // Detect localhost defaults that should be overridden in production
   if (config.corsOrigins.includes('localhost')) {
     warnings.push('SHEM_CORS_ORIGINS still contains localhost — set to production domain');
-  }
-  if (config.stripe.successUrl.includes('localhost')) {
-    warnings.push('STRIPE_SUCCESS_URL still points to localhost — set to production URL');
-  }
-  if (config.stripe.cancelUrl.includes('localhost')) {
-    warnings.push('STRIPE_CANCEL_URL still points to localhost — set to production URL');
   }
   if (config.email.appUrl.includes('localhost')) {
     warnings.push('LAVERN_APP_URL still points to localhost — set to production URL');

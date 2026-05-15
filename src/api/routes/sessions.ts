@@ -41,7 +41,6 @@ import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchive
 import type { Moment, Audience, Jurisdiction } from '../../types/index.js';
 import type { ClientIdentity } from '../../types/client.js';
 import { config } from '../../config.js';
-import { canStartSession, getPlanLimits } from './billing.js';
 import { checkDailySpendCap } from '../../utils/spend-tracker.js';
 import type { ParsedDocument } from '../../documents/types.js';
 import { getMatter } from './matters.js';

@@ -16,7 +16,6 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { INTENSITY_PROFILES, type IntensityLevel } from '../../types/engagement.js';
 import { PRICING } from '../../utils/stream-messages.js';
-import { config } from '../../config.js';
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -136,14 +135,9 @@ export function registerPricingRoutes(fastify: FastifyInstance): void {
       tokenRates: buildTokenRates(),
       paymentMethods: [
         {
-          method: 'api_key_billing',
+          method: 'self_hosted',
           status: 'active',
-          description: 'Register for an API key at POST /api/clients. Usage tracked per engagement. Budget cap enforced per session.',
-        },
-        {
-          method: 'x402_usdc_base',
-          status: config.x402Enabled ? 'active' : 'coming_soon',
-          description: 'Pay per request with USDC on Base via x402 protocol. No account needed — include X-PAYMENT header.',
+          description: 'Bring your own LLM provider key (Anthropic, Mistral) or run locally via Ollama. Costs are paid directly to the provider.',
         },
       ],
       budgetEnforcement: 'Hard cap. Session halts if budget is exceeded. Unused budget is not charged.',
