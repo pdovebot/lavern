@@ -370,17 +370,19 @@ export function detectParseWarnings(text: string, parseMethod: string): ParseWar
     });
   }
 
-  // 3. Possible OCR artifacts (PDF only): unusual character sequences
-  if (parseMethod === 'pdf-parse') {
-    const ocrPatterns = /[^\x20-\x7E\xA0-\xFF\n\r\t]{3,}/g;
-    const matches = text.match(ocrPatterns);
-    if (matches && matches.length >= 3) {
-      warnings.push({
-        type: 'possible_ocr_errors',
-        message: `${matches.length} sequences of non-standard characters detected. This PDF may be scanned or contain OCR artifacts. Text in affected regions may be unreliable.`,
-        sample: matches.slice(0, 3).join(' | ').slice(0, 200),
-      });
-    }
+  // 3. Possible extraction artifacts: unusual character sequences that often
+  //    indicate OCR errors, font-encoding issues, or layout-leak from the
+  //    source format. Runs for every parser — DOCX/RTF/plaintext can carry
+  //    these too (e.g., embedded glyphs, ligature drops, encoding mismatches).
+  const ocrPatterns = /[^\x20-\x7E\xA0-\xFF\n\r\t]{3,}/g;
+  const matches = text.match(ocrPatterns);
+  if (matches && matches.length >= 3) {
+    const sourceLabel = parseMethod === 'pdf-parse' ? 'PDF' : 'document';
+    warnings.push({
+      type: 'possible_ocr_errors',
+      message: `${matches.length} sequences of non-standard characters detected. This ${sourceLabel} may contain extraction artifacts (scan/OCR, font encoding, or layout leak). Text in affected regions may be unreliable.`,
+      sample: matches.slice(0, 3).join(' | ').slice(0, 200),
+    });
   }
 
   return warnings;

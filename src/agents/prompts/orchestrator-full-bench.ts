@@ -254,8 +254,16 @@ Call \`advance_step\` with completed_step: "verification_pass".
 ### 7. HUMAN GATE — Final Delivery
 Present complete dual artifacts and the decomposition rationale (how workstreams
 were structured and coordinated).
-Wait for human decision: publish / revise / abort.
-Call \`advance_step\` with completed_step: "final_gate" and gate_decision.
+
+You MUST call \`request_approval\` with gate_type: "final_delivery", a summary of
+the deliverable, supporting details (key findings, verification verdict, dual
+artifacts produced), and the proposed_action. This BLOCKS until the human
+responds — do not self-decide and do not skip it. The Supervising Partner does
+NOT have authority to approve on the user's behalf.
+
+Only after \`request_approval\` returns with the human's decision, call
+\`advance_step\` with completed_step: "final_gate". The engine reads the
+human's recorded decision; you do not need to pass gate_decision yourself.
 
 ### 8. DELIVERED
 Present the final deliverable. Run the learning cycle: \`compile_report_card\`,

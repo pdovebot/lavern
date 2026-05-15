@@ -173,7 +173,7 @@ export interface NonNegotiableCheck {
 }
 
 export interface HumanGateDecision {
-  gateType: 'ethics_critical' | 'meaning_critical' | 'final_delivery';
+  gateType: 'ethics_critical' | 'meaning_critical' | 'final_delivery' | 'engagement_acceptance' | 'team_selection';
   timestamp: string;
   summary: string;
   decision: 'approve' | 'reject' | 'modify';

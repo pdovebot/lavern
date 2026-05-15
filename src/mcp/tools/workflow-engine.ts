@@ -75,21 +75,29 @@ ${stepDef.requiresGateApproval ? `**Gate Required**: ${stepDef.gateType} (must i
 
       const stepDef = STEP_DEFINITIONS[completedStep];
       if (stepDef.requiresGateApproval) {
-        if (!args.gate_decision) {
+        const gateType = stepDef.gateType!;
+        const stepStartedAt = Date.parse(state.lastTransitionAt);
+        const humanDecision = [...session.gateDecisions]
+          .reverse()
+          .find(d => d.gateType === gateType && Date.parse(d.timestamp) >= stepStartedAt);
+
+        if (!humanDecision) {
           return {
             content: [{
               type: 'text' as const,
-              text: `ERROR: Step "${completedStep}" is a gate step requiring a decision. Provide gate_decision: "approved", "rejected", or "skipped" (only if no findings require the gate).`
+              text: `ERROR: Step "${completedStep}" requires a human gate (${gateType}) but no approval has been recorded for this step. You MUST call \`request_approval\` with gate_type: "${gateType}" and wait for the human's response BEFORE calling advance_step. Do not self-report a gate_decision — the human must decide.`
             }],
           };
         }
-        state.gateDecisions[stepDef.gateType!] = args.gate_decision;
 
-        if (args.gate_decision === 'rejected') {
+        const mapped = humanDecision.decision === 'approve' ? 'approved' : 'rejected';
+        state.gateDecisions[gateType] = mapped;
+
+        if (mapped === 'rejected') {
           return {
             content: [{
               type: 'text' as const,
-              text: `GATE REJECTED: ${stepDef.gateType}. The workflow does NOT advance. The orchestrator must address the rejection (re-run relevant agents with modified approach) and then try advancing again.`
+              text: `GATE REJECTED by human: ${gateType}.${humanDecision.notes ? ` Notes: ${humanDecision.notes}` : ''} The workflow does NOT advance. Address the rejection (re-run relevant agents with modified approach), then request approval again.`
             }],
           };
         }

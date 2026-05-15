@@ -24,7 +24,7 @@ export interface StepDefinition {
   description: string;
   preconditions: WorkflowStep[];
   requiresGateApproval?: boolean;
-  gateType?: 'ethics_critical' | 'meaning_critical' | 'final_delivery';
+  gateType?: 'ethics_critical' | 'meaning_critical' | 'final_delivery' | 'engagement_acceptance' | 'team_selection';
 }
 
 export const STEP_DEFINITIONS: Record<WorkflowStep, StepDefinition> = {
