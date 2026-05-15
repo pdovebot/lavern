@@ -87,12 +87,12 @@ describe('Parse Warning Detection', () => {
       expect(ocr.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('does not flag OCR for non-PDF documents', () => {
+    it('flags extraction artifacts for non-PDF documents too', () => {
       const text = 'Normal text \u0000\u0001\u0002\u0003\u0004 garbage \u0000\u0001\u0002\u0003 more \u0000\u0001\u0002\u0003\u0004\u0005';
 
       const warnings = detectParseWarnings(text, 'mammoth');
       const ocr = warnings.filter(w => w.type === 'possible_ocr_errors');
-      expect(ocr).toHaveLength(0);
+      expect(ocr.length).toBeGreaterThanOrEqual(1);
     });
   });
 
