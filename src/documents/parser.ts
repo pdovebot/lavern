@@ -8,7 +8,7 @@
 
 import { parsePdf } from './pdf-parser.js';
 import { parseDocx } from './docx-parser.js';
-import { detectSections, detectDefinedTerms, detectTables } from './structure-detector.js';
+import { detectSections, detectDefinedTerms, detectTables, detectParseWarnings } from './structure-detector.js';
 import { sanitizeDocumentFields } from './sanitize-text.js';
 import type { ParsedDocument } from './types.js';
 
@@ -111,6 +111,7 @@ function parsePlainText(
 
   const wordCount = fullText.split(/\s+/).filter(w => w.length > 0).length;
   const pageCount = Math.max(1, Math.ceil(wordCount / 250));
+  const parseWarnings = detectParseWarnings(fullText, 'plaintext');
 
   return {
     id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -125,5 +126,6 @@ function parsePlainText(
     definedTerms: detectDefinedTerms(fullText),
     parseMethod: 'plaintext',
     parsedAt: new Date().toISOString(),
+    parseWarnings: parseWarnings.length > 0 ? parseWarnings : undefined,
   };
 }
