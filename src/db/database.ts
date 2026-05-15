@@ -753,6 +753,20 @@ function completedStepsCount(session: SessionState): number {
   return (session.genericWorkflow?.completedSteps ?? session.workflow.completedSteps).length;
 }
 
+/**
+ * Derive a stable display title for a session so the delivery view shows the
+ * same name before and after restart. Persisted to session_archive.title.
+ * Order: explicit matter title → first document name (sans extension) →
+ * "Session Results" (the same fallback the live UI used to compute on render).
+ */
+function deriveSessionTitle(session: SessionState): string {
+  const matterTitle = session.matterRecord?.title?.trim();
+  if (matterTitle) return matterTitle;
+  const firstDoc = session.documents[0]?.name?.trim();
+  if (firstDoc) return firstDoc.replace(/\.[^.]+$/, '');
+  return 'Session Results';
+}
+
 export function earlyArchiveSession(session: SessionState): void {
   const db = getDb();
   const now = new Date().toISOString();
@@ -765,7 +779,7 @@ export function earlyArchiveSession(session: SessionState): void {
   `).run(
     session.id,
     session.userId ?? null,
-    'Untitled Analysis',
+    deriveSessionTitle(session),
     'running',
     session.workflowTemplateId ?? null,
     JSON.stringify(session.selectedTeam ?? []),
@@ -882,7 +896,7 @@ export function archiveSession(session: SessionState, userId: string | null): vo
     `).run(
       session.id,
       userId,
-      session.matterRecord?.title ?? 'Untitled Analysis',
+      deriveSessionTitle(session),
       status,
       session.workflowTemplateId ?? null,
       JSON.stringify(session.selectedTeam),

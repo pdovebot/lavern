@@ -713,7 +713,9 @@ export function registerSessionRoutes(
       afterScores: session.afterScores,
 
       reportCard: session.reportCard ?? null,
-      matterTitle: session.matterRecord?.title ?? null,
+      matterTitle: session.matterRecord?.title
+        ?? session.documents[0]?.name?.replace(/\.[^.]+$/, '')
+        ?? null,
       workflowTemplateId: session.workflowTemplateId ?? null,
       provider: session.provider ?? config.provider,
       selectedTeam: session.selectedTeam,
