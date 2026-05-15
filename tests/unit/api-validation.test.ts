@@ -154,7 +154,7 @@ describe('API Validation', () => {
       it('should reject budget above maximum', () => {
         const result = CreateSessionSchema.safeParse({
           documentPath: '/doc.pdf',
-          options: { budget: 500 },
+          options: { budget: 501 },
         });
         expect(result.success).toBe(false);
       });
