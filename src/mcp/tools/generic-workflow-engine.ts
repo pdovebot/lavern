@@ -100,24 +100,31 @@ ${stepDef?.requiresEvaluatorGate ? `**Evaluator Gate**: Automated quality check 
 
       const stepDef = defs[completedStep];
 
-      // Gate steps require a decision
+      // Gate steps require a real human decision recorded by request_approval
       if (stepDef?.requiresGateApproval) {
-        if (!args.gate_decision) {
+        const gateKey = stepDef.gateType ?? completedStep;
+        const stepStartedAt = Date.parse(state.lastTransitionAt);
+        const humanDecision = [...session.gateDecisions]
+          .reverse()
+          .find(d => d.gateType === gateKey && Date.parse(d.timestamp) >= stepStartedAt);
+
+        if (!humanDecision) {
           return {
             content: [{
               type: 'text' as const,
-              text: `ERROR: Step "${completedStep}" is a gate step requiring a decision. Provide gate_decision: "approved", "rejected", or "skipped" (only if no findings require the gate).`,
+              text: `ERROR: Step "${completedStep}" requires a human gate (${gateKey}) but no approval has been recorded for this step. You MUST call \`request_approval\` with gate_type: "${gateKey}" and wait for the human's response BEFORE calling advance_step. Do not self-report a gate_decision — the human must decide.`,
             }],
           };
         }
-        const gateKey = stepDef.gateType ?? completedStep;
-        state.gateDecisions[gateKey] = args.gate_decision;
 
-        if (args.gate_decision === 'rejected') {
+        const mapped = humanDecision.decision === 'approve' ? 'approved' : 'rejected';
+        state.gateDecisions[gateKey] = mapped;
+
+        if (mapped === 'rejected') {
           return {
             content: [{
               type: 'text' as const,
-              text: `GATE REJECTED: ${gateKey}. The workflow does NOT advance. Address the rejection and try again.`,
+              text: `GATE REJECTED by human: ${gateKey}.${humanDecision.notes ? ` Notes: ${humanDecision.notes}` : ''} The workflow does NOT advance. Address the rejection and request approval again.`,
             }],
           };
         }

@@ -190,11 +190,17 @@ Present findings in DECISION ORDER, not document order:
 2. Negotiation priorities — things to push back on, ranked by importance
 3. Standard provisions — things that are normal for this type of agreement
 
+You MUST call \`request_approval\` with gate_type: "final_delivery", a summary
+of the findings (in decision order above), supporting details, and the proposed
+action. This BLOCKS until the human responds — do not self-decide and do not
+skip it.
+
 When the human asks for revision, be specific about what changes — do not send the
 entire analysis back through the pipeline. When the human overrides a recommendation,
 record the override clearly. This is an audit trail, not a suggestion box.
 
-Call \`advance_step\` with completed_step: "final_gate" and gate_decision.
+Only after \`request_approval\` returns, call \`advance_step\` with
+completed_step: "final_gate". The engine reads the recorded human decision.
 
 ### 7. DELIVERED
 Present the final deliverable. Save patterns with \`save_precedent\` and new
