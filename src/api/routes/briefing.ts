@@ -13,6 +13,7 @@ import { buildInterviewSystemPrompt, buildFinalizationSystemPrompt } from '../br
 import { config } from '../../config.js';
 import { createApiKeyAccessor } from '../../utils/ensure-api-key.js';
 import { createLogger } from '../../utils/logger.js';
+import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 
 const logger = createLogger('BRIEFING');
 const API_KEY_LAZY = createApiKeyAccessor('interview calls');
@@ -184,13 +185,44 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
     reply.raw.on('close', () => { clientDisconnected = true; });
 
     try {
-      // Set up SSE response
+      // Set up SSE response (shared by both provider branches)
       reply.raw.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
       });
 
+      // ── Non-Anthropic providers (local / mistral) ────────────────────
+      // crossProviderChat is single-turn + non-streaming, so we flatten the
+      // conversation into a single user message and emit the full reply as
+      // one SSE `text` frame followed by `done`. Local/mistral users opted
+      // out of the cloud streaming UX; appearing-at-once is acceptable.
+      if (config.provider !== 'anthropic' && config.provider !== 'managed') {
+        const conversation = apiMessages
+          .map(m => `${m.role === 'user' ? 'Client' : 'Interviewer'}: ${m.content}`)
+          .join('\n\n');
+
+        const chat = await crossProviderChat({
+          system: systemPrompt,
+          user: `${conversation}\n\nContinue as the Interviewer with your next message. Respond with only what the Interviewer would say next — no labels, no preamble.`,
+          tier: 'sonnet',
+          maxTokens: 1600,
+        });
+
+        // Strip any <thinking>…</thinking> tags the model may have emitted.
+        const cleaned = chat.text.replace(/<thinking>[\s\S]*?<\/thinking>/g, '').trim();
+
+        if (!clientDisconnected && cleaned) {
+          reply.raw.write(`data: ${JSON.stringify({ type: 'text', content: cleaned })}\n\n`);
+        }
+        if (!clientDisconnected) {
+          reply.raw.write(`data: ${JSON.stringify({ type: 'done', turn: turnNumber + 1 })}\n\n`);
+        }
+        reply.raw.end();
+        return;
+      }
+
+      // ── Anthropic / managed: native token-by-token SSE streaming ─────
       // Stream from Anthropic API using raw fetch + SSE parsing.
       // Enable extended thinking so the model reasons internally (filtered out)
       // and produces a clean conversational response.
