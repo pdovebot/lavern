@@ -77,7 +77,11 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
       const result = await analyzeBriefing(parsed.data);
       return reply.send(result);
     } catch (err) {
-      logger.error('Analysis failed', { error: err });
+      logger.error('Analysis failed', {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        name: err instanceof Error ? err.name : undefined,
+      });
       return reply.status(500).send({
         error: 'Briefing analysis failed',
         message: err instanceof Error ? err.message : String(err),
@@ -132,13 +136,19 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
         const validated = BriefingAnalyzeResponseSchema.safeParse(rawResult);
 
         if (!validated.success) {
-          logger.error('Finalization schema validation failed', { error: validated.error });
+          logger.error('Finalization schema validation failed', {
+            issues: validated.error.issues,
+          });
           throw new Error('Finalization did not return a valid structured response');
         }
 
         return reply.send(validated.data);
       } catch (err) {
-        logger.error('Finalization failed', { error: err });
+        logger.error('Finalization failed', {
+          message: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+          name: err instanceof Error ? err.name : undefined,
+        });
         return reply.status(500).send({
           error: 'Interview finalization failed',
           message: err instanceof Error ? err.message : String(err),
@@ -294,7 +304,11 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
       }
       reply.raw.end();
     } catch (err) {
-      logger.error('Interview turn failed', { error: err });
+      logger.error('Interview turn failed', {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        name: err instanceof Error ? err.name : undefined,
+      });
       const errMsg = err instanceof Error ? err.message : String(err);
       if (!reply.raw.headersSent) {
         reply.raw.writeHead(500, { 'Content-Type': 'application/json' });
