@@ -6,39 +6,52 @@
 
 ## Run it locally
 
-You need Node.js 22+ and `npm`.
+You need Node.js 20+ and `npm`.
 
 ```bash
 # 1. Clone
 git clone https://github.com/AnttiHero/lavern.git
 cd lavern
 
-# 2. Install (backend + dashboard)
-npm install
-(cd viz && npm install)
+# 2. One-shot setup — installs deps, picks a provider, writes .env
+npm run setup
 ```
 
-Then run two processes:
+`npm run setup` walks you through:
+
+- Installing root + `viz/` (dashboard) dependencies
+- Picking an inference provider (see below)
+- Writing `.env` (mode 0600), backing up any existing one
+- Creating `data/`, `audit-logs/`, `.shem/`
+- Optionally launching the dev server at the end
+
+When it finishes, the API server runs on `http://localhost:3000` and serves the dashboard from the same port.
+
+### Pick a provider
+
+The setup prompts you to choose one:
+
+| Provider | What it is | Cost | Needs |
+|---|---|---|---|
+| **Local (Ollama)** *(default)* | On-device inference via `gemma4:e4b`. Nothing leaves the host. | $0 | Ollama installed; setup will offer to `brew install` (macOS) or `curl \| sh` (Linux). ~3 GB model pull. |
+| **Anthropic Cloud** | Claude via Anthropic API. Best capability. | Paid per call | `sk-ant-...` key from [console.anthropic.com](https://console.anthropic.com/settings/keys) |
+| **Mistral (EU Sovereign)** | EU-hosted inference for GDPR-bound matters. | Paid per call | Key from [console.mistral.ai](https://console.mistral.ai/api-keys) |
+
+To change provider later: edit `.env` or re-run `npm run setup`.
+
+## Hacking on the dashboard (hot reload)
+
+If you're editing `viz/` and want Vite's hot reload, run two processes instead:
 
 ```bash
-# Terminal 1 — API server on :3000 (demo mode, no API key required)
+# Terminal 1 — API server on :3000
 npm run serve:dev
 
-# Terminal 2 — dashboard on :5173 (Vite, hot reload)
+# Terminal 2 — dashboard on :5173 with hot reload
 cd viz && npm run dev
 ```
 
-Open <http://localhost:5173>. You should see Lavern's landing page within a few seconds.
-
-## ⚠️ Add your Anthropic key to actually process documents
-
-Demo mode gets you the full UI — landing page, auth, Clawern dashboard, agent profiles, the works — but it cannot run real engagements without an API key.
-
-1. Copy `.env.example` to `.env` (this happens automatically on first run).
-2. Open `.env` and set `ANTHROPIC_API_KEY=sk-ant-...`.
-3. Restart Terminal 1 (`npm run serve:dev`).
-
-EU teams: set `LAVERN_PROVIDER=mistral` and `MISTRAL_API_KEY=...` to route through Mistral instead of Anthropic. Data never leaves the EU.
+Open <http://localhost:5173>.
 
 ## First engagement
 
@@ -54,9 +67,9 @@ EU teams: set `LAVERN_PROVIDER=mistral` and `MISTRAL_API_KEY=...` to route throu
 
 | You're a… | First move |
 |---|---|
-| **Contracts lawyer reviewing one document** | The dashboard. Run the steps above. Briefing → Quick Counsel is the fastest path. |
-| **GC managing a portfolio of contracts** | Clawern. Point Lavern at a folder; it watches, reviews, and surfaces critical findings to your phone. See [Clawern (autonomous mode)](#clawern-autonomous-mode) below. |
-| **Engineer integrating Lavern into your stack** | The API. `npm run dev -- --serve`, then hit `POST /api/sessions`. See the [API section in README](README.md#api). |
+| **Contracts lawyer reviewing one document** | The dashboard. Run `npm run setup`, pick Local or Anthropic. Briefing → Quick Counsel is the fastest path. |
+| **GC managing a portfolio of contracts** | Clawern. Point Lavern at a folder; it watches, reviews, and surfaces critical findings. See [Clawern (autonomous mode)](#clawern-autonomous-mode) below. |
+| **Engineer integrating Lavern into your stack** | The API. `npm run serve:dev`, then hit `POST /api/sessions`. See the [API section in README](README.md#api). |
 | **Researcher / academic / OSS contributor** | The agents themselves. Open `src/agents/prompts/` — 67 markdown prompts, every one editable. Fork a workflow in `src/workflows/templates/`. No build step on the prompts. |
 | **Lawyer-Twitter / curious onlooker** | Watch the demo at [lavern.ai](https://lavern.ai), then come back here when you have 60 seconds. |
 
@@ -71,6 +84,8 @@ npm run dev -- claw start      # Start watching
 npm run dev -- claw pause      # Pause processing
 npm run dev -- claw resume     # Resume processing
 ```
+
+You can also run the API server and Claw together: `npm run dev -- --serve --claw`.
 
 Heartbeat every 30 minutes · Telegram bot · email alerts · weekly digest · change detection on re-review · precedent board (institutional memory across documents) · hybrid local+frontier processing · multi-client isolation · audit trail · Prometheus metrics.
 
@@ -93,17 +108,17 @@ Customize:
 
 ## What's in the box
 
-**67 agents** · **21 MCP tools** · **9 workflows** · **5 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · LEDGAR) · **2 LLM providers** (Claude · Mistral EU) · **1,695 tests** across 108 files.
+**67 agents** · **21 MCP tools** · **9 workflows** · **5 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · LEDGAR) · **3 inference providers** (Local Ollama · Anthropic · Mistral EU) · **1,695 tests** across 108 files.
 
 Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/architecture/](https://lavern.ai/architecture/).
 
 ## Stuck?
 
 - **`npm install` fails on `better-sqlite3`** → you need a working C/C++ toolchain. macOS: `xcode-select --install`. Linux: `apt install build-essential`. Windows: WSL2 is easier than native.
-- **Dashboard loads but shows "Connection lost"** → the API server didn't start, or stopped. Check the terminal where you ran `npm run dev -- --serve`. The dashboard talks to it over WebSocket.
-- **An engagement won't start** → most often this means `ANTHROPIC_API_KEY` isn't set. Demo mode shows the UI; real processing needs the key (or `MISTRAL_API_KEY` if you're on the EU provider).
-- **402 Payment Required when creating a session** → Lavern enforces a per-session budget hold against your account's billable-hours balance. New accounts get 10 free trial hours (~2 quick engagements). To top up: My Page → Billing.
-- **Agents are slow, or seem to stall** → Lavern auto-retries Claude API calls on transient 429/500s with exponential backoff (1s → 2s → 4s). Watch the terminal logs for retry events. Sustained retries mean your API key is rate-limited.
+- **Ollama daemon not reachable** → setup pings `http://localhost:11434`. Start it with `ollama serve` (or open Ollama.app on macOS), then re-run `npm run setup`.
+- **Dashboard loads but shows "Connection lost"** → the API server didn't start, or stopped. Check the terminal where you ran `npm run dev -- --serve` (or `npm run serve:dev`). The dashboard talks to it over WebSocket.
+- **An engagement won't start with no provider configured** → Lavern boots in demo mode (UI works, processing doesn't) until `.env` is filled in. Re-run `npm run setup` or set `LAVERN_PROVIDER` plus the matching key directly in `.env`.
+- **Agents are slow, or seem to stall** → Lavern auto-retries cloud API calls on transient 429/500s with exponential backoff (1s → 2s → 4s). Watch the terminal logs for retry events. Sustained retries mean your API key is rate-limited. On Local, slow generation usually means the model is CPU-only — check Ollama is using your GPU.
 - **I want to try without installing** → there is no hosted demo right now. Watch the video at [lavern.ai](https://lavern.ai); the install above is 60 seconds.
 
 ---
