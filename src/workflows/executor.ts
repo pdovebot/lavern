@@ -463,7 +463,8 @@ export async function runGenericWorkflow(
     // Update the pre-archived row with the assembled document (if any) and final cost.
     // This runs even if assembly failed — it updates cost and marks row as completed.
     try {
-      updateArchivedDocument(session.id, session.assembledDocument, session.accumulatedCost);
+      const stepsDone = (session.genericWorkflow?.completedSteps ?? session.workflow.completedSteps).length;
+      updateArchivedDocument(session.id, session.assembledDocument, session.accumulatedCost, stepsDone);
     } catch (updateErr) {
       logger.warn('Archive document update failed (non-fatal)', { error: updateErr });
     }

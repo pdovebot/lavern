@@ -88,7 +88,8 @@ function runMigrations(db: Database.Database): void {
       summary_json        TEXT DEFAULT '{}',
       created_at          TEXT NOT NULL,
       completed_at        TEXT,
-      duration_ms         INTEGER DEFAULT 0
+      duration_ms         INTEGER DEFAULT 0,
+      completed_steps_count INTEGER DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS matters (
@@ -255,6 +256,12 @@ function runMigrations(db: Database.Database): void {
     db.exec(`ALTER TABLE session_archive ADD COLUMN assembled_document TEXT`);
   } catch { /* column already exists */ }
 
+  // Persist workflow step progress so the UI shows the real count after server restart
+  // (cost and DELIVERED status survive but the live session — where steps lived — is gone).
+  try {
+    db.exec(`ALTER TABLE session_archive ADD COLUMN completed_steps_count INTEGER DEFAULT 0`);
+  } catch { /* column already exists */ }
+
   // v19 migration: Add is_global flag to kb_collections for shared reference data
   try {
     db.exec(`ALTER TABLE kb_collections ADD COLUMN is_global INTEGER DEFAULT 0`);
@@ -288,9 +295,16 @@ function runMigrations(db: Database.Database): void {
           summary_json        TEXT DEFAULT '{}',
           created_at          TEXT NOT NULL,
           completed_at        TEXT,
-          duration_ms         INTEGER DEFAULT 0
+          duration_ms         INTEGER DEFAULT 0,
+          completed_steps_count INTEGER DEFAULT 0
         );
-        INSERT INTO session_archive SELECT * FROM session_archive_old;
+        INSERT INTO session_archive (id, user_id, title, status, workflow_id, team_roles,
+          findings_count, resolutions_count, cost_usd, budget_usd, final_output,
+          assembled_document, summary_json, created_at, completed_at, duration_ms)
+        SELECT id, user_id, title, status, workflow_id, team_roles,
+          findings_count, resolutions_count, cost_usd, budget_usd, final_output,
+          assembled_document, summary_json, created_at, completed_at, duration_ms
+        FROM session_archive_old;
         DROP TABLE session_archive_old;
         CREATE INDEX IF NOT EXISTS idx_session_archive_user ON session_archive(user_id);
         COMMIT;
@@ -727,6 +741,7 @@ export interface ArchivedSession {
   created_at: string;
   completed_at: string | null;
   duration_ms: number;
+  completed_steps_count: number;
 }
 
 /**
@@ -734,6 +749,10 @@ export interface ArchivedSession {
  * even if the session never reaches completion (crash, restart, error).
  * Uses INSERT OR IGNORE so it's safe to call multiple times.
  */
+function completedStepsCount(session: SessionState): number {
+  return (session.genericWorkflow?.completedSteps ?? session.workflow.completedSteps).length;
+}
+
 export function earlyArchiveSession(session: SessionState): void {
   const db = getDb();
   const now = new Date().toISOString();
@@ -741,8 +760,8 @@ export function earlyArchiveSession(session: SessionState): void {
     INSERT OR IGNORE INTO session_archive
     (id, user_id, title, status, workflow_id, team_roles, findings_count,
      resolutions_count, cost_usd, budget_usd, final_output, assembled_document,
-     summary_json, created_at, completed_at, duration_ms)
-    VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, ?, NULL, NULL, '{}', ?, NULL, NULL)
+     summary_json, created_at, completed_at, duration_ms, completed_steps_count)
+    VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, ?, NULL, NULL, '{}', ?, NULL, NULL, ?)
   `).run(
     session.id,
     session.userId ?? null,
@@ -752,6 +771,7 @@ export function earlyArchiveSession(session: SessionState): void {
     JSON.stringify(session.selectedTeam ?? []),
     session.budgetUsd,
     now,
+    completedStepsCount(session),
   );
 }
 
@@ -841,8 +861,8 @@ export function archiveSession(session: SessionState, userId: string | null): vo
       INSERT INTO session_archive
       (id, user_id, title, status, workflow_id, team_roles, findings_count,
        resolutions_count, cost_usd, budget_usd, final_output, assembled_document,
-       summary_json, created_at, completed_at, duration_ms)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       summary_json, created_at, completed_at, duration_ms, completed_steps_count)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         user_id = excluded.user_id,
         title = excluded.title,
@@ -857,7 +877,8 @@ export function archiveSession(session: SessionState, userId: string | null): vo
         assembled_document = excluded.assembled_document,
         summary_json = excluded.summary_json,
         completed_at = excluded.completed_at,
-        duration_ms = excluded.duration_ms
+        duration_ms = excluded.duration_ms,
+        completed_steps_count = excluded.completed_steps_count
     `).run(
       session.id,
       userId,
@@ -875,6 +896,7 @@ export function archiveSession(session: SessionState, userId: string | null): vo
       startedAt ?? now,
       now,
       durationMs,
+      completedStepsCount(session),
     );
   })();
 }
@@ -906,8 +928,8 @@ export function preArchiveSessionRow(session: SessionState, userId: string | nul
     INSERT OR IGNORE INTO session_archive
     (id, user_id, title, status, workflow_id, team_roles, findings_count,
      resolutions_count, cost_usd, budget_usd, final_output, assembled_document,
-     summary_json, created_at, completed_at, duration_ms)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     summary_json, created_at, completed_at, duration_ms, completed_steps_count)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     session.id,
     userId,
@@ -925,6 +947,7 @@ export function preArchiveSessionRow(session: SessionState, userId: string | nul
     startedAt ?? now,
     null, // not completed yet
     null,
+    completedStepsCount(session),
   );
 }
 
@@ -936,14 +959,16 @@ export function updateArchivedDocument(
   sessionId: string,
   assembledDocument: string,
   finalCostUsd: number,
+  completedSteps: number,
 ): void {
   const db = getDb();
   const now = new Date().toISOString();
   db.prepare(`
     UPDATE session_archive
-    SET assembled_document = ?, cost_usd = ?, status = 'completed', completed_at = COALESCE(completed_at, ?)
+    SET assembled_document = ?, cost_usd = ?, status = 'completed',
+        completed_at = COALESCE(completed_at, ?), completed_steps_count = ?
     WHERE id = ?
-  `).run(assembledDocument || null, finalCostUsd, now, sessionId);
+  `).run(assembledDocument || null, finalCostUsd, now, completedSteps, sessionId);
 }
 
 export function getSessionArchive(userId: string, limit = 50): ArchivedSession[] {

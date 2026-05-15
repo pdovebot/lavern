@@ -433,7 +433,7 @@ export function registerSessionRoutes(
       .map(a => ({
         id: a.id,
         currentStep: 'delivered' as const,
-        completedSteps: 0,
+        completedSteps: a.completed_steps_count ?? 0,
         eventCount: 0,
         cost: a.cost_usd,
         budget: a.budget_usd,
@@ -531,7 +531,12 @@ export function registerSessionRoutes(
         const summary = safeJsonParse<Record<string, unknown>>(archived.summary_json, {});
         return reply.send({
           id: archived.id,
-          workflow: { currentStep: 'delivered', completedSteps: [], gateDecisions: [] },
+          workflow: {
+            currentStep: 'delivered',
+            completedSteps: Array.from({ length: archived.completed_steps_count ?? 0 }, (_, i) => `step-${i + 1}`),
+            completedStepsCount: archived.completed_steps_count ?? 0,
+            gateDecisions: [],
+          },
           debate: {
             findingsCount: archived.findings_count,
             challengesCount: 0,
