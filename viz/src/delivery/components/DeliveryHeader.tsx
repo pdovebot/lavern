@@ -25,7 +25,7 @@ export function DeliveryHeader({ matterNumber, matterType, jurisdiction, onBack,
       >{'\u2190'} Back</button>
       <div style={styles.center}>
         <div style={styles.logoType}><LavernIlluminated color={colors.textMuted} /></div>
-        <h1 style={styles.title}>Lavern <span style={{ fontStyle: 'italic' }}>Delivery</span></h1>
+        <h1 style={styles.title}>Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Delivery</span></h1>
         {matterNumber && (
           <div style={styles.matterBadge}>
             {matterNumber}
@@ -79,9 +79,9 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase' as const,
   },
   title: {
-    fontSize: 36,
-    fontWeight: 300,
-    fontFamily: fonts.serif,
+    fontSize: 'clamp(24px, 6vw, 36px)',
+    fontWeight: 400,
+    fontFamily: fonts.sans,
     color: colors.text,
     margin: '8px 0 0',
     letterSpacing: -0.5,

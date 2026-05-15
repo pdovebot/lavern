@@ -106,7 +106,6 @@ export function TeamBench({
             fontSize: 13,
             fontFamily: fonts.sans,
             color: colors.textDim,
-            fontStyle: 'italic',
           }}>
             Select agents or choose a preset...
           </span>

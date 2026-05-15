@@ -56,9 +56,9 @@ export const colors = {
 };
 
 export const fonts = {
-  sans: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  serif: "'Cormorant Garamond', 'Georgia', 'Times New Roman', serif",
-  mono: "'SF Mono', 'Fira Code', 'Fira Mono', Menlo, monospace",
+  sans: "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  serif: "'Newsreader', Georgia, 'Times New Roman', serif",
+  mono: "'Geist Mono', 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, monospace",
 };
 
 export const spacing = {

@@ -37,28 +37,33 @@ export function BriefingHeader({ matterNumber, matterTitle, workflowId, jurisdic
 
   return (
     <div style={styles.container}>
-      <button
-        onClick={onBack}
-        style={styles.backButton}
-        onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
-        onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
-      >
-        {'\u2190'} Back
-      </button>
-      {onSkip && (
+      <div style={styles.headerRow}>
         <button
-          onClick={onSkip}
-          style={styles.skipButton}
-          onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; b.style.borderColor = colors.text; }}
-          onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.textMuted; b.style.borderColor = colors.border; }}
+          onClick={onBack}
+          style={styles.backButton}
+          onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
+          onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
         >
-          Skip {'\u2192'}
+          {'←'} Back
         </button>
-      )}
 
-      <h1 style={styles.title}>
-        Lavern <span style={{ fontStyle: 'italic' }}>Briefing</span>
-      </h1>
+        <h1 style={styles.title}>
+          Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Briefing</span>
+        </h1>
+
+        {onSkip ? (
+          <button
+            onClick={onSkip}
+            style={styles.skipButton}
+            onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; b.style.borderColor = colors.text; }}
+            onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.textMuted; b.style.borderColor = colors.border; }}
+          >
+            Skip {'→'}
+          </button>
+        ) : (
+          <span style={styles.spacer} aria-hidden="true" />
+        )}
+      </div>
 
       <p style={styles.subtitle}>
         {parts.join(' · ')}
@@ -74,10 +79,14 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     marginBottom: 24,
   },
+  headerRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    width: '100%',
+  },
   backButton: {
-    position: 'absolute' as const,
-    left: 48,
-    top: 48,
     padding: '6px 14px',
     borderRadius: radii.sm,
     border: `1.5px solid ${colors.text}`,
@@ -90,19 +99,20 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase' as const,
     cursor: 'pointer',
     transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
+    flexShrink: 0,
   },
   title: {
-    fontSize: 32,
-    fontFamily: fonts.serif,
-    fontWeight: 300,
+    fontSize: 'clamp(22px, 5.5vw, 32px)',
+    fontFamily: fonts.sans,
+    fontWeight: 400,
     color: colors.text,
     margin: 0,
     lineHeight: 1.2,
+    flex: '1 1 auto',
+    minWidth: 0,
+    textAlign: 'center',
   },
   skipButton: {
-    position: 'absolute' as const,
-    right: 48,
-    top: 48,
     padding: '6px 14px',
     borderRadius: radii.sm,
     border: `1.5px solid ${colors.border}`,
@@ -115,6 +125,12 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase' as const,
     cursor: 'pointer',
     transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
+    flexShrink: 0,
+  },
+  spacer: {
+    // Invisible placeholder to keep title centered when no Skip button.
+    display: 'inline-block',
+    minWidth: 78,
   },
   subtitle: {
     fontSize: 13,

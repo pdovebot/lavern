@@ -54,7 +54,7 @@ const S: Record<string, React.CSSProperties> = {
     animation: 'partnerTextFadeIn 0.6s ease both',
   },
   stepBadge: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 9,
     fontWeight: 700,
     letterSpacing: 1.5,
@@ -65,7 +65,7 @@ const S: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   content: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 11,
     color: '#4a4a4a',
     letterSpacing: 0.3,

@@ -284,7 +284,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 14,
     fontFamily: fonts.serif,
     fontWeight: 500,
-    fontStyle: 'italic',
     color: colors.textSecondary,
     marginBottom: 4,
   },
@@ -338,7 +337,6 @@ const styles: Record<string, React.CSSProperties> = {
   hint: {
     fontSize: 12,
     fontFamily: fonts.sans,
-    fontStyle: 'italic',
     color: colors.textDim,
     marginBottom: 8,
   },
@@ -391,7 +389,6 @@ const styles: Record<string, React.CSSProperties> = {
   maxRoundsNote: {
     fontSize: 11,
     fontFamily: fonts.sans,
-    fontStyle: 'italic',
     color: colors.textDim,
     textAlign: 'center' as const,
   },

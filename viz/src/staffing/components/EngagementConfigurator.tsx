@@ -168,7 +168,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic',
   },
   orchestratorSection: {
     display: 'flex',
@@ -183,7 +182,6 @@ const styles: Record<string, React.CSSProperties> = {
   connectorText: {
     fontSize: 14,
     fontFamily: fonts.serif,
-    fontStyle: 'italic',
     color: colors.textMuted,
     letterSpacing: 0.2,
   },

@@ -1,7 +1,7 @@
 /**
  * LavernMark — The Lavern "L" mark.
  *
- * A single serif "L" rendered in Cormorant Garamond.
+ * A single serif "L" rendered in Newsreader.
  * Appears in the upper-left corner of every page.
  * Clicking navigates home (landing page).
  */

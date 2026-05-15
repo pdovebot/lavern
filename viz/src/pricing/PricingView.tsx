@@ -601,7 +601,7 @@ export default function PricingView({ onBack }: Props) {
         <Section label="What an Hour Gets You" delay={0.3}>
           <div style={sty.pitch}>
             One hour costs{' '}
-            <span style={{ color: D.gold, fontWeight: 400 }}>ten cents.</span>{' '}
+            <span style={{ color: D.gold, fontFamily: fonts.serif, fontWeight: 400 }}>ten cents.</span>{' '}
             Here{'\u2019'}s what that buys.
           </div>
           <div style={sty.engList}>
@@ -639,7 +639,7 @@ export default function PricingView({ onBack }: Props) {
         <Section label={"Who\u2019s on Your Team"} delay={0.4}>
           <div style={sty.pitch}>
             The same work.{' '}
-            <span style={{ color: D.gold, fontStyle: 'italic' }}>A different century{'\u2019'}s rates.</span>
+            <span style={{ color: D.gold, fontFamily: fonts.serif, fontWeight: 400 }}>A different century{'\u2019'}s rates.</span>
           </div>
           <div style={sty.rateGrid}>
             <RateCard
@@ -690,7 +690,7 @@ export default function PricingView({ onBack }: Props) {
         <Section label="Buy Hours" delay={0.45}>
           <div ref={packsRef} style={sty.pitch}>
             Top off anytime.{' '}
-            <span style={{ color: D.gold }}>No commitment.</span>
+            <span style={{ color: D.gold, fontFamily: fonts.serif, fontWeight: 400 }}>No commitment.</span>
           </div>
           <div style={sty.packGrid}>
             <PlanCard
@@ -751,7 +751,7 @@ export default function PricingView({ onBack }: Props) {
         <Section label="Subscribe & Save" delay={0.48}>
           <div style={sty.pitch}>
             Use Lavern regularly?{' '}
-            <span style={{ color: D.gold, fontStyle: 'italic' }}>Save with a plan.</span>
+            <span style={{ color: D.gold, fontFamily: fonts.serif, fontWeight: 400 }}>Save with a plan.</span>
           </div>
           <div style={sty.subGrid}>
             <div style={sty.subCard}>
@@ -781,7 +781,7 @@ export default function PricingView({ onBack }: Props) {
         <Section label="What It Actually Costs" delay={0.5}>
           <h3 style={sty.pitch}>
             The same documents.{' '}
-            <span style={{ color: D.gold, fontStyle: 'italic' }}>A fraction of the bill.</span>
+            <span style={{ color: D.gold, fontFamily: fonts.serif, fontWeight: 400 }}>A fraction of the bill.</span>
           </h3>
           <div style={sty.compList}>
             <ComparisonCard
@@ -1077,7 +1077,6 @@ const sty: Record<string, React.CSSProperties> = {
     fontSize: 32,
     fontWeight: 300,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: D.gold,
     margin: 0,
     letterSpacing: 2,
@@ -1391,8 +1390,7 @@ const sty: Record<string, React.CSSProperties> = {
     fontSize: 14,
     fontFamily: fonts.sans,
     color: D.strikethrough,
-    textDecoration: 'line-through',
-    fontStyle: 'italic' as const,
+    textDecoration: 'line-through' as const,
   },
   rateTraditionalLabel: {
     fontSize: 9,
@@ -1727,8 +1725,7 @@ const sty: Record<string, React.CSSProperties> = {
     fontFamily: fonts.sans,
     fontWeight: 300,
     color: D.strikethrough,
-    textDecoration: 'line-through',
-    fontStyle: 'italic' as const,
+    textDecoration: 'line-through' as const,
   },
   compSavings: {
     fontSize: 20,
@@ -1873,7 +1870,6 @@ const sty: Record<string, React.CSSProperties> = {
   ctaDone: {
     fontSize: 18,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: D.gold,
   },
   ctaDoneCheck: {

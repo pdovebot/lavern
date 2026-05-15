@@ -78,7 +78,7 @@ export default function StrategyView({ onComplete, onBack, onSkip }: Props) {
           >
             {'\u2190'} Back
           </button>
-          <h1 style={styles.title}>Lavern <span style={{ fontStyle: 'italic' }}>Strategy</span></h1>
+          <h1 style={styles.title}>Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Strategy</span></h1>
           {onSkip && (
             <button
               onClick={onSkip}
@@ -184,9 +184,9 @@ const styles: Record<string, React.CSSProperties> = {
     transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 300,
-    fontFamily: fonts.serif,
+    fontSize: 'clamp(22px, 5.5vw, 32px)',
+    fontWeight: 400,
+    fontFamily: fonts.sans,
     color: colors.text,
     letterSpacing: -0.5,
     margin: 0,
@@ -199,7 +199,6 @@ const styles: Record<string, React.CSSProperties> = {
   intro: {
     fontSize: 13,
     fontFamily: fonts.serif,
-    fontStyle: 'italic',
     color: colors.textMuted,
     margin: `0 0 ${spacing.lg}px`,
     lineHeight: 1.5,

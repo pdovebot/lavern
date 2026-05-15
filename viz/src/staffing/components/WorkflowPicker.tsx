@@ -208,7 +208,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   whyUse: {
     fontSize: 11,
-    fontStyle: 'italic',
     lineHeight: '15px',
     color: colors.textDim,
     marginTop: 2,
@@ -223,6 +222,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 12,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic',
   },
 };

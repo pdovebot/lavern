@@ -72,7 +72,7 @@ export default function MyPageView({ onBack }: Props) {
       </button>
 
       {/* Page title */}
-      <h1 style={styles.pageTitle}>Lavern <span style={{ fontStyle: 'italic' }}>Profile</span></h1>
+      <h1 style={styles.pageTitle}>Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Profile</span></h1>
       <p style={styles.pageSub}>
         Your preferences persist across engagements. Everything saves automatically.
       </p>
@@ -289,7 +289,7 @@ export default function MyPageView({ onBack }: Props) {
 
           <div style={styles.soulLabel}>Soul</div>
           <h2 style={styles.soulHeading}>
-            What kind of firm<br />is Lavern <em>for you?</em>
+            What kind of firm<br />is Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>for you?</span>
           </h2>
           <p style={styles.soulSub}>
             Voice. Principles. Values. The character that shapes every decision your agents make.
@@ -757,9 +757,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   pageTitle: {
-    fontFamily: fonts.serif,
-    fontSize: 36,
-    fontWeight: 300,
+    fontFamily: fonts.sans,
+    fontSize: 'clamp(24px, 6vw, 36px)',
+    fontWeight: 400,
     color: colors.text,
     margin: 0,
     letterSpacing: -0.5,
@@ -890,7 +890,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '16px 20px',
     fontSize: 15,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: 'rgba(250, 249, 246, 0.85)',
     backgroundColor: 'rgba(250, 249, 246, 0.05)',
     border: '1px solid rgba(250, 249, 246, 0.1)',
@@ -1085,7 +1084,6 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 640,
     fontSize: 13,
     color: colors.textDim,
-    fontStyle: 'italic',
     textAlign: 'center',
     padding: `${spacing.xxl}px 0`,
   },

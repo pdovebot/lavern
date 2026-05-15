@@ -587,7 +587,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     color: colors.textMuted,
     padding: '6px 10px',
-    fontStyle: 'italic',
   },
   // ── Your-roster section ──────────────────────────────────────────────
   roster: {
@@ -737,6 +736,5 @@ const styles: Record<string, React.CSSProperties> = {
   importHint: {
     fontSize: 12,
     color: colors.textMuted,
-    fontStyle: 'italic',
   },
 };

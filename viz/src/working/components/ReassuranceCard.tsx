@@ -1,7 +1,7 @@
 /**
  * ReassuranceCard — System-level warmth during silent periods.
  *
- * A centered, serif-italic message that appears in the conversation feed
+ * A centered, serif message that appears in the conversation feed
  * when there's been a gap between high-value events. Reassures the user
  * that the system is working normally and that waiting is expected.
  *
@@ -56,8 +56,7 @@ const styles: Record<string, React.CSSProperties> = {
   message: {
     fontSize: 12,
     fontFamily: fonts.serif,
-    fontWeight: 400,
-    fontStyle: 'italic' as const,
+    fontWeight: 400 as const,
     color: colors.textDim,
     textAlign: 'center' as const,
     lineHeight: 1.4,

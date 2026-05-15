@@ -131,7 +131,7 @@ function markdownToHtml(md: string): string {
 function applyInline(text: string): string {
   return text
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    .replace(/\*(.+?)\*/g, '<span>$1</span>');
 }
 
 function escapeHtml(s: string): string {
@@ -311,11 +311,11 @@ export function DownloadPanel({ data, assemblyStatus, onRetry, selectedStyle: co
             h1{font-family:'Times New Roman',Times,serif;font-size:16pt;font-weight:bold;text-align:center;border-bottom:2px solid #1a1a1a;padding-bottom:8px;margin-bottom:24px;counter-reset:section}
             h2{font-family:'Times New Roman',Times,serif;font-size:13pt;font-weight:bold;margin-top:28px;counter-increment:section}
             h2::before{content:counter(section) '. '}
-            h3{font-family:'Times New Roman',Times,serif;font-size:12pt;font-weight:bold;font-style:italic}
+            h3{font-family:'Times New Roman',Times,serif;font-size:12pt;font-weight:bold;}
             h4{font-family:'Times New Roman',Times,serif;font-size:11pt;font-weight:bold}
             p{margin:0 0 12px;text-align:justify}
             ul,ol{padding-left:28px;margin:0 0 12px}
-            blockquote{border-left:3px solid #1a1a1a;margin:16px 0;padding:8px 16px;font-style:italic}
+            blockquote{border-left:3px solid #1a1a1a;margin:16px 0;padding:8px 16px;}
             hr{border:none;border-top:1px solid #1a1a1a;margin:24px 0}
             table{width:100%;border-collapse:collapse;border-spacing:0;margin:16px 0;font-size:11pt;line-height:1.4}
             th{background:#1a1a1a;color:#fff;padding:6px 10px;text-align:left;font-weight:bold;font-family:'Times New Roman',Times,serif;line-height:1.4}
@@ -323,19 +323,19 @@ export function DownloadPanel({ data, assemblyStatus, onRetry, selectedStyle: co
             tr:nth-child(even) td{background:#f5f5f5}
           `,
           elegant: `
-            @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400&display=swap');
-            body{font-family:'Inter',Helvetica,sans-serif;max-width:720px;margin:56px auto;line-height:1.8;color:#2c2118;font-size:14px;font-weight:300;background:#faf8f5}
-            h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:36px;font-weight:300;color:#b85c38;line-height:1.1;margin-bottom:32px;border:none}
-            h2{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:300;color:#2c2118;margin-top:40px;border-bottom:1px solid rgba(44,33,24,.12);padding-bottom:8px}
-            h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:400;font-style:italic;color:#b85c38}
-            h4{font-family:'Inter',Helvetica,sans-serif;font-size:13px;font-weight:500;color:#2c2118;margin-top:24px}
+            @import url('https://fonts.googleapis.com/css2?family=Newsreader:wght@300;400;500;600;700;800&family=Geist:wght@400;500;600;700&display=swap');
+            body{font-family:'Geist',Helvetica,sans-serif;max-width:720px;margin:56px auto;line-height:1.8;color:#2c2118;font-size:14px;font-weight:300;background:#faf8f5}
+            h1{font-family:'Newsreader',Georgia,serif;font-size:36px;font-weight:300;color:#b85c38;line-height:1.1;margin-bottom:32px;border:none}
+            h2{font-family:'Newsreader',Georgia,serif;font-size:24px;font-weight:300;color:#2c2118;margin-top:40px;border-bottom:1px solid rgba(44,33,24,.12);padding-bottom:8px}
+            h3{font-family:'Newsreader',Georgia,serif;font-size:18px;font-weight:400;color:#b85c38}
+            h4{font-family:'Geist',Helvetica,sans-serif;font-size:13px;font-weight:500;color:#2c2118;margin-top:24px}
             p{margin:0 0 16px}
             ul,ol{padding-left:24px;margin:0 0 16px}
-            blockquote{border-left:2px solid #b85c38;margin:24px 0;padding:12px 20px;font-style:italic;color:#6b5744}
+            blockquote{border-left:2px solid #b85c38;margin:24px 0;padding:12px 20px;color:#6b5744}
             hr{border:none;border-top:1px solid rgba(44,33,24,.15);margin:32px 0}
             strong{font-weight:500}
             table{width:100%;border-collapse:collapse;border-spacing:0;margin:24px 0;font-size:13px;line-height:1.4}
-            th{background:#f5ede8;color:#2c2118;padding:7px 12px;text-align:left;font-weight:500;font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;border-bottom:2px solid #c4795a;line-height:1.4}
+            th{background:#f5ede8;color:#2c2118;padding:7px 12px;text-align:left;font-weight:500;font-family:'Newsreader',Georgia,serif;font-size:14px;border-bottom:2px solid #c4795a;line-height:1.4}
             td{padding:7px 12px;border-bottom:1px solid #ddd0c8;vertical-align:top;line-height:1.4}
             tr:last-child td{border-bottom:none}
           `,

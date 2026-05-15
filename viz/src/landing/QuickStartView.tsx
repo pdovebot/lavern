@@ -258,10 +258,10 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
 
       {/* ── Top nav ────────────────────────────────────── */}
       <div
-        className="relative z-2 w-full flex justify-between items-center pt-5 px-7 box-border"
+        className="relative z-2 w-full flex justify-between items-center pt-5 px-4 sm:px-7 box-border gap-2"
         style={{ animation: 'qsFadeIn 0.5s ease 0.7s both' }}
       >
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 sm:gap-5">
           {/* The Archive — quiet serif, just typography */}
           <button
             onClick={() => { window.location.hash = '#/archive'; }}
@@ -270,7 +270,6 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
               padding: '4px 0',
               color: archiveHovered ? colors.text : colors.textMuted,
               fontFamily: fonts.serif,
-              fontStyle: 'italic',
               fontSize: 15,
               fontWeight: 400,
               letterSpacing: 0.5,
@@ -291,7 +290,6 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
                   padding: '4px 0',
                   color: pricingHovered ? colors.text : colors.textMuted,
                   fontFamily: fonts.serif,
-                  fontStyle: 'italic',
                   fontSize: 15,
                   fontWeight: 400,
                   letterSpacing: 0.5,
@@ -326,12 +324,11 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           {onChallenge && (
             <button
               onClick={onChallenge}
-              className="cursor-pointer bg-transparent border-none transition-all duration-300 ease-in-out"
+              className="hidden sm:inline-flex cursor-pointer bg-transparent border-none transition-all duration-300 ease-in-out"
               style={{
                 padding: '4px 0',
                 color: challengeHovered ? colors.text : colors.textMuted,
                 fontFamily: fonts.serif,
-                fontStyle: 'italic',
                 fontSize: 15,
                 fontWeight: 400,
                 letterSpacing: 0.5,
@@ -349,7 +346,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           {/* Claw — the night shift */}
           <button
             onClick={() => { window.location.hash = '#/claw'; }}
-            className="cursor-pointer bg-transparent border-none transition-all duration-300 ease-in-out"
+            className="hidden sm:inline-flex cursor-pointer bg-transparent border-none transition-all duration-300 ease-in-out"
             style={{
               fontSize: 18,
               padding: '2px 6px',
@@ -364,7 +361,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           </button>
 
           {/* Separator */}
-          <div className="w-px h-4 bg-border opacity-40 mx-1" />
+          <div className="hidden sm:block w-px h-4 bg-border opacity-40 mx-1" />
 
           {/* Account buttons — compact */}
           <ShimmerButton onClick={() => { window.location.hash = '#/my-cases'; }} className="px-[14px] py-1.5 text-[10px]">
@@ -383,7 +380,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           className="text-3xl sm:text-4xl lg:text-[52px] font-light font-serif text-text m-0 tracking-tight leading-[1.15]"
           style={{ animation: 'qsFadeUp 0.7s ease 0.1s both' }}
         >
-          Your firm is{' '}<span className="italic">ready.</span>
+          Your firm is{' '}<span className="font-serif font-light text-text-muted">ready.</span>
         </h1>
         <p
           className="text-[13px] sm:text-sm font-serif text-text-muted mt-4 tracking-[0.3px] leading-normal"
@@ -443,7 +440,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
             'text-base lg:text-[17px] font-serif text-text',
             'bg-transparent border-none resize-none outline-none',
             'leading-[1.7] box-border min-h-[120px]',
-            'placeholder:font-serif placeholder:italic placeholder:text-text-dim',
+            'placeholder:font-serif placeholder:text-text-dim',
           )}
         />
 
@@ -470,7 +467,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           <p className="text-xs font-sans text-danger mx-7 mb-2">{uploadError}</p>
         )}
         {parsing && (
-          <p className="text-[11px] font-sans text-text-muted mx-7 mb-2 italic">
+          <p className="text-[11px] font-sans text-text-muted mx-7 mb-2">
             Parsing{'\u2026'}
           </p>
         )}

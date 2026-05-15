@@ -99,7 +99,7 @@ export function ActivityRing({ progress, activeCount, size = 64 }: ActivityRingP
           fill={strokeColor}
           fontSize={isActive ? 14 : 16}
           fontWeight={600}
-          fontFamily="Inter, sans-serif"
+          fontFamily="Geist, sans-serif"
         >
           {progress >= 1 ? '✓' : isActive ? activeCount : '·'}
         </text>

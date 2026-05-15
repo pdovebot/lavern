@@ -236,7 +236,7 @@ export default function LandingView({ onEnter, onMyPage, onAgentDocs }: Props) {
         </h1>
         <h1
           className={cn(
-            'text-3xl sm:text-4xl lg:text-[56px] font-light font-serif italic',
+            'text-3xl sm:text-4xl lg:text-[56px] font-light font-serif',
             'text-[rgba(250,249,246,0.55)] m-0 mt-0.5 tracking-[0.5px] leading-[1.15] text-center',
           )}
           style={{
@@ -331,7 +331,7 @@ export default function LandingView({ onEnter, onMyPage, onAgentDocs }: Props) {
 
         {waitlistDone ? (
           <p
-            className="text-sm font-serif italic m-0 tracking-wide"
+            className="text-sm font-serif m-0 tracking-wide"
             style={{ color: '#B8960B' }}
           >
             You're on the list.
@@ -339,7 +339,7 @@ export default function LandingView({ onEnter, onMyPage, onAgentDocs }: Props) {
         ) : (
           <>
             <p
-              className="text-xs font-serif italic m-0 mb-4 tracking-wide"
+              className="text-xs font-serif m-0 mb-4 tracking-wide"
               style={{ color: 'rgba(250, 249, 246, 0.35)' }}
             >
               Get notified when we launch
@@ -412,7 +412,7 @@ export default function LandingView({ onEnter, onMyPage, onAgentDocs }: Props) {
         {/* Already have an invite? */}
         <button
           onClick={() => { window.location.hash = '#/login'; }}
-          className="bg-transparent border-none cursor-pointer font-serif italic text-[11px] tracking-wide mt-4"
+          className="bg-transparent border-none cursor-pointer font-serif text-[11px] tracking-wide mt-4"
           style={{
             color: 'rgba(250, 249, 246, 0.18)',
             transition: 'color 0.3s ease',

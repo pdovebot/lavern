@@ -152,7 +152,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: fonts.sans,
     fontWeight: 400,
     color: colors.textMuted,
-    fontStyle: 'italic' as const,
   },
   doneBubble: {
     display: 'inline-flex',

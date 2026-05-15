@@ -3,7 +3,7 @@
  * has not verified their email address.
  *
  * Design: matches the connection-lost / halt-error banner language —
- * warm amber with pulsing dot, Inter sans-serif, understated but visible.
+ * warm amber with pulsing dot, Geist sans-serif, understated but visible.
  *
  * Dismissible per session (reappears on reload). Includes a "Resend"
  * button that POSTs to /api/auth/resend-verification with feedback states.

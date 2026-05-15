@@ -97,7 +97,7 @@ export function SessionList({ onBeginEngagement, onYoloLaunch }: SessionListProp
         </p>
 
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-light font-serif text-text m-0 mt-4 tracking-tight leading-none">
-          Your <span className="italic font-light">Engagements</span>
+          Your <span className="font-light">Engagements</span>
         </h1>
 
         <p className="text-sm sm:text-base text-text-muted mt-6 font-normal leading-relaxed font-sans tracking-[0.3px]">

@@ -37,9 +37,9 @@ const BORDER = '#E5E3DD';
 const TEXT   = '#1A1A1A';
 const MUTED  = '#6B6B67';
 const ACCENT = '#C45D3E';
-const SERIF  = "'Cormorant Garamond', Georgia, serif";
-const SANS   = "'Inter', -apple-system, sans-serif";
-const MONO   = "'SF Mono', 'Fira Code', Menlo, monospace";
+const SERIF  = "'Newsreader', Georgia, serif";
+const SANS   = "'Geist', -apple-system, sans-serif";
+const MONO   = "'Geist Mono', 'SF Mono', 'Fira Code', Menlo, monospace";
 
 // Category colours (matches real app tokens)
 const CAT: Record<string, string> = {
@@ -424,7 +424,7 @@ function S0Case({ isMobile, selected, onPick, onContinue: _onContinue }: {
   const [hov, setHov] = useState<CaseId | null>(null);
   return (
     <Shell isMobile={isMobile} light
-      headline={<>It actually<br />does <em style={{fontStyle:'italic'}}>stuff.</em></>}
+      headline={<>It actually<br />does <span style={{}}>stuff.</span></>}
       sub={<>A law firm on autopilot. 66 specialist agents, one billable hour at a time. Except our billable hours cost 1000x less than in a human law firm.<br /><br />Pick a case.</>}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -486,7 +486,7 @@ function S1Partner({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId
 
   return (
     <Shell isMobile={isMobile}
-      headline={<>Talk to<br />a <em style={{fontStyle:'italic'}}>partner.</em></>}
+      headline={<>Talk to<br />a <span style={{}}>partner.</span></>}
       sub={<>Lavern listens, asks the right questions, and assembles the team.<br /><br />Agents grounding the answers and tirelessly checking the quality.</>}
       footer={phase >= 4 ? (
         <button
@@ -593,7 +593,7 @@ function S2Voice({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: 
 
   return (
     <Shell isMobile={isMobile}
-      headline={<>Lavern<br /><em style={{fontStyle:'italic'}}>listens.</em></>}
+      headline={<>Lavern<br /><span style={{}}>listens.</span></>}
       sub="Just talk to the agents. Plain language. No forms. Just say what you need."
       footer={phase >= 4 ? (
         <button onClick={(e) => { e.stopPropagation(); onContinue(); }}
@@ -722,7 +722,7 @@ function S2Voice({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: 
         {phase >= 4 && (
           <div style={{ animation: 'dBubble .4s ease both', marginTop: 16 }}>
             <div style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(250,249,246,.65)', marginBottom: 8 }}>Lavern</div>
-            <p style={{ fontFamily: SERIF, fontSize: isMobile ? 17 : 20, fontWeight: 300, color: 'rgba(250,249,246,.75)', fontStyle: 'italic', lineHeight: 1.4, margin: 0 }}>
+            <p style={{ fontFamily: SERIF, fontSize: isMobile ? 17 : 20, fontWeight: 300, color: 'rgba(250,249,246,.75)', lineHeight: 1.4, margin: 0 }}>
               {c.voiceReply}
             </p>
           </div>
@@ -793,7 +793,7 @@ function S3Team({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: C
 
   return (
     <Shell isMobile={isMobile}
-      headline={<>Assemble<br />your <em style={{fontStyle:'italic'}}>team.</em></>}
+      headline={<>Assemble<br />your <span style={{}}>team.</span></>}
       sub={<>Partners, red teamers, privacy counsel, risk pricers, designers. Not only lawyers.<br /><br />66 specialists on the bench.</>}
       footer={showCTA ? (
         <button onClick={(e) => { e.stopPropagation(); onContinue(); }}
@@ -1087,7 +1087,7 @@ function S4Builder({ isMobile, caseId, onLaunch }: { isMobile: boolean; caseId: 
       />
     )}
     <Shell isMobile={isMobile}
-      headline={<>Make it<br /><em style={{fontStyle:'italic'}}>yours.</em></>}
+      headline={<>Make it<br /><span style={{}}>yours.</span></>}
       sub="66 agents in the roster. Not enough? Forge your own. Set the rules. Make your own team of experts."
       footer={
         <button
@@ -1411,7 +1411,7 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
         <div style={{ position: 'absolute', top: '36%', left: 0, right: 0, bottom: 0, zIndex: 10, padding: '0 24px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(40px,11vw,56px)', fontWeight: 300, lineHeight: 0.95, letterSpacing: -1.5, color: CREAM, margin: '0 0 28px', animation: 'dReveal .8s ease .2s both' }}>
-              While you <em style={{ fontStyle: 'italic' }}>sleep.</em>
+              While you <span>sleep.</span>
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18, opacity: showSteps ? 1 : 0, transform: showSteps ? 'none' : 'translateY(10px)', transition: 'opacity .5s ease, transform .5s ease' }}>
               {STEPS.map(s => (
@@ -1458,7 +1458,7 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
             color: CREAM, margin: 0,
             animation: 'dReveal .9s ease .1s both',
           }}>
-            While you <em style={{ fontStyle: 'italic' }}>sleep.</em>
+            While you <span>sleep.</span>
           </h2>
         </div>
       </div>
@@ -1577,7 +1577,7 @@ function SIntro({ isMobile, onContinue }: { isMobile: boolean; onContinue: () =>
           color: CREAM, margin: '0 0 24px',
           animation: 'dReveal .9s ease .3s both',
         }}>
-          Software <em style={{ fontStyle: 'italic' }}>masquerading</em><br />as a law firm.
+          Software <span>masquerading</span><br />as a law firm.
         </h1>
 
         {/* Sub */}

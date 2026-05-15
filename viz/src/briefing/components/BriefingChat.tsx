@@ -253,7 +253,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 400,
     color: colors.textSecondary,
     lineHeight: 1.5,
-    fontStyle: 'italic',
   },
 
   // ── Footer ──────────────────────────────────────────────────────────────

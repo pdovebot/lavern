@@ -382,7 +382,6 @@ const styles: Record<string, React.CSSProperties> = {
   noDebateNote: {
     fontSize: 12,
     color: colors.textMuted,
-    fontStyle: 'italic' as const,
   },
 
   // Cost

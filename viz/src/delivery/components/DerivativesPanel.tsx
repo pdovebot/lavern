@@ -493,7 +493,6 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: spacing.md,
     fontSize: 11,
     color: colors.textDim,
-    fontStyle: 'italic' as const,
     textAlign: 'center' as const,
   },
 };

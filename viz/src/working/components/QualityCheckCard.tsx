@@ -262,7 +262,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: fonts.sans,
     fontWeight: 400,
     color: colors.textSecondary,
-    lineHeight: '1.4',
-    fontStyle: 'italic' as const,
+    lineHeight: '1.4' as const,
   },
 };

@@ -103,14 +103,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 10,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic',
     marginTop: -2,
   },
   emptyText: {
     fontSize: 12,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic',
     marginTop: 2,
   },
   costRow: {
@@ -167,7 +165,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 10,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic',
     marginTop: 4,
   },
 };

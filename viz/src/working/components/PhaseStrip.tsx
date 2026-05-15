@@ -122,7 +122,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: fonts.sans,
     fontWeight: 400,
     color: colors.textDim,
-    fontStyle: 'italic',
   },
   estimatedTime: {
     fontSize: 10,

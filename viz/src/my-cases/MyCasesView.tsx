@@ -302,16 +302,16 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap' as const,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 300,
-    fontFamily: fonts.serif,
+    fontSize: 'clamp(20px, 5vw, 28px)',
+    fontWeight: 400,
+    fontFamily: fonts.sans,
     color: colors.text,
     margin: 0,
     letterSpacing: -0.5,
   },
   titleItalic: {
-    fontStyle: 'italic' as const,
-    fontWeight: 300,
+    fontFamily: fonts.serif,
+    fontWeight: 400,
   },
   refreshBtn: {
     background: 'none',

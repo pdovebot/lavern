@@ -328,7 +328,7 @@ export default function TeamView({ onTeamConfirmed, onBack, onSkip }: Props) {
           >
             {'\u2190'} Strategy
           </button>
-          <h1 style={styles.title}>Lavern <span style={{ fontStyle: 'italic' }}>Team</span></h1>
+          <h1 style={styles.title}>Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Team</span></h1>
           {onSkip && (
             <button
               onClick={onSkip}
@@ -642,9 +642,9 @@ const styles: Record<string, React.CSSProperties> = {
     transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 300,
-    fontFamily: fonts.serif,
+    fontSize: 'clamp(22px, 5.5vw, 32px)',
+    fontWeight: 400,
+    fontFamily: fonts.sans,
     color: colors.text,
     letterSpacing: -0.5,
     margin: 0,
@@ -668,7 +668,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic',
     flexShrink: 0,
   },
   loadingMessage: {

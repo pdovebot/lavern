@@ -781,7 +781,6 @@ export default function AgentDocsView({ onBack }: Props) {
             </div>
             <div style={{
               fontFamily: fonts.serif,
-              fontStyle: 'italic',
               fontSize: 14,
               color: clawHover ? 'rgba(250, 249, 246, 0.7)' : D.textDim,
               letterSpacing: 1,
@@ -883,7 +882,6 @@ const sty: Record<string, React.CSSProperties> = {
   subtitle: {
     fontSize: 18,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     fontWeight: 300,
     color: D.textDim,
     marginTop: 8,

@@ -71,7 +71,6 @@ const AgentBuilderView = lazy(() => import('./agent-builder/AgentBuilderView.js'
 const PublicAgentShareView = lazy(() => import('./agent-builder/PublicAgentShareView.js'));
 const PublicTeamShareView = lazy(() => import('./agent-builder/PublicTeamShareView.js'));
 const LegalView = lazy(() => import('./legal/LegalView.js'));
-const FoyerView = lazy(() => import('./landing/FoyerView.js'));
 const PartnerView = lazy(() => import('./partner/PartnerView.js'));
 const ShowcaseView = lazy(() => import('./showcase/ShowcaseView.js'));
 
@@ -161,9 +160,9 @@ function VerifyEmailHandler() {
   }, []);
 
   return (
-    <div style={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0ede8', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0ede8', fontFamily: 'Geist, sans-serif' }}>
       <div style={{ textAlign: 'center', maxWidth: 400, padding: 32 }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, fontWeight: 300, fontStyle: 'italic', marginBottom: 16 }}>
+        <h2 style={{ fontFamily: "'Newsreader', serif", fontSize: 24, fontWeight: 300, marginBottom: 16 }}>
           {status === 'verifying' ? 'Verifying...' : status === 'success' ? 'Verified' : 'Error'}
         </h2>
         <p style={{ fontSize: 14, color: '#6b6560', lineHeight: 1.6 }}>{message}</p>
@@ -669,12 +668,12 @@ export function App() {
       <div style={{
         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#0A0A0F', color: '#FAF9F6', fontFamily: "'Inter', -apple-system, sans-serif",
+        backgroundColor: '#0A0A0F', color: '#FAF9F6', fontFamily: "'Geist', -apple-system, sans-serif",
         zIndex: 99999,
       }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>{isSuccess ? '✓' : '×'}</div>
         <h1 style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 32,
+          fontFamily: "'Newsreader', Georgia, serif", fontSize: 32,
           fontWeight: 300, letterSpacing: -0.5, margin: '0 0 12px',
         }}>
           {isSuccess ? 'Hours credited.' : 'Purchase cancelled.'}
@@ -1324,7 +1323,7 @@ export function App() {
     );
   }
 
-  // ── Foyer — the new default landing ─────────────────────────────────
+  // ── QuickStart — the new default landing ───────────────────────────
   return (
     <ErrorBoundary>
       {skipLink}
@@ -1332,14 +1331,12 @@ export function App() {
       {offlineBanner}
       {verifyBanner}
       {cursor}
-      <Suspense fallback={<div style={{ width: '100%', height: '100vh', backgroundColor: '#f0ede8' }} />}>
-        <FoyerView
-          onPartner={() => { window.location.hash = '#/partner'; }}
-          onQuickStart={() => { window.location.hash = '#/quickstart'; }}
-          onMyPage={() => { window.location.hash = '#/my-page'; }}
-          onLogin={() => { window.location.hash = '#/login'; }}
-          onAgentDocs={() => { window.location.hash = '#/agent-docs'; }}
-          onDemo={() => { window.location.hash = '#/demo'; }}
+      <Suspense fallback={<ViewFallback text="Loading..." />}>
+        <QuickStartView
+          onQuickStart={handleQuickStart}
+          onGuidedFlow={() => { window.location.hash = '#/intake'; }}
+          onPricing={() => { window.location.hash = '#/pricing'; }}
+          onChallenge={() => { window.location.hash = '#/challenge'; }}
         />
       </Suspense>
     </ErrorBoundary>

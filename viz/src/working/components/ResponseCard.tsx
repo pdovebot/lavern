@@ -85,7 +85,6 @@ const styles: Record<string, React.CSSProperties> = {
   verb: {
     fontSize: 11,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     fontWeight: 500,
   },
   time: {

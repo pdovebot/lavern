@@ -240,11 +240,11 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#E8845C', marginTop: 2,
   },
   previewTagline: {
-    fontFamily: fonts.serif, fontStyle: 'italic',
+    fontFamily: fonts.serif,
     fontSize: 16, color: 'rgba(245,239,223,0.7)', marginTop: 4,
   },
   previewOwner: {
-    fontSize: 11, color: 'rgba(245,239,223,0.5)', marginTop: 4, fontStyle: 'italic',
+    fontSize: 11, color: 'rgba(245,239,223,0.5)', marginTop: 4,
   },
   previewActions: { display: 'flex', gap: 10, marginTop: 16 },
   importConfirmBtn: {

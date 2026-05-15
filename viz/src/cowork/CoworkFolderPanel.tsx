@@ -168,7 +168,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 12,
     fontFamily: fonts.sans,
     color: colors.textMuted,
-    fontStyle: 'italic' as const,
   },
   emptyRow: {
     padding: `${spacing.md}px`,
@@ -186,6 +185,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 10,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic' as const,
   },
 };

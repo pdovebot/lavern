@@ -142,8 +142,7 @@ const styles: Record<string, React.CSSProperties> = {
   chartTitle: {
     fontFamily: fonts.serif,
     fontSize: 14,
-    fontWeight: 400,
-    fontStyle: 'italic' as const,
+    fontWeight: 400 as const,
     color: colors.textMuted,
   },
   chartMeta: {

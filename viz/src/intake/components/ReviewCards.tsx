@@ -109,7 +109,7 @@ const styles: Record<string, React.CSSProperties> = {
   cardBody: { fontSize: 13, fontFamily: fonts.sans, color: colors.textSecondary, lineHeight: 1.5 },
   flags: { marginTop: 8 },
   flag: { fontSize: 12, fontFamily: fonts.sans, color: colors.warning, marginTop: 4 },
-  noFlags: { fontSize: 12, fontFamily: fonts.sans, color: colors.textDim, fontStyle: 'italic', marginTop: 8 },
+  noFlags: { fontSize: 12, fontFamily: fonts.sans, color: colors.textDim, marginTop: 8 },
   footer: { display: 'flex', justifyContent: 'flex-end' },
   continueBtn: { padding: '12px 32px', borderRadius: radii.sm, border: `2px solid ${colors.text}`, backgroundColor: colors.text, color: '#fff', fontFamily: fonts.sans, fontSize: 12, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase' as const, cursor: 'pointer', transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease' },
 };

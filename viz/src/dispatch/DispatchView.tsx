@@ -148,8 +148,7 @@ const styles: Record<string, React.CSSProperties> = {
   title: {
     fontFamily: fonts.serif,
     fontSize: 32,
-    fontWeight: 400,
-    fontStyle: 'italic' as const,
+    fontWeight: 400 as const,
     color: '#E8E0D4',
     margin: '60px 0 4px',
   },

@@ -202,7 +202,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
   },
   title: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 52,
     fontWeight: 500,
     margin: 0,
@@ -214,7 +214,7 @@ const styles: Record<string, React.CSSProperties> = {
   subtitle: {
     fontSize: 14,
     color: 'rgba(245,239,223,0.6)',
-    fontFamily: `'Inter', sans-serif`,
+    fontFamily: `'Geist', sans-serif`,
   },
   heroWrap: {
     width: '100%',
@@ -252,7 +252,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: '#1A140A',
   },
   rosterName: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 17,
     fontWeight: 500,
     color: '#FAF7F0',
@@ -298,7 +298,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
   },
   wordmark: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 14,
     letterSpacing: 8,
     color: 'rgba(245,239,223,0.4)',
@@ -306,13 +306,12 @@ const styles: Record<string, React.CSSProperties> = {
   footerMeta: {
     fontSize: 11,
     color: 'rgba(245,239,223,0.35)',
-    fontFamily: `'Inter', sans-serif`,
+    fontFamily: `'Geist', sans-serif`,
   },
   loading: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 22,
     color: 'rgba(245,239,223,0.55)',
-    fontStyle: 'italic',
   },
   errorBox: {
     display: 'flex',
@@ -322,7 +321,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 40,
   },
   errorTitle: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 32,
     color: '#FAF7F0',
   },

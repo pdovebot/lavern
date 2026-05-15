@@ -24,7 +24,7 @@ export function ArchiveHeader({ onBack, searchQuery, onSearchChange, demoMode }:
           {'\u2190'} Back
         </button>
         <h1 style={styles.title}>
-          Lavern <span style={{ fontStyle: 'italic' }}>Archive</span>
+          Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Archive</span>
         </h1>
         <div style={{ width: 80 }} />
       </div>
@@ -73,9 +73,9 @@ const styles: Record<string, React.CSSProperties> = {
     transition: 'background-color 0.25s ease, color 0.25s ease',
   },
   title: {
-    fontFamily: fonts.serif,
-    fontSize: 32,
-    fontWeight: 300,
+    fontFamily: fonts.sans,
+    fontSize: 'clamp(22px, 5.5vw, 32px)',
+    fontWeight: 400,
     color: colors.text,
     margin: 0,
     letterSpacing: -0.5,

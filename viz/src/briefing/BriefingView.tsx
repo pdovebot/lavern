@@ -327,7 +327,7 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
             )}
 
             <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3 mt-5">
-              <span className="text-xs font-sans text-text-dim italic">
+              <span className="text-xs font-sans text-text-dim">
                 {upload.documents.length === 0
                   ? 'You can skip this step if you have no documents to upload.'
                   : ''}
@@ -414,7 +414,7 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
       {analysis.isAnalyzing && phase !== 'brief' && (
         <div className="flex items-center justify-center gap-2.5 p-6">
           <div className="w-2 h-2 rounded-full bg-accent" style={{ animation: 'pulse 1.2s ease-in-out infinite' }} />
-          <span className="text-sm font-serif italic text-text-secondary">Analyzing your intake...</span>
+          <span className="text-sm font-serif text-text-secondary">Analyzing your intake...</span>
         </div>
       )}
 
