@@ -29,9 +29,7 @@ import type { IntensityLevel } from '../../types/engagement.js';
 import { defaultBudgetForIntensity } from '../../types/engagement.js';
 import type { ClientIdentity } from '../../types/client.js';
 import { validateBody } from '../middleware/validation.js';
-import { checkX402Payment } from '../middleware/payment.js';
 import { config } from '../../config.js';
-import { canStartSession } from './billing.js';
 import { holdBillableHours } from '../../db/database.js';
 import { createLogger } from '../../utils/logger.js';
 import { captureError } from '../../utils/sentry.js';
@@ -405,13 +403,6 @@ export function registerEngageRoutes(
 
     // Extract client identity (attached by auth middleware)
     const client = (request as FastifyRequest & { client?: ClientIdentity }).client;
-    const isAuthenticated = !!client || !!(request as FastifyRequest & { userId?: string }).userId;
-
-    // x402 payment check — alternative auth for unauthenticated callers.
-    // When x402 is enabled and no Bearer/cookie auth is present, returns
-    // 402 Payment Required with USDC payment instructions. When x402 is
-    // disabled (default) or the caller is already authenticated, this is a no-op.
-    if (!checkX402Payment(request, reply, isAuthenticated)) return;
 
     // Resolve intensity + budget
     const intensity: IntensityLevel = body.constraints?.intensity ?? 'standard';

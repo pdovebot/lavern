@@ -1,104 +1,149 @@
 /**
  * Unit Tests — Tool Converter (src/providers/tool-converter.ts)
  *
- * Tests the bridge between MCP tool definitions and OpenAI function format.
+ * Verifies the bridge from `SdkMcpToolDefinition[]` to OpenAI function
+ * format used by the Mistral and local providers.
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { buildToolRegistry, type McpServer } from '../../src/providers/tool-converter.js';
+import { describe, it, expect } from 'vitest';
+import { z } from 'zod';
+import type { SdkMcpToolDefinition } from '@anthropic-ai/claude-agent-sdk';
+import { buildToolRegistry } from '../../src/providers/tool-converter.js';
 
-function createMockMcpServer(tools: Array<{ name: string; description?: string; inputSchema?: Record<string, unknown> }>, callResult?: { content: Array<{ type: string; text?: string }>; isError?: boolean }): McpServer {
-  return {
-    listTools: async () => ({ tools }),
-    callTool: async () => callResult ?? { content: [{ type: 'text', text: 'OK' }] },
-  };
+type ToolResult = { content: Array<{ type: string; text?: string }>; isError?: boolean };
+
+function makeTool(
+  name: string,
+  description: string | undefined,
+  inputSchema: Record<string, z.ZodTypeAny>,
+  handler: (args: unknown) => Promise<ToolResult>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): SdkMcpToolDefinition<any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return { name, description, inputSchema, handler } as unknown as SdkMcpToolDefinition<any>;
 }
 
 describe('buildToolRegistry', () => {
-  it('converts MCP tools to OpenAI function definitions', async () => {
-    const server = createMockMcpServer([
-      { name: 'debate_board', description: 'Post findings', inputSchema: { type: 'object', properties: { finding: { type: 'string' } } } },
-      { name: 'score', description: 'Score document' },
-    ]);
+  it('converts tool definitions to OpenAI function format', () => {
+    const tools = [
+      makeTool('debate_board', 'Post findings', { finding: z.string() }, async () => ({
+        content: [{ type: 'text', text: 'OK' }],
+      })),
+      makeTool('score', 'Score document', {}, async () => ({
+        content: [{ type: 'text', text: 'OK' }],
+      })),
+    ];
 
-    const registry = await buildToolRegistry(server);
+    const registry = buildToolRegistry(tools);
     expect(registry.definitions).toHaveLength(2);
     expect(registry.definitions[0].type).toBe('function');
     expect(registry.definitions[0].function.name).toBe('debate_board');
     expect(registry.definitions[0].function.description).toBe('Post findings');
-    expect(registry.definitions[0].function.parameters).toEqual({
-      type: 'object',
-      properties: { finding: { type: 'string' } },
-    });
+    const params = registry.definitions[0].function.parameters as Record<string, unknown>;
+    expect(params.type).toBe('object');
+    expect((params.properties as Record<string, unknown>).finding).toBeDefined();
   });
 
-  it('uses fallback description when none provided', async () => {
-    const server = createMockMcpServer([{ name: 'mystery_tool' }]);
-    const registry = await buildToolRegistry(server);
+  it('uses fallback description when none provided', () => {
+    const tools = [makeTool('mystery_tool', undefined, {}, async () => ({ content: [] }))];
+    const registry = buildToolRegistry(tools);
     expect(registry.definitions[0].function.description).toBe('Tool: mystery_tool');
   });
 
-  it('uses empty object schema when none provided', async () => {
-    const server = createMockMcpServer([{ name: 'no_schema' }]);
-    const registry = await buildToolRegistry(server);
-    expect(registry.definitions[0].function.parameters).toEqual({ type: 'object', properties: {} });
+  it('produces an empty-properties object schema for tools with no inputs', () => {
+    const tools = [makeTool('no_args', 'desc', {}, async () => ({ content: [] }))];
+    const registry = buildToolRegistry(tools);
+    const params = registry.definitions[0].function.parameters as Record<string, unknown>;
+    expect(params.type).toBe('object');
+    expect(params.properties).toEqual({});
   });
 
   it('callTool extracts text from successful result', async () => {
-    const server = createMockMcpServer(
-      [{ name: 'test' }],
-      { content: [{ type: 'text', text: 'Result line 1' }, { type: 'text', text: 'Result line 2' }] },
-    );
-    const registry = await buildToolRegistry(server);
+    const tools = [
+      makeTool('test', 'desc', {}, async () => ({
+        content: [
+          { type: 'text', text: 'Result line 1' },
+          { type: 'text', text: 'Result line 2' },
+        ],
+      })),
+    ];
+    const registry = buildToolRegistry(tools);
     const result = await registry.callTool('test', {});
     expect(result).toBe('Result line 1\nResult line 2');
   });
 
   it('callTool returns error text for isError responses', async () => {
-    const server = createMockMcpServer(
-      [{ name: 'test' }],
-      { content: [{ type: 'text', text: 'Something broke' }], isError: true },
-    );
-    const registry = await buildToolRegistry(server);
+    const tools = [
+      makeTool('test', 'desc', {}, async () => ({
+        content: [{ type: 'text', text: 'Something broke' }],
+        isError: true,
+      })),
+    ];
+    const registry = buildToolRegistry(tools);
     const result = await registry.callTool('test', {});
     expect(result).toContain('[TOOL ERROR]');
     expect(result).toContain('Something broke');
   });
 
   it('callTool handles empty error content', async () => {
-    const server = createMockMcpServer(
-      [{ name: 'test' }],
-      { content: [], isError: true },
-    );
-    const registry = await buildToolRegistry(server);
+    const tools = [
+      makeTool('test', 'desc', {}, async () => ({ content: [], isError: true })),
+    ];
+    const registry = buildToolRegistry(tools);
     const result = await registry.callTool('test', {});
     expect(result).toContain('Unknown tool error');
   });
 
-  it('callTool catches exceptions and returns error string', async () => {
-    const server: McpServer = {
-      listTools: async () => ({ tools: [{ name: 'throws' }] }),
-      callTool: async () => { throw new Error('Connection lost'); },
-    };
-    const registry = await buildToolRegistry(server);
+  it('callTool catches handler exceptions and returns error string', async () => {
+    const tools = [
+      makeTool('throws', 'desc', {}, async () => {
+        throw new Error('Connection lost');
+      }),
+    ];
+    const registry = buildToolRegistry(tools);
     const result = await registry.callTool('throws', {});
     expect(result).toContain('[TOOL ERROR]');
     expect(result).toContain('Connection lost');
   });
 
   it('callTool filters non-text content blocks', async () => {
-    const server = createMockMcpServer(
-      [{ name: 'test' }],
-      { content: [{ type: 'image', text: undefined }, { type: 'text', text: 'Real content' }] },
-    );
-    const registry = await buildToolRegistry(server);
+    const tools = [
+      makeTool('test', 'desc', {}, async () => ({
+        content: [
+          { type: 'image' },
+          { type: 'text', text: 'Real content' },
+        ],
+      })),
+    ];
+    const registry = buildToolRegistry(tools);
     const result = await registry.callTool('test', {});
     expect(result).toBe('Real content');
   });
 
-  it('handles empty tool list', async () => {
-    const server = createMockMcpServer([]);
-    const registry = await buildToolRegistry(server);
+  it('callTool returns error for unknown tool name', async () => {
+    const registry = buildToolRegistry([]);
+    const result = await registry.callTool('nonexistent', {});
+    expect(result).toContain('[TOOL ERROR]');
+    expect(result).toContain('Unknown tool');
+  });
+
+  it('callTool rejects invalid args via Zod', async () => {
+    const tools = [
+      makeTool(
+        'strict',
+        'desc',
+        { count: z.number().int().min(1) },
+        async () => ({ content: [{ type: 'text', text: 'ok' }] }),
+      ),
+    ];
+    const registry = buildToolRegistry(tools);
+    const result = await registry.callTool('strict', { count: 'not a number' });
+    expect(result).toContain('[TOOL ERROR]');
+    expect(result).toContain('invalid args');
+  });
+
+  it('handles empty tool list', () => {
+    const registry = buildToolRegistry([]);
     expect(registry.definitions).toEqual([]);
   });
 });
