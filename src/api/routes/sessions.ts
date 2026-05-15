@@ -37,7 +37,7 @@ import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 import { DERIVATIVE_TYPES, DERIVATIVE_TYPE_LIST, buildFullContext } from '../derivatives/derivative-types.js';
 import { agentProfiles } from '../../agents/profiles.js';
 import { getOrchestratorForWorkflow } from '../../workflows/orchestrator-mapping.js';
-import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchivedSessionById, getRecentArchivedSessions, getUserById, logAuditEvent, holdBillableHours, debitBillableHours, updateArchiveUserId } from '../../db/database.js';
+import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchivedSessionById, getUserById, logAuditEvent, holdBillableHours, debitBillableHours, updateArchiveUserId } from '../../db/database.js';
 import type { Moment, Audience, Jurisdiction } from '../../types/index.js';
 import type { ClientIdentity } from '../../types/client.js';
 import { config } from '../../config.js';
@@ -425,24 +425,14 @@ export function registerSessionRoutes(
       budget: s.budgetUsd,
     }));
 
-    // Include recent archived sessions so work survives server restarts
-    const archived = getRecentArchivedSessions(5);
-    const activeIds = new Set(active.map(s => s.id));
-    const archivedEntries = archived
-      .filter(a => !activeIds.has(a.id))
-      .map(a => ({
-        id: a.id,
-        currentStep: 'delivered' as const,
-        completedSteps: a.completed_steps_count ?? 0,
-        eventCount: 0,
-        cost: a.cost_usd,
-        budget: a.budget_usd,
-        _restored: true,
-      }));
-
+    // Archived sessions are surfaced separately via /api/sessions/archive and
+    // routed through the delivery view (which hydrates from SQLite). Including
+    // them here used to leak post-restart sessions into the "Active Sessions"
+    // list, where clicking opened the working view and triggered a "Session
+    // Expired" overlay because the WS handshake couldn't find them in memory.
     return reply.send({
-      sessions: [...active, ...archivedEntries],
-      total: active.length + archivedEntries.length,
+      sessions: active,
+      total: active.length,
     });
   });
 
