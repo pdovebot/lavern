@@ -11,12 +11,12 @@
  * 2. `apiFetch()` — Optional drop-in replacement for new code.
  *    Same interception + auto-includes `credentials: 'include'`.
  *
- * App.tsx listens for 'shem:api-error' events and shows toasts / TopUpDialog / logout.
+ * App.tsx listens for 'shem:api-error' events and shows toasts / handles logout.
  */
 
 // ── Event types ───────────────────────────────────────────────────────
 
-export type ApiErrorType = 'auth-expired' | 'payment-required' | 'rate-limited' | 'server-error';
+export type ApiErrorType = 'auth-expired' | 'rate-limited' | 'server-error';
 
 export interface ApiErrorEvent {
   type: ApiErrorType;
@@ -80,11 +80,6 @@ async function interceptResponse(res: Response, url: string): Promise<void> {
       return;
     }
     dispatchApiError('auth-expired', 'Your session has expired. Please sign in again.', 401);
-    return;
-  }
-
-  if (res.status === 402) {
-    dispatchApiError('payment-required', 'You need more billable hours to continue.', 402);
     return;
   }
 

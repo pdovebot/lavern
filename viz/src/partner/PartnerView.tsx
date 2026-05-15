@@ -17,7 +17,6 @@ import { useVoiceOutput } from './hooks/useVoiceOutput.js';
 import { VoiceOrb } from './components/VoiceOrb.js';
 import { SparkleEffect } from './components/SparkleEffect.js';
 import { DemoNarration } from '../components/DemoNarration.js';
-import { TopUpDialog } from '../components/TopUpDialog.js';
 
 interface Props {
   onSessionCreated: (sessionId: string) => void;
@@ -117,7 +116,6 @@ export default function PartnerView({ onSessionCreated, onManualFlow, onBack, is
   const [input, setInput] = useState('');
   const [isCreatingSession, setIsCreatingSession] = useState(false);
   const [sessionError, setSessionError] = useState<string | null>(null);
-  const [showTopUp, setShowTopUp] = useState(false);
   const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
   const hasStarted = useRef(false);
   const autoSubmitTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -334,10 +332,6 @@ export default function PartnerView({ onSessionCreated, onManualFlow, onBack, is
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({ error: 'Session creation failed' }));
-        if (res.status === 402) {
-          setShowTopUp(true);
-          return;
-        }
         throw new Error((errData as { error?: string }).error || `HTTP ${res.status}`);
       }
       const data = await res.json() as { sessionId: string };
@@ -622,7 +616,6 @@ export default function PartnerView({ onSessionCreated, onManualFlow, onBack, is
         )}
       </div>
 
-      {showTopUp && <TopUpDialog onDismiss={() => setShowTopUp(false)} />}
     </div>
   );
 }
