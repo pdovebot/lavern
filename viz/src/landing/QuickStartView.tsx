@@ -346,6 +346,25 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
               The Challenge
             </button>
           )}
+          <button
+            onClick={() => { window.location.hash = '#/ralph'; }}
+            className="hidden sm:inline-flex items-center gap-1.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]"
+            style={{
+              padding: '4px 10px',
+              fontFamily: fonts.sans,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: 1,
+              textTransform: 'uppercase',
+              color: '#5B4A0A',
+              backgroundColor: '#FFF8C8',
+              border: '1px solid #FED90F',
+              borderRadius: 999,
+            }}
+            title="Ralph Wiggum, Esq. — the goal-driven loop"
+          >
+            🎓 Ralph mode
+          </button>
         </div>
 
         <div className="flex items-center gap-2">

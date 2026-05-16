@@ -63,6 +63,7 @@ const ResetPasswordView = lazy(() => import('./auth/ResetPasswordView.js'));
 const QuickStartView = lazy(() => import('./landing/QuickStartView.js'));
 const ClawView = lazy(() => import('./claw/ClawView.js'));
 const ClawLiveView = lazy(() => import('./claw/ClawLiveView.js'));
+const RalphLoopView = lazy(() => import('./ralph/RalphLoopView.js'));
 const DispatchView = lazy(() => import('./dispatch/DispatchView.js'));
 const ArchiveView = lazy(() => import('./archive/ArchiveView.js'));
 const PricingView = lazy(() => import('./pricing/PricingView.js'));
@@ -74,7 +75,7 @@ const LegalView = lazy(() => import('./legal/LegalView.js'));
 const PartnerView = lazy(() => import('./partner/PartnerView.js'));
 const ShowcaseView = lazy(() => import('./showcase/ShowcaseView.js'));
 
-type AppView = 'foyer' | 'partner' | 'quickstart' | 'landing' | 'lobby' | 'login' | 'reset-password' | 'verify-email' | 'dashboard' | 'intake' | 'briefing' | 'strategy' | 'team' | 'working' | 'delivery' | 'billing' | 'my-page' | 'my-cases' | 'agent-docs' |'claw' | 'claw-live' | 'dispatch' | 'archive' | 'pricing' | 'challenge' | 'agent-builder' | 'shared-agent' | 'shared-team' | 'terms' | 'privacy' | 'showcase' | 'demo';
+type AppView = 'foyer' | 'partner' | 'quickstart' | 'landing' | 'lobby' | 'login' | 'reset-password' | 'verify-email' | 'dashboard' | 'intake' | 'briefing' | 'strategy' | 'team' | 'working' | 'delivery' | 'billing' | 'my-page' | 'my-cases' | 'agent-docs' |'claw' | 'claw-live' | 'dispatch' | 'archive' | 'pricing' | 'challenge' | 'agent-builder' | 'shared-agent' | 'shared-team' | 'terms' | 'privacy' | 'showcase' | 'demo' | 'ralph';
 
 function getViewFromHash(): AppView {
   const hash = window.location.hash;
@@ -100,6 +101,7 @@ function getViewFromHash(): AppView {
   if (hash.startsWith('#/dispatch')) return 'dispatch';
   if (hash.startsWith('#/claw-live')) return 'claw-live';
   if (hash.startsWith('#/claw')) return 'claw';
+  if (hash.startsWith('#/ralph')) return 'ralph';
   if (hash.startsWith('#/archive')) return 'archive';
   if (hash.startsWith('#/pricing')) return 'pricing';
   if (hash.startsWith('#/challenge')) return 'challenge';
@@ -1195,6 +1197,20 @@ export function App() {
           />
         </Suspense>
       </>
+    );
+  }
+
+  // ── Ralph — goal-driven loop. He keeps going until done. ─────────────
+  if (view === 'ralph') {
+    return (
+      <ErrorBoundary>
+        {skipLink}
+        {toast}
+        {offlineBanner}
+        <Suspense fallback={<ViewFallback text="Loading Ralph..." />}>
+          <RalphLoopView onBack={() => { window.location.hash = '#/'; }} />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 

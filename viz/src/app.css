@@ -109,6 +109,36 @@ body::before {
   }
 }
 
+/* ── Ralph mode ─────────────────────────────────────────────────────── */
+/* Activated by toggling html.ralph-mode. Swaps the body font to a hand-
+   drawn Patrick Hand, the display font to Bangers (a chunky cartoon
+   block face), and tints the page chrome yellow. Headings, buttons,
+   inputs — anything that uses our CSS variables — picks up the swap
+   automatically. The view-specific Ralph cards layer their own colors
+   on top. */
+html.ralph-mode {
+  --font-sans: 'Patrick Hand', 'Geist', -apple-system, sans-serif;
+  --font-serif: 'Bangers', 'Newsreader', Georgia, serif;
+  --ralph-font: 'Patrick Hand', 'Geist', -apple-system, sans-serif;
+  --ralph-display: 'Bangers', 'Newsreader', Georgia, serif;
+  --color-accent: #FED90F;
+  --color-accentLight: rgba(254, 217, 15, 0.16);
+  --color-accentMid: rgba(254, 217, 15, 0.28);
+}
+
+html.ralph-mode body {
+  background-color: #FFFBE6;
+}
+
+html.ralph-mode :focus-visible {
+  outline-color: #D62828;
+}
+
+/* Slow the underlying paper-grain texture in Ralph mode — comic style
+   wants less noise. */
+html.ralph-mode body::after { opacity: 0.020; }
+html.ralph-mode body::before { opacity: 0; }
+
 /* ── Accessibility ─────────────────────────────────────────────────── */
 
 /* Focus indicators — warm terracotta ring on keyboard navigation only.
