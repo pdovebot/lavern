@@ -28,7 +28,6 @@ import { NextStepsTab } from './components/NextStepsTab.js';
 import { ConversationTab, type ConversationMessage } from './components/ConversationTab.js';
 import { ConfettiBurst } from './components/ConfettiBurst.js';
 import { DeliverySkeleton } from './components/DeliverySkeleton.js';
-import { DemoNarration } from '../components/DemoNarration.js';
 
 interface Props {
   onContinue: () => void;
@@ -77,17 +76,11 @@ export default function DeliveryView({ onContinue, onBack, onSkip }: Props) {
     } catch { return {}; }
   });
 
-  // Build narration detail with cost info
-  const narrationDetail = data
-    ? `Transformed document with full process transparency. Cost: $${data.cost.accumulated.toFixed(2)}`
-    : undefined;
-
   return (
     <main style={{
       ...styles.container,
       ...(isMobile ? { padding: spacing.lg } : {}),
     }} id="main-content">
-      {isDemo && <DemoNarration step={3} detail={narrationDetail} />}
       <DeliveryHeader
         matterNumber={matterInfo.matterNumber}
         matterType={matterInfo.matterType}
@@ -155,32 +148,6 @@ export default function DeliveryView({ onContinue, onBack, onSkip }: Props) {
               onMouseLeave={e => { const b = e.currentTarget; b.style.transform = ''; b.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 8px rgba(0,0,0,0.35), 0 8px 28px rgba(0,0,0,0.18)'; }}
             >
               {'\u2190'} Back to Cases
-            </button>
-          </>
-        ) : isDemo ? (
-          <>
-            <button
-              onClick={() => {
-                sessionStorage.removeItem('shem-session-id');
-                sessionStorage.removeItem('shem-demo-case');
-                window.location.hash = '#/demo';
-              }}
-              style={styles.secondaryBtn}
-              onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; b.style.transform = 'translateY(-2px)'; b.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)'; }}
-              onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; b.style.transform = ''; b.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.5)'; }}
-            >
-              Try Another Case
-            </button>
-            <button
-              onClick={() => {
-                sessionStorage.setItem('shem-demo-resume', 'clawern');
-                window.location.hash = '#/demo';
-              }}
-              style={styles.continueBtn}
-              onMouseEnter={e => { const b = e.currentTarget; b.style.transform = 'translateY(-2px) scale(1.02)'; b.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 16px rgba(0,0,0,0.4), 0 14px 40px rgba(0,0,0,0.25)'; }}
-              onMouseLeave={e => { const b = e.currentTarget; b.style.transform = ''; b.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 8px rgba(0,0,0,0.35), 0 8px 28px rgba(0,0,0,0.18)'; }}
-            >
-              See how the autopilot works {'\u2192'}
             </button>
           </>
         ) : (
