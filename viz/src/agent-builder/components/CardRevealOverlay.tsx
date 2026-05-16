@@ -403,7 +403,7 @@ export function CardRevealOverlay({
                 e.currentTarget.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
               }}
             >
-              {saveLabel ?? 'See the agents work'}
+              {saveLabel ?? 'Hire them'}
             </button>
           </motion.div>
         )}
