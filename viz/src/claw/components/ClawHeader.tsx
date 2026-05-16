@@ -20,7 +20,7 @@ export function ClawHeader({ company, jurisdiction, industry, daemon, demoMode, 
     <div style={styles.container}>
       {/* Crab photo — full bleed, desaturated, mysterious */}
       <img
-        src="/crab.jpg"
+        src={`${import.meta.env.BASE_URL}crab.jpg`}
         alt=""
         role="presentation"
         style={styles.crabImg}

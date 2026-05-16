@@ -1,3 +1,8 @@
 # Renamed: /claw/internal-ref-7f3a9.html → /architecture/
 /claw/internal-ref-7f3a9.html /architecture/ 301
 /claw/how-it-works.html /architecture/ 301
+
+# Embedded demo SPA — hash router lives under /demo/. Any deep path
+# inside /demo/ falls back to the SPA index so refreshes don't 404.
+/demo /demo/ 301!
+/demo/* /demo/index.html 200

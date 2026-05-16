@@ -1411,7 +1411,7 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
       <div style={{ position: 'absolute', inset: 0, backgroundColor: '#FAFAFA' }}>
         {/* Mac Mini photo — top 40%, fades into dark */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', overflow: 'hidden', zIndex: 1 }}>
-          <img src="/mac-mini-dark.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 35%', opacity: 0.75 }} />
+          <img src={`${import.meta.env.BASE_URL}mac-mini-dark.jpg`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 35%', opacity: 0.75 }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(250,250,250,0) 30%, #FAFAFA 100%)' }} />
         </div>
 
@@ -1451,7 +1451,7 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
       {/* ── Hero photo — top 42% of screen ── */}
       <div style={{ position: 'relative', width: '100%', height: '42vh', overflow: 'hidden', flexShrink: 0 }}>
         <img
-          src="/mac-mini-dark.jpg"
+          src={`${import.meta.env.BASE_URL}mac-mini-dark.jpg`}
           alt=""
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 35%', opacity: 0.85 }}
         />
