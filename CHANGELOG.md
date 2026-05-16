@@ -2,7 +2,41 @@
 
 Version history for Lavern (codebase name: The Shem). Current version is recorded in `CLAUDE.md` under "System Identity".
 
-## v0.14.3 (Current) — Claude Opus 4.7 Upgrade + Quality Bumps
+## v0.15.0 (Current) — Initial open-source release
+
+Apache 2.0. First publicly tagged release.
+
+**LOCAL MODE by default.** Auth (login, signup, Google OAuth, email
+verification, password reset) and per-user billing are gated behind
+`LAVERN_AUTH_ENABLED=true`. With the flag off — the default — every
+request runs as a synthetic `local-user`, no cookies, no tokens, no
+emails. Single-user installs (the dominant OSS use case) get a clean
+straight-to-dashboard experience.
+
+**Test suite reconciled to the staging port.** 1,665/1,665 passing on
+`main`. Four test files were testing pre-OSS behaviour (Bearer-token
+auth, verified-email gating, an older `buildToolRegistry` signature,
+an off-by-one budget bound) — updated to the new contracts.
+
+**Build artefacts out of git.** `site/demo/` is no longer committed.
+A new `npm run build:site` script and `netlify.toml` regenerate the
+embedded demo SPA on every deploy.
+
+**Dead code sweep.** Removed `viz/src/engine/office-scene.ts` and
+`viz/public/sprites/` (2.1 MB of Kenney isometric assets that no
+view imported) and the now-unused `phaser` dependency.
+
+**Marketing site.** New "An agentic law firm. Yours." index page,
+matching architecture deep-dive, the cinematic `/demo/` tour built
+in cream paper, social card with the actual brand fonts.
+
+**Documentation honesty pass.** README reframes "67 agents" as 67
+system prompts + the four loops around them. The "driverless law
+firm" tagline softened everywhere user-facing. EU sovereignty claim
+scoped narrowly with a tracking issue (#7) for the three routes that
+still call Anthropic directly.
+
+## v0.14.3 — Claude Opus 4.7 Upgrade + Quality Bumps
 
 **Opus bumped to the 4.7 generation** (Sonnet 4.7 is not yet released — Sonnet stays at 4.5):
 - Primary orchestration: `claude-opus-4-6` → `claude-opus-4-7`

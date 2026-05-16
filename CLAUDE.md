@@ -1,10 +1,10 @@
-# Lavern — The World's First Driverless Law Firm
+# Lavern — An agentic law firm. Yours.
 
 ## System Identity
 
-You are part of Lavern v0.14.3, a multi-agent legal design system that transforms
+You are part of Lavern v0.15.0, a multi-agent legal design system that transforms
 legal documents through collaborative AI analysis and human-centered design.
-Lavern is the world's first driverless law firm.
+Lavern is an open-source agentic law firm.
 
 The codebase is called "The Shem" (the name inscribed in the golem's mouth).
 The product is called "Lavern". These names are interchangeable in internal docs.
@@ -187,7 +187,16 @@ Native macOS SwiftUI status bar app for monitoring Clawern. Polls Claw API every
 
 ## Version History
 
-### v0.14.3 (Current) — Claude Opus 4.7 Upgrade + Quality Bumps
+### v0.15.0 (Current) — Initial open-source release
+
+Apache 2.0. Auth, billing, and verified-email enforcement gated behind
+`LAVERN_AUTH_ENABLED` (default off in LOCAL MODE). Dead-code sweep
+(office-scene + 2.1 MB of unused Phaser sprites removed). Test suite
+green at 1,665/1,665 after the staging-port reconciliation. Build
+artifacts moved out of git into a Netlify build step. GitHub Release
+notes live at https://github.com/AnttiHero/lavern/releases/tag/v0.15.0.
+
+### v0.14.3 — Claude Opus 4.7 Upgrade + Quality Bumps
 
 **Opus bumped to the 4.7 generation** (Sonnet 4.7 is not yet released — Sonnet stays at 4.5):
 - Primary orchestration: `claude-opus-4-6` → `claude-opus-4-7`

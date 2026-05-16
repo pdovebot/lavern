@@ -7,7 +7,7 @@
  * - createAuthMiddleware (public path matching: exact, prefix, wildcard, method-specific)
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { ClientRegistry, parseCookieToken, createAuthMiddleware } from '../../src/api/middleware/auth.js';
 
 // ── ClientRegistry ──────────────────────────────────────────────────────

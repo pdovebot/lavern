@@ -361,7 +361,7 @@ async function main(): Promise<void> {
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
     console.log(`
 \u2554${'═'.repeat(62)}\u2557
-\u2551                          LAVERN v0.14.5                      \u2551
+\u2551                          LAVERN v0.15.0                      \u2551
 \u2551                                                              \u2551
 \u2551         An agentic law firm. Yours.                          \u2551
 \u2551         Open source. Apache 2.0.                             \u2551
