@@ -41,6 +41,17 @@ export const config = {
   /** True when NODE_ENV=test. */
   get isTest(): boolean { return this.nodeEnv === 'test'; },
 
+  // ── Auth surface (off by default in LOCAL MODE) ───────────────────────
+  /**
+   * Multi-user auth is gated for v0.15.0's OSS LOCAL MODE. With this off
+   * (the default), the auth middleware injects a synthetic `local-user`
+   * on every request and the auth/Google-OAuth/billing/referral/email
+   * routes don't register. Set `LAVERN_AUTH_ENABLED=true` to bring the
+   * cookie-based login flow + verified-email enforcement back online —
+   * intended for shared / hosted deployments.
+   */
+  authEnabled: process.env.LAVERN_AUTH_ENABLED === 'true',
+
   // ── Paths ──────────────────────────────────────────────────────────────
   auditDir: process.env.SHEM_AUDIT_DIR ?? './audit-logs',
   memoryDir: process.env.SHEM_MEMORY_DIR ?? '.shem/memory',

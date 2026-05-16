@@ -33,16 +33,20 @@ function setAuthCookie(reply: FastifyReply, token: string): void {
   reply.header('Set-Cookie', cookie);
 }
 
-// Store CSRF state tokens in-memory (short-lived, 10 min TTL)
+// Store CSRF state tokens in-memory (short-lived, 10 min TTL).
+// The cleanup interval is started inside registerGoogleAuthRoutes so
+// that importing this module doesn't spin up a timer on servers that
+// have Google OAuth disabled (the LOCAL-MODE default).
 const stateTokens = new Map<string, number>();
-setInterval(() => {
-  const now = Date.now();
-  for (const [token, expires] of stateTokens) {
-    if (now > expires) stateTokens.delete(token);
-  }
-}, 60_000);
 
 export function registerGoogleAuthRoutes(fastify: FastifyInstance): void {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [token, expires] of stateTokens) {
+      if (now > expires) stateTokens.delete(token);
+    }
+  }, 60_000).unref();
+
   // ── Step 1: Redirect to Google ──────────────────────────────────────
   fastify.get('/api/auth/google', async (_request, reply) => {
     if (!config.google.clientId) {

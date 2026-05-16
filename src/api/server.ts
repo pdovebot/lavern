@@ -365,18 +365,24 @@ export async function startApiServer(port: number): Promise<void> {
   // Runs AFTER auth (needs userId). Blocks unverified browser users from
   // paid mutations. Anonymous QuickStart, GET requests, API clients, and
   // exempt paths (auth, billing) pass through.
-  const { createRequireVerifiedHook } = await import('./middleware/require-verified.js');
-  const requireVerified = createRequireVerifiedHook([
-    '/api/auth/',       // All auth routes (login, signup, verify, reset, etc.)
-    '/api/billing/',    // Must buy hours even if unverified (waitlist = identity check)
-    '/api/waitlist',    // Public waitlist operations
-    '/api/documents/',  // Document parsing (needed by Challenge + Briefing)
-    '/api/challenge',   // Zero-friction challenge
-    '/api/partner/',    // Conversational intake
-    '/api/briefing/',   // Intake flow
-    '/api/voice/',      // STT/TTS proxy
-  ]);
-  fastify.addHook('onRequest', requireVerified);
+  //
+  // Gated by config.authEnabled: with auth off (LOCAL MODE default), every
+  // request is the synthetic local-user and there's no email to verify, so
+  // wiring the hook would be pure overhead.
+  if (config.authEnabled) {
+    const { createRequireVerifiedHook } = await import('./middleware/require-verified.js');
+    const requireVerified = createRequireVerifiedHook([
+      '/api/auth/',       // All auth routes (login, signup, verify, reset, etc.)
+      '/api/billing/',    // Must buy hours even if unverified (waitlist = identity check)
+      '/api/waitlist',    // Public waitlist operations
+      '/api/documents/',  // Document parsing (needed by Challenge + Briefing)
+      '/api/challenge',   // Zero-friction challenge
+      '/api/partner/',    // Conversational intake
+      '/api/briefing/',   // Intake flow
+      '/api/voice/',      // STT/TTS proxy
+    ]);
+    fastify.addHook('onRequest', requireVerified);
+  }
 
   // ── Per-User Rate Limiting ────────────────────────────────────────────
   // Runs AFTER auth so we have userId. 30 req/min per user, 5 concurrent sessions.
@@ -634,11 +640,16 @@ export async function startApiServer(port: number): Promise<void> {
   // Register route groups
   registerSessionRoutes(fastify, sessionManager);
   registerReplayRoutes(fastify);
-  registerAuthRoutes(fastify, clientRegistry);
-  // v14: User auth (signup, login, logout, profile)
-  registerUserAuthRoutes(fastify);
-  // v0.12: Google OAuth
-  registerGoogleAuthRoutes(fastify);
+  // Auth surface is gated off in LOCAL MODE (v0.15.0 default). When
+  // LAVERN_AUTH_ENABLED=true is set, the API-key client registry,
+  // user-account signup/login/email-verify routes, and Google OAuth
+  // come online together. When off, every request runs as the
+  // synthetic `local-user` injected by createAuthMiddleware.
+  if (config.authEnabled) {
+    registerAuthRoutes(fastify, clientRegistry);
+    registerUserAuthRoutes(fastify);
+    registerGoogleAuthRoutes(fastify);
+  }
   // v8: Pre-engagement & team staffing routes
   registerMatterRoutes(fastify);
   registerAgentRoutes(fastify);
@@ -667,8 +678,12 @@ export async function startApiServer(port: number): Promise<void> {
   registerClawRoutes(fastify);
   // v19: The Lavern Challenge — blind document comparison
   registerChallengeRoutes(fastify);
-  // v21: Billing — Stripe subscriptions and usage tracking
-  registerBillingRoutes(fastify);
+  // Billing + referral routes both read `lavern_token` cookies via
+  // parseCookieToken to identify a user. Without auth, that cookie is
+  // never set — every request becomes 401. Gate them off in LOCAL MODE.
+  if (config.authEnabled) {
+    registerBillingRoutes(fastify);
+  }
   // v22: Waitlist — join, status, admin invite & listing
   registerWaitlistRoutes(fastify);
   // Admin observability endpoints (X-Admin-Key gated)
@@ -676,7 +691,9 @@ export async function startApiServer(port: number): Promise<void> {
   // Remote MCP bridge — Managed Agents integration (Stage 1: scaffolded, off
   // unless both LAVERN_MANAGED_AGENTS_BRIDGE=1 and the shared secret are set).
   maybeRegisterRemoteBridge(fastify, sessionManager);
-  registerReferralRoutes(fastify);
+  if (config.authEnabled) {
+    registerReferralRoutes(fastify);
+  }
   registerTemplateRoutes(fastify);
 
   // ── Frontend Static Files ──────────────────────────────────────────
