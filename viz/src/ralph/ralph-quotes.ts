@@ -17,8 +17,21 @@ export const RALPH_CATCHPHRASES = [
   "Me lawyer good. Me lawyer the law.",
 ] as const;
 
-/** Legal-flavored Ralph riffs — keep him sounding like Ralph, doing law. */
+/** Legal-flavored Ralph riffs — keep him sounding like Ralph, doing law.
+ *  Includes the canon Simpsons-comic lines (Ralph as Bart's defender):
+ *  "Innosensical, your honor!", "Ladies and men of the jerky", "Two
+ *  wrongs don't make a Bill of Rights!", "Do the dew process!", etc. */
 export const RALPH_LEGAL_RIFFS = [
+  // ── Canon (Simpsons comics) ─────────────────────────────────────
+  'Innosensical, your honor!',
+  'Ladies and men of the jerky.',
+  'Bart Simpson is guilty. Guilty of being innocent!',
+  'I had fingerprints all over me one day. Then teacher said finger painting was on my no-no list.',
+  "Two wrongs don't make a Bill of Rights!",
+  'Do the dew process!',
+  "If the glove doesn't fit, you must be bit!",
+
+  // ── Original Ralph-as-lawyer riffs ──────────────────────────────
   'I am lawyering!',
   "I'm reading the contract!",
   'The big words are confusing me but I keep going.',
