@@ -62,6 +62,7 @@ export default function RalphLoopView({ onBack }: Props) {
 
         {/* Title block */}
         <header style={styles.titleBlock}>
+          <div style={styles.kicker}>You found here. Congrats!</div>
           <h1 style={styles.title}>
             Ralph Wiggum <span style={styles.titleAccent}>mode</span>
           </h1>
@@ -415,6 +416,15 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: spacing.sm,
     paddingBottom: spacing.md,
+  },
+  kicker: {
+    fontSize: 11,
+    fontFamily: fonts.sans,
+    fontWeight: 600,
+    color: colors.accent,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    marginBottom: -2,
   },
   title: {
     fontSize: 'clamp(28px, 5.5vw, 40px)',
