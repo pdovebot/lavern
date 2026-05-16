@@ -1,6 +1,6 @@
 # Lavern
 
-**The driverless law firm.** Open source. Apache 2.0.
+**An agentic law firm. Yours.** Open source. Apache 2.0.
 
 Lavern is a team of 67 AI agents that reviews documents, debates risks, and delivers defensible outputs — every finding cited, every decision auditable, every critical call gated by a human. Run it interactively (brief it; it works), or autonomously: **Clawern** mode watches a folder, reviews documents overnight, and pings your phone when something matters.
 
@@ -30,6 +30,21 @@ They're compatible: Lavern runs on Claude (or Mistral), the same models Claude f
 67 agents (specialists + orchestrators) organized into 9 workflows, from quick legal questions to full adversarial review. Agents post findings with evidence, challenge each other through a formal debate protocol, and resolve disputes with auditable reasoning.
 
 Every engagement produces two outputs: a user-facing deliverable and a complete legal review package with the full chain of reasoning.
+
+### What "67 agents" actually means
+
+Honest version, because this is the first question every engineer asks: **each agent is a specialized system prompt with its own role, its own MCP tool permissions, and its own slot in the debate protocol.** Sixty-seven of them — 59 domain specialists, 7 orchestrators, 1 base prompt — all running on the same underlying frontier LLM (Claude or Mistral, your choice).
+
+So yes — at the bottom of the stack it's an LLM. Anyone can prompt one.
+
+The work isn't the prompts. The work is everything around them:
+
+- **The debate protocol.** Agents must cite evidence from the parsed document. Findings without citations don't enter the board. Agents review each other's work and can challenge — the challenger has to cite text too.
+- **The three-layer verification loop.** Evaluator gate (drops weak findings), adversarial debate (red-team / blue-team), 10-pass verification pipeline (mechanical cross-checks: clause grounding, defined-term integrity, monetary preservation, jurisdiction integrity, …). Each layer fails closed.
+- **Human gates.** Critical findings don't auto-deliver. The orchestrator pauses, surfaces the call, and waits for a real human (you) to approve or override.
+- **Precedent Board.** Persistent memory across engagements. Findings that recurred across documents get reinforced; stale ones decay. The next review starts smarter than the last.
+
+That stack is what separates "I prompted Claude and got a contract review" from "I have an auditable artifact I can defend in a deposition."
 
 **Key architectural ideas:**
 

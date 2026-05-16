@@ -363,8 +363,8 @@ async function main(): Promise<void> {
 \u2554${'═'.repeat(62)}\u2557
 \u2551                          LAVERN v0.14.5                      \u2551
 \u2551                                                              \u2551
-\u2551         The world's first driverless law firm.               \u2551
-\u2551         Multi-agent legal design system.                     \u2551
+\u2551         An agentic law firm. Yours.                          \u2551
+\u2551         Open source. Apache 2.0.                             \u2551
 \u2551                                                              \u2551
 \u255a${'═'.repeat(62)}\u255d
 
