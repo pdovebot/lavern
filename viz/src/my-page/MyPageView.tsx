@@ -61,15 +61,17 @@ export default function MyPageView({ onBack }: Props) {
 
   return (
     <div style={styles.page}>
-      {/* Back link */}
-      <button
-        onClick={onBack}
-        style={styles.backLink}
-        onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
-        onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
-      >
-        {'\u2190'} Back to Home
-      </button>
+      {/* Back link \u2014 wrapped so it shares the content column's left edge */}
+      <div style={styles.backLinkRow}>
+        <button
+          onClick={onBack}
+          style={styles.backLink}
+          onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
+          onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
+        >
+          {'\u2190'} Back to Home
+        </button>
+      </div>
 
       {/* Page title */}
       <h1 style={styles.pageTitle}>Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Profile</span></h1>
@@ -736,10 +738,12 @@ const styles: Record<string, React.CSSProperties> = {
     boxSizing: 'border-box',
   },
 
-  backLink: {
-    alignSelf: 'flex-start',
+  backLinkRow: {
+    width: '100%',
     maxWidth: 640,
-    width: 'auto',
+    marginBottom: spacing.xl,
+  },
+  backLink: {
     background: 'none',
     border: `1.5px solid ${colors.text}`,
     borderRadius: radii.sm,
@@ -751,8 +755,6 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase' as const,
     cursor: 'pointer',
     padding: '6px 14px',
-    marginBottom: spacing.xl,
-    marginLeft: 48,
     transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
   },
 
