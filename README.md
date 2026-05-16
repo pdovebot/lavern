@@ -23,7 +23,7 @@ The honest split:
 - **Use Claude for Legal** if you want to augment an existing lawyer's workflow with task-specific AI skills inside Claude.
 - **Use Lavern** if you want an autonomous law firm — multi-agent, end-to-end, with a continuous-practice mode (Clawern) that watches your folders and an EU-sovereign mode (Mistral) for European in-house teams.
 
-They're compatible: Lavern runs on Claude (or Mistral), the same models Claude for Legal does. A v0.15 path is on our radar that lets Lavern's orchestrator dispatch to `claude-for-legal` plugins as installable specialists.
+They're compatible: Lavern runs on Claude (or Mistral), the same models Claude for Legal does. A future release will let Lavern's orchestrator dispatch to `claude-for-legal` plugins as installable specialists.
 
 ## What This Is
 
@@ -63,19 +63,28 @@ For the full 60-second walkthrough — install + first engagement + "who are you
 Short version:
 
 ```bash
+curl -fsSL lavern.ai/install.sh | sh   # or: git clone + npm install (see below)
+cd lavern
+
+# Terminal 1 — API server on :3000  (demo mode, no API key needed)
+npm run serve:dev
+
+# Terminal 2 — Dashboard on :5173  (Vite, hot reload)
+cd viz && npm run dev
+
+open http://localhost:5173
+```
+
+Without curl-piping, the manual path is the same three steps the script runs for you:
+
+```bash
 git clone https://github.com/AnttiHero/lavern.git
 cd lavern
 npm install
 (cd viz && npm install)
-
-# Start in demo mode (no API key needed)
-npm run dev -- --serve
-
-# Open dashboard
-open http://localhost:3000
 ```
 
-Demo mode gives you the full dashboard, auth, and Clawern monitoring without an API key. To process documents, add `ANTHROPIC_API_KEY` (or `MISTRAL_API_KEY` for the EU sovereign provider) to `.env`.
+Demo mode gives you the full dashboard, auth, and Clawern monitoring without an API key. To process documents, add `ANTHROPIC_API_KEY` (or `MISTRAL_API_KEY` for the EU sovereign provider) to `.env` — it's auto-created from `.env.example` on first run.
 
 ## Clawern (Autonomous Mode)
 
@@ -126,7 +135,7 @@ See [`.env.example`](.env.example) for full configuration. Key variables:
 ## Development
 
 ```bash
-npm test                  # 1,695 tests across 108 files
+npm test                  # 1,665 tests across 108 files
 npm run typecheck:all     # TSC check (backend + frontend)
 npm run build             # Build backend
 cd viz && npm run build   # Build dashboard
@@ -166,7 +175,7 @@ viz/                    # React dashboard
 
 site/                   # Marketing site (static, Netlify)
 menubar/                # macOS menu bar app (SwiftUI)
-tests/                  # 1,695 tests across 108 files
+tests/                  # 1,665 tests across 108 files
 ```
 
 For full architectural detail see [CLAUDE.md](CLAUDE.md) (the same context Claude Code reads when working on this repo).
@@ -179,7 +188,7 @@ Lavern's 21 MCP tools, 5 bundled legal datasets, 2 LLM providers, and the remote
 
 Lavern is at **v0.15.0** — the initial public open-source release. Lavern was developed privately for several months before this point; the codebase has been running in production-like environments throughout that period. The engine, Clawern daemon, and dashboard are stable. The remote MCP bridge for Anthropic Managed Agents is gated behind a feature flag and considered preview. The HTTP API is evolving — expect non-breaking additions before a v1.0 freeze. Pin a tag if you depend on it.
 
-Test coverage is 1,695 tests across 108 files (98 unit + 9 integration). `npm run typecheck:all` is clean on both backend and frontend.
+Test coverage is 1,665 tests across 108 files (97 unit + 11 integration). `npm run typecheck:all` is clean on both backend and frontend.
 
 ## Contributing
 
