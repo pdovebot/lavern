@@ -1,109 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  OG / social-share card for lavern.ai.
-  Cream paper palette, Newsreader serif headline, Geist Mono detail row.
-  1200×630 — the OpenGraph + Twitter summary-large-image canonical size.
-  Re-render with:
+  OG card. Three elements borrowed verbatim from the site hero:
+    1. LAVERN wordmark
+    2. Newsreader headline, weight 400, no italic
+    3. Switzer deck with weight-600 emphasis on the punch words
+  Nothing else. The site hero, distilled.
+  Render:
       rsvg-convert -w 1200 -h 630 site/img/og-source.svg -o site/img/og.png
 -->
 <svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 1200 630"
-     width="1200" height="630"
-     font-family="'Newsreader','Times New Roman',serif">
+     width="1200" height="630">
 
   <defs>
-    <!-- Subtle paper-grain noise for warmth. -->
     <filter id="grain" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/>
-      <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 .035 0"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .03 0"/>
       <feComposite in2="SourceGraphic" operator="in"/>
     </filter>
-
-    <!-- Hairline border. -->
-    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="rgba(20,19,16,0)"/>
-      <stop offset=".5" stop-color="rgba(20,19,16,.22)"/>
-      <stop offset="1" stop-color="rgba(20,19,16,0)"/>
-    </linearGradient>
+    <radialGradient id="vignette" cx=".5" cy=".18" r="1.05">
+      <stop offset="0"   stop-color="#FFFFFF" stop-opacity=".55"/>
+      <stop offset=".55" stop-color="#FAFAFA" stop-opacity="0"/>
+      <stop offset="1"   stop-color="#E6DDC9" stop-opacity=".40"/>
+    </radialGradient>
   </defs>
 
-  <!-- Cream paper background. -->
+  <!-- Cream paper. -->
   <rect width="1200" height="630" fill="#FAFAFA"/>
-  <!-- Faint warm vignette so the corners don't feel flat. -->
-  <radialGradient id="vignette" cx=".5" cy=".5" r=".75">
-    <stop offset="0"  stop-color="#FAFAFA" stop-opacity="0"/>
-    <stop offset="1"  stop-color="#E6DDC9" stop-opacity=".45"/>
-  </radialGradient>
   <rect width="1200" height="630" fill="url(#vignette)"/>
+  <rect width="1200" height="630" filter="url(#grain)" opacity=".4"/>
 
-  <!-- Grain (very subtle). -->
-  <rect width="1200" height="630" filter="url(#grain)" opacity=".55"/>
-
-  <!-- Top brand row: wordmark + version pill. -->
-  <text x="64" y="84"
-        font-family="'Newsreader',serif"
+  <!-- LAVERN wordmark. Same letter-spacing as the site nav brand. -->
+  <text x="600" y="118"
+        text-anchor="middle"
+        font-family="'Newsreader','Times New Roman',serif"
         font-size="22"
         font-weight="300"
-        letter-spacing="8"
+        letter-spacing="9"
         fill="#141310">LAVERN</text>
 
-  <!-- Right-side eyebrow: licence + provenance. -->
-  <text x="1136" y="84"
-        text-anchor="end"
-        font-family="'Geist Mono','SF Mono',monospace"
-        font-size="13"
-        font-weight="500"
-        letter-spacing="2"
-        fill="rgba(20,19,16,.55)">OPEN SOURCE · APACHE 2.0</text>
-
-  <!-- Hairline divider under brand row. -->
-  <line x1="64" y1="118" x2="1136" y2="118" stroke="url(#hair)" stroke-width="1"/>
-
-  <!-- ── Headline ─────────────────────────────────────────────────── -->
-  <text font-family="'Newsreader',serif"
-        fill="#141310"
-        font-size="124"
-        font-weight="300"
-        letter-spacing="-3">
-    <tspan x="64" y="290">An agentic</tspan>
-    <tspan x="64" y="408">law firm. <tspan font-style="italic" font-weight="400">Yours.</tspan></tspan>
+  <!-- Headline. Two lines, identical weight (the site is the same).
+       76px keeps the longer first line on a single line. -->
+  <text x="600"
+        text-anchor="middle"
+        font-family="'Newsreader','Times New Roman',serif"
+        font-size="76"
+        font-weight="400"
+        letter-spacing="-1"
+        fill="#141310">
+    <tspan x="600" y="312">Agentic open-source legal AI tool.</tspan>
+    <tspan x="600" y="404">Now it is yours.</tspan>
   </text>
 
-  <!-- Hairline divider above the meta row. -->
-  <line x1="64" y1="478" x2="1136" y2="478" stroke="url(#hair)" stroke-width="1"/>
-
-  <!-- ── Meta row at the foot: three pieces of evidence ────────────── -->
-  <g font-family="'Geist Mono','SF Mono',monospace"
-     font-size="14"
-     font-weight="500"
-     letter-spacing="2"
-     fill="rgba(20,19,16,.70)">
-    <text x="64"  y="540">67 SPECIALIST AGENTS</text>
-    <text x="64"  y="564"
-          font-size="12"
-          letter-spacing="1.5"
-          fill="rgba(20,19,16,.45)">Evidence-backed debate. Institutional memory.</text>
-
-    <!-- Centre column. -->
-    <text x="600" y="540" text-anchor="middle">RUNS LOCALLY · OR FRONTIER</text>
-    <text x="600" y="564"
-          text-anchor="middle"
-          font-size="12"
-          letter-spacing="1.5"
-          fill="rgba(20,19,16,.45)">On a Mac Mini, or in the cloud.</text>
-
-    <!-- Right column. -->
-    <text x="1136" y="540" text-anchor="end">LAVERN.AI</text>
-    <text x="1136" y="564"
-          text-anchor="end"
-          font-size="12"
-          letter-spacing="1.5"
-          fill="rgba(20,19,16,.45)">Helsinki · Paris</text>
-  </g>
-
-  <!-- Small accent diamond, pulling brand orange into the card. -->
-  <g transform="translate(1106 268) rotate(45)">
-    <rect width="22" height="22" fill="#E8845C"/>
-  </g>
+  <!-- Deck. Switzer 400 muted; weight 600 on the punch words. -->
+  <text x="600" y="510"
+        text-anchor="middle"
+        font-family="'Switzer','Geist',-apple-system,sans-serif"
+        font-size="22"
+        font-weight="400"
+        fill="rgba(20,19,16,.58)">
+    <tspan font-weight="600" fill="#141310">Sixty-seven</tspan>
+    <tspan> specialist agents.  </tspan>
+    <tspan font-weight="600" fill="#141310">Free</tspan>
+    <tspan> for you to use and build.  </tspan>
+    <tspan font-weight="600" fill="#141310">Open source.</tspan>
+  </text>
 
 </svg>
