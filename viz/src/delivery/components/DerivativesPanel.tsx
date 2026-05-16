@@ -35,15 +35,20 @@ const FORMAT_OPTIONS: { id: OutputFormat; label: string; ext: string }[] = [
   { id: 'md', label: 'Markdown', ext: '.md' },
 ];
 
+/**
+ * Two-letter editorial monograms in serif \u2014 same visual vocabulary as
+ * legal section headers. No vendor-coloured emoji, no inconsistent
+ * stroke weights, just typography.
+ */
 const DERIVATIVES = [
-  { id: 'executive-memo',       icon: '\uD83D\uDCDD', title: 'Executive Memo',       desc: 'Formal memo for leadership' },
-  { id: 'board-briefing',       icon: '\uD83C\uDFDB\uFE0F', title: 'Board Briefing',       desc: 'Board-level risk summary' },
-  { id: 'implementation-guide', icon: '\uD83D\uDCCB', title: 'Implementation Guide', desc: 'Step-by-step action plan' },
-  { id: 'compliance-checklist', icon: '\u2705',       title: 'Compliance Checklist', desc: 'Actionable compliance items' },
-  { id: 'risk-register',        icon: '\u26A0\uFE0F', title: 'Risk Register',        desc: 'Structured risk entries' },
-  { id: 'client-letter',        icon: '\u2709\uFE0F', title: 'Client Letter',        desc: 'Professional advice letter' },
-  { id: 'matter-update',        icon: '\uD83D\uDCCA', title: 'Status Update',        desc: 'Internal matter update' },
-  { id: 'training-brief',       icon: '\uD83C\uDF93', title: 'Training Brief',       desc: 'Educational issues summary' },
+  { id: 'executive-memo',       mark: 'EM', title: 'Executive Memo',       desc: 'Formal memo for leadership' },
+  { id: 'board-briefing',       mark: 'BB', title: 'Board Briefing',       desc: 'Board-level risk summary' },
+  { id: 'implementation-guide', mark: 'IG', title: 'Implementation Guide', desc: 'Step-by-step action plan' },
+  { id: 'compliance-checklist', mark: 'CC', title: 'Compliance Checklist', desc: 'Actionable compliance items' },
+  { id: 'risk-register',        mark: 'RR', title: 'Risk Register',        desc: 'Structured risk entries' },
+  { id: 'client-letter',        mark: 'CL', title: 'Client Letter',        desc: 'Professional advice letter' },
+  { id: 'matter-update',        mark: 'SU', title: 'Status Update',        desc: 'Internal matter update' },
+  { id: 'training-brief',       mark: 'TB', title: 'Training Brief',       desc: 'Educational issues summary' },
 ];
 
 function triggerBlobDownload(content: string | ArrayBuffer, filename: string, mimeType: string) {
@@ -288,20 +293,26 @@ export function DerivativesPanel({ data, assemblyStatus }: Props) {
                 ...(status === 'error' ? styles.cardError : {}),
               }}
               onMouseEnter={e => {
-                if (!disabled) e.currentTarget.style.borderColor = colors.borderHover;
+                if (disabled) return;
+                e.currentTarget.style.borderColor = colors.text;
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,0,0,0.05)';
               }}
               onMouseLeave={e => {
-                if (!disabled) e.currentTarget.style.borderColor = colors.border;
+                if (disabled) return;
+                e.currentTarget.style.borderColor = colors.border;
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
-              <div style={styles.cardIcon}>{d.icon}</div>
+              <div style={styles.cardMark} aria-hidden="true">{d.mark}</div>
               <div style={styles.cardBody}>
                 <div style={styles.cardTitle}>{d.title}</div>
                 <div style={styles.cardDesc}>{d.desc}</div>
               </div>
               <div style={styles.cardAction}>
                 {status === 'idle' && (
-                  <span style={styles.generateLabel}>Generate</span>
+                  <span style={styles.generateLabel}>Generate {'\u2192'}</span>
                 )}
                 {status === 'generating' && (
                   <span style={styles.generatingLabel}>Generating{'\u2026'}</span>
@@ -310,7 +321,7 @@ export function DerivativesPanel({ data, assemblyStatus }: Props) {
                   <span style={styles.doneLabel}>{'\u2713'} Done</span>
                 )}
                 {status === 'error' && (
-                  <span style={styles.errorLabel} title={errorMessages[d.id] || 'Failed'}>Retry</span>
+                  <span style={styles.errorLabel} title={errorMessages[d.id] || 'Failed'}>Retry {'\u2192'}</span>
                 )}
               </div>
             </button>
@@ -399,13 +410,13 @@ const styles: Record<string, React.CSSProperties> = {
   card: {
     display: 'flex',
     alignItems: 'center',
-    gap: spacing.md,
-    padding: `${spacing.md}px ${spacing.lg}px`,
+    gap: spacing.lg,
+    padding: `${spacing.lg}px ${spacing.lg}px`,
     backgroundColor: colors.bgCard,
     border: `1px solid ${colors.border}`,
     borderRadius: radii.md,
     cursor: 'pointer',
-    transition: 'border-color 0.15s ease',
+    transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
     textAlign: 'left' as const,
     width: '100%',
   },
@@ -422,11 +433,21 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   // Card internals
-  cardIcon: {
-    fontSize: 20,
+  cardMark: {
     flexShrink: 0,
-    width: 28,
-    textAlign: 'center' as const,
+    width: 36,
+    height: 36,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontFamily: fonts.serif,
+    fontSize: 12,
+    fontWeight: 500,
+    letterSpacing: 1.2,
+    color: colors.accent,
+    border: `1px solid ${colors.border}`,
+    borderRadius: '50%',
+    backgroundColor: 'transparent',
   },
   cardBody: {
     flex: 1,
@@ -437,42 +458,49 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     fontFamily: fonts.sans,
     color: colors.text,
+    letterSpacing: 0.2,
   },
   cardDesc: {
     fontSize: 11,
     fontFamily: fonts.sans,
     color: colors.textMuted,
-    lineHeight: 1.4,
-    marginTop: 2,
+    lineHeight: 1.5,
+    marginTop: 3,
   },
   cardAction: {
     flexShrink: 0,
   },
   generateLabel: {
-    fontSize: 11,
-    fontWeight: 500,
+    fontSize: 10,
+    fontWeight: 600,
     fontFamily: fonts.sans,
     color: colors.accent,
-    letterSpacing: 0.3,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
   },
   generatingLabel: {
-    fontSize: 11,
-    fontWeight: 500,
+    fontSize: 10,
+    fontWeight: 600,
     fontFamily: fonts.sans,
     color: colors.textMuted,
-    letterSpacing: 0.3,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
   },
   doneLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 600,
     fontFamily: fonts.sans,
     color: colors.success,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
   },
   errorLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 600,
     fontFamily: fonts.sans,
     color: colors.danger,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
   },
 
   // Blocked warning

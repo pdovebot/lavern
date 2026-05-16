@@ -157,6 +157,8 @@ export default function BillingView({ onClose }: Props) {
     { category: 'speed', label: 'Speed', value: null },
     { category: 'communication', label: 'Communication', value: null },
   ]);
+  /** Hover preview: which dot is hovered (per-category). */
+  const [hoverRating, setHoverRating] = useState<Record<string, number | null>>({});
 
   useEffect(() => {
     const data = buildBillingData();
@@ -390,8 +392,20 @@ export default function BillingView({ onClose }: Props) {
               key={i}
               onClick={i === 0 ? onClose : undefined}
               style={styles.nextCard}
+              onMouseEnter={e => {
+                const b = e.currentTarget;
+                b.style.borderColor = colors.text;
+                b.style.transform = 'translateY(-2px)';
+                b.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)';
+              }}
+              onMouseLeave={e => {
+                const b = e.currentTarget;
+                b.style.borderColor = colors.border;
+                b.style.transform = 'translateY(0)';
+                b.style.boxShadow = 'none';
+              }}
             >
-              <div style={styles.nextCardIcon}>{opt.icon}</div>
+              <div style={styles.nextCardIcon} aria-hidden="true">{opt.icon}</div>
               <div style={styles.nextCardTitle}>{opt.title}</div>
               <div style={styles.nextCardDesc}>{opt.description}</div>
               <div style={styles.nextCardAction}>{opt.actionLabel} {'\u2192'}</div>
@@ -410,48 +424,85 @@ export default function BillingView({ onClose }: Props) {
             </div>
 
             <div style={styles.surveyRows}>
-              {ratings.map(r => (
-                <div key={r.category} style={styles.surveyRow}>
-                  <div style={styles.surveyRowLabel}>{r.label}</div>
-                  <div style={styles.surveyDots}>
-                    {RATING_DOTS.map(v => (
-                      <button
-                        key={v}
-                        onClick={() => handleRate(r.category, v)}
-                        style={{
-                          ...styles.surveyDot,
-                          backgroundColor: r.value !== null && v <= r.value
-                            ? (r.value >= 4 ? colors.accent : colors.text)
-                            : 'transparent',
-                          borderColor: r.value !== null && v <= r.value
-                            ? (r.value >= 4 ? colors.accent : colors.text)
-                            : colors.border,
-                        }}
-                        title={RATING_LABELS[v]}
-                      />
-                    ))}
+              {ratings.map(r => {
+                const hover = hoverRating[r.category] ?? null;
+                const displayValue = hover ?? r.value;
+                const isFinal = r.value !== null && hover === null;
+                return (
+                  <div key={r.category} style={styles.surveyRow}>
+                    <div style={styles.surveyRowLabel}>{r.label}</div>
+                    <div
+                      style={styles.surveyDots}
+                      onMouseLeave={() => setHoverRating(prev => ({ ...prev, [r.category]: null }))}
+                    >
+                      {RATING_DOTS.map(v => {
+                        const filled = displayValue !== null && v <= displayValue;
+                        const peak = displayValue !== null && displayValue >= 4;
+                        return (
+                          <button
+                            key={v}
+                            onClick={() => handleRate(r.category, v)}
+                            onMouseEnter={() => setHoverRating(prev => ({ ...prev, [r.category]: v }))}
+                            style={{
+                              ...styles.surveyDot,
+                              backgroundColor: filled
+                                ? (peak ? colors.accent : colors.text)
+                                : 'transparent',
+                              borderColor: filled
+                                ? (peak ? colors.accent : colors.text)
+                                : colors.border,
+                              opacity: filled ? (isFinal ? 1 : 0.7) : 1,
+                              transform: filled ? 'scale(1)' : 'scale(0.92)',
+                            }}
+                            title={RATING_LABELS[v]}
+                            aria-label={`${r.label} ${RATING_LABELS[v]}`}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div style={{
+                      ...styles.surveyRowValue,
+                      color: displayValue !== null ? colors.textSecondary : colors.textDim,
+                      fontWeight: displayValue !== null ? 500 : 400,
+                    }}>
+                      {displayValue !== null ? RATING_LABELS[displayValue] : ''}
+                    </div>
                   </div>
-                  <div style={styles.surveyRowValue}>
-                    {r.value !== null ? RATING_LABELS[r.value] : ''}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div style={styles.surveyFooter}>
-              <button
-                onClick={handleSubmitSurvey}
-                disabled={ratings.some(r => r.value === null)}
-                style={{
-                  ...styles.surveySubmitBtn,
-                  opacity: ratings.some(r => r.value === null) ? 0.3 : 1,
-                  cursor: ratings.some(r => r.value === null) ? 'not-allowed' : 'pointer',
-                }}
-                onMouseEnter={e => { if (!ratings.some(r => r.value === null)) { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; } }}
-                onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
-              >
-                Submit {'\u2192'}
-              </button>
+              {(() => {
+                const incomplete = ratings.some(r => r.value === null);
+                return (
+                  <button
+                    onClick={handleSubmitSurvey}
+                    disabled={incomplete}
+                    style={{
+                      ...styles.surveySubmitBtn,
+                      backgroundColor: incomplete ? 'transparent' : colors.text,
+                      color: incomplete ? colors.textDim : '#fff',
+                      borderColor: incomplete ? colors.border : colors.text,
+                      cursor: incomplete ? 'not-allowed' : 'pointer',
+                    }}
+                    onMouseEnter={e => {
+                      if (incomplete) return;
+                      const b = e.currentTarget;
+                      b.style.backgroundColor = 'transparent';
+                      b.style.color = colors.text;
+                    }}
+                    onMouseLeave={e => {
+                      if (incomplete) return;
+                      const b = e.currentTarget;
+                      b.style.backgroundColor = colors.text;
+                      b.style.color = '#fff';
+                    }}
+                  >
+                    Submit {'\u2192'}
+                  </button>
+                );
+              })()}
             </div>
           </>
         ) : (
@@ -765,36 +816,42 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
     padding: `${spacing.xl}px ${spacing.lg}px`,
     backgroundColor: colors.bgCard,
-    border: `1.5px solid ${colors.border}`,
-    borderRadius: radii.sm,
+    border: `1px solid ${colors.border}`,
+    borderRadius: radii.md,
     cursor: 'pointer',
-    transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
+    transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
     fontFamily: fonts.sans,
     textAlign: 'center',
+    boxShadow: 'none',
   },
   nextCardIcon: {
-    fontSize: 16,
+    fontSize: 12,
     color: colors.accent,
-    marginBottom: 4,
+    marginBottom: 6,
+    letterSpacing: 1,
+    lineHeight: 1,
   },
   nextCardTitle: {
     fontSize: 13,
     fontWeight: 600,
     color: colors.text,
+    letterSpacing: 0.2,
   },
   nextCardDesc: {
     fontSize: 11,
     color: colors.textDim,
-    lineHeight: 1.5,
+    lineHeight: 1.6,
   },
   nextCardAction: {
-    fontSize: 11,
-    fontWeight: 500,
+    fontSize: 10,
+    fontWeight: 600,
     color: colors.accent,
-    marginTop: 4,
+    marginTop: 6,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
   },
 
   // Feedback
@@ -843,18 +900,18 @@ const styles: Record<string, React.CSSProperties> = {
   },
   surveyDots: {
     display: 'flex',
-    gap: 8,
+    gap: 10,
     flex: 1,
   },
   surveyDot: {
-    width: 14,
-    height: 14,
+    width: 16,
+    height: 16,
     borderRadius: '50%',
     border: `1.5px solid ${colors.border}`,
     backgroundColor: 'transparent',
     cursor: 'pointer',
     padding: 0,
-    transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease',
+    transition: 'background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease, opacity 0.18s ease',
   },
   surveyRowValue: {
     width: 80,
