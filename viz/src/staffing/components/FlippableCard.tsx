@@ -11,7 +11,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AgentCard } from './AgentCard.js';
 import { AgentCardBack } from './AgentCardBack.js';
-import { colors, radii } from '../styles/tokens.js';
+import { colors, radii, shadows } from '../styles/tokens.js';
 import { injectHolographicStyles } from '../styles/holographic.js';
 import type { AgentProfile } from '../hooks/useAgentProfiles.js';
 
@@ -77,10 +77,10 @@ export function FlippableCard({ profile, selected, onToggle, onFlipSound, onSele
             backfaceVisibility: 'hidden',
             border: `1px solid ${selected ? colors.text : isHovered ? colors.borderHover : colors.border}`,
             boxShadow: selected
-              ? `0 0 0 1px ${colors.text}, 0 2px 8px rgba(0,0,0,0.06)`
+              ? shadows.selected
               : isHovered
-                ? '0 4px 16px rgba(0,0,0,0.08)'
-                : '0 1px 4px rgba(0,0,0,0.04)',
+                ? shadows.lg
+                : shadows.sm,
           }}
           onClick={handleFlip}
         >
@@ -134,9 +134,7 @@ export function FlippableCard({ profile, selected, onToggle, onFlipSound, onSele
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
             border: `1px solid ${selected ? colors.text : colors.border}`,
-            boxShadow: selected
-              ? `0 0 0 1px ${colors.text}, 0 2px 8px rgba(0,0,0,0.06)`
-              : '0 1px 4px rgba(0,0,0,0.04)',
+            boxShadow: selected ? shadows.selected : shadows.sm,
           }}
           onClick={handleFlip}
         >

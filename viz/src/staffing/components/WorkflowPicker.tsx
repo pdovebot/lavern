@@ -92,6 +92,9 @@ export function WorkflowPicker({ workflows, activeWorkflow, onSelect, loading }:
                 ...styles.card,
                 borderColor: isActive ? colors.text : colors.border,
                 backgroundColor: isActive ? colors.text : colors.bgCard,
+                boxShadow: isActive
+                  ? '0 12px 32px rgba(20,18,14,0.22), 0 4px 8px rgba(20,18,14,0.14), inset 0 1px 0 rgba(255,255,255,0.06)'
+                  : '0 2px 6px rgba(20,18,14,0.05), 0 1px 2px rgba(20,18,14,0.03)',
               }}
             >
               {/* Icon + Name row */}
@@ -182,7 +185,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.bgCard,
     fontFamily: fonts.sans,
     cursor: 'pointer',
-    transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease',
+    transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease',
     textAlign: 'left',
     minHeight: 0,
   },
@@ -213,10 +216,10 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 2,
   },
   meta: {
-    fontSize: 10,
+    fontSize: 11,
     color: colors.textDim,
     marginTop: 'auto',
-    paddingTop: 4,
+    paddingTop: 6,
   },
   loadingText: {
     fontSize: 12,

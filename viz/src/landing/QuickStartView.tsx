@@ -421,8 +421,8 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           animation: 'qsFadeUp 0.6s ease 0.5s both',
           border: `1.5px solid ${isDragOver ? colors.accent : inputFocused ? 'rgba(0,0,0,0.10)' : 'rgba(0,0,0,0.06)'}`,
           boxShadow: inputFocused
-            ? '0 8px 40px rgba(0,0,0,0.10), 0 2px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03)'
-            : '0 2px 24px rgba(0,0,0,0.06), 0 1px 6px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02)',
+            ? '0 16px 56px rgba(20,18,14,0.12), 0 4px 16px rgba(20,18,14,0.08), 0 0 0 1px rgba(0,0,0,0.04)'
+            : '0 8px 32px rgba(20,18,14,0.08), 0 2px 8px rgba(20,18,14,0.05), 0 0 0 1px rgba(0,0,0,0.03)',
         }}
       >
         {/* Textarea */}
@@ -544,10 +544,10 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
                 opacity: canSubmit ? 1 : 0.35,
                 cursor: canSubmit ? 'pointer' : 'default',
                 boxShadow: instructPulsed
-                  ? '0 0 0 4px rgba(196, 93, 62, 0.15), 0 4px 16px rgba(196, 93, 62, 0.25)'
+                  ? '0 0 0 4px rgba(196, 93, 62, 0.18), 0 8px 24px rgba(196, 93, 62, 0.32), 0 2px 8px rgba(196, 93, 62, 0.20)'
                   : instructHovered && canSubmit
-                    ? '0 4px 16px rgba(196, 93, 62, 0.35), 0 2px 6px rgba(196, 93, 62, 0.2)'
-                    : '0 1px 4px rgba(196, 93, 62, 0.15)',
+                    ? '0 8px 24px rgba(196, 93, 62, 0.40), 0 3px 10px rgba(196, 93, 62, 0.26), inset 0 1px 0 rgba(255,255,255,0.18)'
+                    : '0 3px 10px rgba(196, 93, 62, 0.28), 0 1px 3px rgba(196, 93, 62, 0.20), inset 0 1px 0 rgba(255,255,255,0.18)',
                 transform: instructPulsed
                   ? 'scale(1.04)'
                   : instructHovered && canSubmit ? 'translateY(-1px)' : 'none',
@@ -619,7 +619,9 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
                   )}
                   style={{
                     borderColor: active ? colors.text : colors.border,
-                    boxShadow: active ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
+                    boxShadow: active
+                      ? '0 6px 16px rgba(20,18,14,0.18), 0 2px 4px rgba(20,18,14,0.10), inset 0 1px 0 rgba(255,255,255,0.05)'
+                      : '0 1px 2px rgba(20,18,14,0.04)',
                     transition: active
                       ? 'border-color 0.25s ease 0.08s, box-shadow 0.3s ease 0.1s'
                       : 'border-color 0.2s ease, box-shadow 0.2s ease',
@@ -655,10 +657,10 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
                     {t.name}
                   </span>
                   <span className="relative" style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     fontFamily: 'var(--font-sans)',
-                    color: active ? 'rgba(255,255,255,0.6)' : colors.textDim,
-                    marginTop: 1,
+                    color: active ? 'rgba(255,255,255,0.65)' : colors.textDim,
+                    marginTop: 2,
                     transition: textTransition,
                     whiteSpace: 'nowrap',
                     zIndex: 1,
@@ -695,13 +697,13 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           animation: 'qsFadeUp 0.6s ease 0.8s both',
           backgroundColor: 'rgba(255,255,255,0.7)',
           border: '1.5px solid rgba(0,0,0,0.06)',
-          boxShadow: '0 1px 8px rgba(0,0,0,0.03)',
+          boxShadow: '0 4px 16px rgba(20,18,14,0.06), 0 1px 4px rgba(20,18,14,0.04)',
         }}
         onClick={onGuidedFlow}
         onMouseEnter={e => {
           e.currentTarget.style.borderColor = colors.borderHover;
           e.currentTarget.style.backgroundColor = colors.bgCard;
-          e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08), 0 1px 6px rgba(0,0,0,0.04)';
+          e.currentTarget.style.boxShadow = '0 16px 40px rgba(20,18,14,0.12), 0 4px 12px rgba(20,18,14,0.08)';
           e.currentTarget.style.transform = 'translateY(-2px)';
           const arrow = e.currentTarget.querySelector('.arrow-nudge') as HTMLElement;
           if (arrow) arrow.style.transform = 'translateX(3px)';
@@ -709,7 +711,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
         onMouseLeave={e => {
           e.currentTarget.style.borderColor = 'rgba(0,0,0,0.06)';
           e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.7)';
-          e.currentTarget.style.boxShadow = '0 1px 8px rgba(0,0,0,0.03)';
+          e.currentTarget.style.boxShadow = '0 4px 16px rgba(20,18,14,0.06), 0 1px 4px rgba(20,18,14,0.04)';
           e.currentTarget.style.transform = 'none';
           const arrow = e.currentTarget.querySelector('.arrow-nudge') as HTMLElement;
           if (arrow) arrow.style.transform = 'none';
@@ -755,13 +757,13 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
             animation: 'qsFadeUp 0.6s ease 1s both',
             backgroundColor: 'rgba(10, 10, 15, 0.85)',
             border: '1.5px solid rgba(184, 150, 11, 0.2)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.32), 0 2px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(184,150,11,0.08)',
           }}
           onClick={onChallenge}
           onMouseEnter={e => {
             e.currentTarget.style.borderColor = 'rgba(184, 150, 11, 0.5)';
             e.currentTarget.style.backgroundColor = 'rgba(10, 10, 15, 0.95)';
-            e.currentTarget.style.boxShadow = '0 6px 28px rgba(0,0,0,0.25), 0 0 20px rgba(184, 150, 11, 0.08)';
+            e.currentTarget.style.boxShadow = '0 20px 56px rgba(0,0,0,0.42), 0 6px 14px rgba(0,0,0,0.24), 0 0 28px rgba(184,150,11,0.18), inset 0 1px 0 rgba(184,150,11,0.18)';
             e.currentTarget.style.transform = 'translateY(-2px)';
             const arrow = e.currentTarget.querySelector('.arrow-nudge') as HTMLElement;
             if (arrow) arrow.style.transform = 'translateX(3px)';

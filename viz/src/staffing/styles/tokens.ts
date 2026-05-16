@@ -80,6 +80,32 @@ export const radii = {
   pill: 999,
 };
 
+/**
+ * Shadow scale — Apple-inspired multi-layer drop shadows.
+ * Each level uses two layers: a tight contact shadow + a soft ambient shadow.
+ * This produces depth that feels physical, not stamped-on.
+ */
+export const shadows = {
+  /** Barely-there elevation. Pills, badges. */
+  xs: '0 1px 2px rgba(20, 18, 14, 0.04), 0 1px 1px rgba(20, 18, 14, 0.03)',
+  /** Resting card. Default surface above background. */
+  sm: '0 2px 4px rgba(20, 18, 14, 0.04), 0 4px 12px rgba(20, 18, 14, 0.06)',
+  /** Standard card. Most surfaces. */
+  md: '0 4px 8px rgba(20, 18, 14, 0.05), 0 12px 24px rgba(20, 18, 14, 0.08)',
+  /** Elevated / hovered card. Lifted, attention-drawing. */
+  lg: '0 8px 16px rgba(20, 18, 14, 0.06), 0 24px 48px rgba(20, 18, 14, 0.12)',
+  /** Modal / overlay. Floating well above the page. */
+  xl: '0 16px 32px rgba(20, 18, 14, 0.10), 0 40px 80px rgba(20, 18, 14, 0.18)',
+  /** Primary button — sits on a surface, slight lift. */
+  button: '0 1px 2px rgba(20, 18, 14, 0.10), 0 2px 6px rgba(20, 18, 14, 0.08)',
+  /** Primary button hover — visible lift. */
+  buttonHover: '0 2px 4px rgba(20, 18, 14, 0.12), 0 6px 14px rgba(20, 18, 14, 0.12)',
+  /** Inset rim — top-edge highlight that gives a "specular" feel. */
+  rimLight: 'inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+  /** Selected card focus ring + lift. */
+  selected: '0 0 0 1.5px rgba(26, 26, 26, 0.95), 0 8px 16px rgba(20, 18, 14, 0.08), 0 24px 48px rgba(20, 18, 14, 0.12)',
+};
+
 /** Map cost tier to color */
 export function tierColor(tier: string): string {
   if (tier === 'opus') return colors.opus;

@@ -69,7 +69,7 @@ export function TeamCostSummary({ selectedProfiles, totalCost, teamSize }: Props
         {avgCost > 0 && (
           <>
             <span style={styles.tierSep}> · </span>
-            <span style={styles.avgText}>~${Math.round(avgCost).toLocaleString()} avg</span>
+            <span style={styles.avgText}>{'≈'} ${Math.round(avgCost).toLocaleString()} avg</span>
           </>
         )}
       </div>
@@ -100,10 +100,10 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase',
   },
   subtitle: {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    marginTop: -2,
+    marginTop: 0,
   },
   emptyText: {
     fontSize: 12,
@@ -162,9 +162,10 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.textDim,
   },
   disclaimer: {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    marginTop: 4,
+    marginTop: 6,
+    opacity: 0.75,
   },
 };
