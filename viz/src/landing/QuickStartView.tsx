@@ -645,10 +645,12 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
                     }
                   }}
                 >
-                  {/* ── Black fill — slides in/out within this pill, waves through middle ── */}
+                  {/* ── Black fill — slides in/out within this pill, waves through middle.
+                       Fill extends 1px past the button edge so it sits *over* the border
+                       (overflow-hidden on the button clips it). No white sliver at corners. */}
                   <div
                     key={isPassThrough ? tierAnimKey : undefined}
-                    className="absolute inset-0 rounded-[5px] pointer-events-none"
+                    className="absolute -inset-px rounded-md pointer-events-none"
                     style={fillStyle}
                   />
                   <span className="relative" style={{
