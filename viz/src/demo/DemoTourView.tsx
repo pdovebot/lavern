@@ -30,12 +30,15 @@ function av(seed: string, size = 80): string {
 }
 
 // ── Design tokens ──────────────────────────────────────────────────────────
-const BG     = '#080808';
-const CREAM  = '#FAF9F6';
+// Cream paper palette — matches the new "An agentic law firm. Yours." site.
+// BG / CREAM kept as variable names for minimal diff, but conceptually flipped:
+// BG is now the cream page surface, CREAM is the dark ink colour.
+const BG     = '#FAFAFA';  // cream paper (was #080808 dark)
+const CREAM  = '#141310';  // dark ink   (was #FAF9F6 cream)
 const WHITE  = '#FFFFFF';
-const BORDER = '#E5E3DD';
-const TEXT   = '#1A1A1A';
-const MUTED  = '#6B6B67';
+const BORDER = 'rgba(20,19,16,0.10)';
+const TEXT   = '#141310';
+const MUTED  = 'rgba(20,19,16,0.58)';
 const ACCENT = '#C45D3E';
 const SERIF  = "'Newsreader', Georgia, serif";
 const SANS   = "'Geist', -apple-system, sans-serif";
@@ -49,39 +52,41 @@ const CAT: Record<string, string> = {
 };
 
 // ── Pill button shared styles ─────────────────────────────────────────────
+// Primary CTA on cream paper: solid dark pill with crisp drop. Matches the
+// .nav-link.primary (GitHub) button on the marketing site.
 const PILL_STYLE = {
   fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: 3,
   textTransform: 'uppercase' as const, borderRadius: 100, border: 'none', cursor: 'pointer',
-  background: `linear-gradient(170deg, #FFFEF9 0%, #EDE9DF 100%)`,
-  color: BG,
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.4), 0 8px 32px rgba(250,249,246,.2)',
+  background: `linear-gradient(170deg, #1F1D1A 0%, #141310 100%)`,
+  color: '#FAF9F6',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06), 0 1px 2px rgba(20,19,16,.10), 0 8px 22px rgba(20,19,16,.18), 0 24px 48px rgba(20,19,16,.10)',
   transition: 'transform .22s ease, box-shadow .22s ease',
 };
 const PILL_GHOST_STYLE = {
   fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: 3,
   textTransform: 'uppercase' as const, borderRadius: 100, cursor: 'pointer',
   background: 'transparent', color: CREAM,
-  border: '1.5px solid rgba(250,249,246,.28)',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)',
+  border: '1.5px solid rgba(20,19,16,.22)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,.6)',
   transition: 'transform .22s ease, background .22s ease, border-color .22s ease',
 };
 function pillEnter(e: React.MouseEvent<HTMLButtonElement>) {
   e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-  e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.4), 0 16px 48px rgba(250,249,246,.28)';
+  e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,.08), 0 2px 4px rgba(20,19,16,.12), 0 14px 36px rgba(20,19,16,.22), 0 32px 60px rgba(20,19,16,.16)';
 }
 function pillLeave(e: React.MouseEvent<HTMLButtonElement>) {
   e.currentTarget.style.transform = '';
-  e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.4), 0 8px 32px rgba(250,249,246,.2)';
+  e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,.06), 0 1px 2px rgba(20,19,16,.10), 0 8px 22px rgba(20,19,16,.18), 0 24px 48px rgba(20,19,16,.10)';
 }
 function ghostEnter(e: React.MouseEvent<HTMLButtonElement>) {
   e.currentTarget.style.transform = 'translateY(-1px)';
-  e.currentTarget.style.backgroundColor = 'rgba(250,249,246,.08)';
-  e.currentTarget.style.borderColor = 'rgba(250,249,246,.5)';
+  e.currentTarget.style.backgroundColor = 'rgba(20,19,16,.04)';
+  e.currentTarget.style.borderColor = 'rgba(20,19,16,.45)';
 }
 function ghostLeave(e: React.MouseEvent<HTMLButtonElement>) {
   e.currentTarget.style.transform = '';
   e.currentTarget.style.backgroundColor = 'transparent';
-  e.currentTarget.style.borderColor = 'rgba(250,249,246,.28)';
+  e.currentTarget.style.borderColor = 'rgba(20,19,16,.22)';
 }
 
 // ── Slide durations (ms). 0 = wait for user interaction. ──────────────────
@@ -244,7 +249,7 @@ function TopBar({ isMobile, slide, onExit }: { isMobile: boolean; slide: number;
       position: 'absolute', top: 0, left: 0, right: 0, zIndex: 40,
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: isMobile ? '20px 24px' : '26px 48px',
-      background: (isMobile && slide === 0) ? 'none' : 'linear-gradient(to bottom, rgba(8,8,8,0.85) 0%, transparent 100%)',
+      background: (isMobile && slide === 0) ? 'none' : 'linear-gradient(to bottom, rgba(250,250,250,0.7) 0%, transparent 100%)',
     }}>
       <span style={{ fontFamily: SERIF, fontSize: isMobile ? 13 : 15, fontWeight: 300, letterSpacing: 7, color: isMobile && slide === 0 ? '#1A1A1A' : CREAM, opacity: 0.55 }}>
         LAVERN
@@ -272,7 +277,7 @@ function BottomBar({ slide, total, goTo, progKey, duration, isMobile }: {
   return (
     <div style={{
       position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 40,
-      background: isLight ? 'none' : 'linear-gradient(to top, rgba(8,8,8,0.8) 0%, transparent 100%)',
+      background: isLight ? 'none' : 'linear-gradient(to top, rgba(250,250,250,0.7) 0%, transparent 100%)',
       paddingBottom: isMobile ? 16 : 20,
     }}>
       <div style={{ display: 'flex', justifyContent: 'center', gap: 8, paddingBottom: 14 }}>
@@ -282,15 +287,15 @@ function BottomBar({ slide, total, goTo, progKey, duration, isMobile }: {
             cursor: 'pointer',
             background: i === slide
               ? (isLight ? 'rgba(26,26,26,0.5)' : CREAM)
-              : (isLight ? 'rgba(26,26,26,0.15)' : 'rgba(250,249,246,0.2)'),
+              : (isLight ? 'rgba(26,26,26,0.15)' : 'rgba(20,19,16,0.2)'),
             transition: 'all .3s ease',
           }} />
         ))}
       </div>
       {duration > 0 && (
-        <div key={progKey} style={{ height: 2, background: 'rgba(255,255,255,0.06)' }}>
+        <div key={progKey} style={{ height: 2, background: 'rgba(20,19,16,0.06)' }}>
           <div style={{
-            height: '100%', background: 'rgba(250,249,246,0.28)',
+            height: '100%', background: 'rgba(20,19,16,0.28)',
             animation: `dProg ${duration}ms linear forwards`,
           }} />
         </div>
@@ -310,12 +315,15 @@ function Shell({
   footer?: React.ReactNode;
   light?: boolean;
 }) {
-  const headlineColor   = light ? TEXT : CREAM;
-  const headlineShadow  = light ? 'none' : '0 2px 24px rgba(0,0,0,.9), 0 0 60px rgba(0,0,0,.5)';
-  const subColor        = light ? 'rgba(26,26,26,.60)' : CREAM;
-  const subOpacity      = light ? 1 : 0.88;
-  const dividerColor    = light ? 'rgba(26,26,26,0.07)' : 'rgba(255,255,255,0.04)';
-  const bgOverlay       = light ? CREAM : 'transparent';
+  // Cream theme — `light` prop is retained for API compatibility but the
+  // entire demo now lives on cream paper, so all branches render the same.
+  void light;
+  const headlineColor   = TEXT;
+  const headlineShadow  = 'none';
+  const subColor        = 'rgba(20,19,16,0.58)';
+  const subOpacity      = 1;
+  const dividerColor    = 'rgba(20,19,16,0.10)';
+  const bgOverlay       = BG;
 
   if (isMobile) {
     return (
@@ -621,38 +629,38 @@ function S2Voice({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: 
               position: 'absolute',
               width: 96 + i * 32, height: 96 + i * 32,
               borderRadius: '50%',
-              border: `1px solid rgba(250,249,246,${0.1 - i * 0.03})`,
+              border: `1px solid rgba(20,19,16,${0.1 - i * 0.03})`,
               animation: `dPulse ${1.4 + i * 0.3}s ease ${i * 0.2}s infinite`,
               pointerEvents: 'none',
             }} />
           ))}
           <div style={{
             width: 96, height: 96, borderRadius: '50%',
-            background: phase >= 1 && phase < 4 ? 'rgba(250,249,246,.1)' : 'rgba(250,249,246,.04)',
-            border: `1.5px solid rgba(250,249,246,${phase >= 1 ? '.22' : '.1'})`,
-            boxShadow: phase >= 1 && phase < 4 ? '0 0 60px rgba(250,249,246,.14)' : 'none',
+            background: phase >= 1 && phase < 4 ? 'rgba(20,19,16,.1)' : 'rgba(20,19,16,.04)',
+            border: `1.5px solid rgba(20,19,16,${phase >= 1 ? '.22' : '.1'})`,
+            boxShadow: phase >= 1 && phase < 4 ? '0 0 60px rgba(20,19,16,.14)' : 'none',
             transition: 'all .6s ease',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <svg width="34" height="48" viewBox="0 0 34 48" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="9" y="2" width="16" height="26" rx="8"
-                stroke={`rgba(250,249,246,${phase >= 1 ? '0.9' : '0.45'})`}
+                stroke={`rgba(20,19,16,${phase >= 1 ? '0.9' : '0.45'})`}
                 strokeWidth="2"
-                fill={phase >= 1 && phase < 4 ? 'rgba(250,249,246,0.08)' : 'none'}
+                fill={phase >= 1 && phase < 4 ? 'rgba(20,19,16,0.08)' : 'none'}
                 style={{ transition: 'all .5s ease' }}
               />
               <path d="M3 22 Q3 36 17 36 Q31 36 31 22"
-                stroke={`rgba(250,249,246,${phase >= 1 ? '0.7' : '0.3'})`}
+                stroke={`rgba(20,19,16,${phase >= 1 ? '0.7' : '0.3'})`}
                 strokeWidth="2" fill="none" strokeLinecap="round"
                 style={{ transition: 'all .5s ease' }}
               />
               <line x1="17" y1="36" x2="17" y2="44"
-                stroke={`rgba(250,249,246,${phase >= 1 ? '0.7' : '0.3'})`}
+                stroke={`rgba(20,19,16,${phase >= 1 ? '0.7' : '0.3'})`}
                 strokeWidth="2" strokeLinecap="round"
                 style={{ transition: 'all .5s ease' }}
               />
               <line x1="10" y1="44" x2="24" y2="44"
-                stroke={`rgba(250,249,246,${phase >= 1 ? '0.7' : '0.3'})`}
+                stroke={`rgba(20,19,16,${phase >= 1 ? '0.7' : '0.3'})`}
                 strokeWidth="2" strokeLinecap="round"
                 style={{ transition: 'all .5s ease' }}
               />
@@ -666,15 +674,15 @@ function S2Voice({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: 
             <div key={i} style={{
               position: 'absolute', inset: -i * 14,
               borderRadius: '50%',
-              border: '1px solid rgba(250,249,246,.1)',
+              border: '1px solid rgba(20,19,16,.1)',
               animation: `dPulse ${1.5 + i * 0.3}s ease ${i * 0.25}s infinite`,
             }} />
           ))}
           <div style={{
             width: 96, height: 96, borderRadius: '50%',
-            overflow: 'hidden', background: 'rgba(250,249,246,.06)',
-            border: '1.5px solid rgba(250,249,246,.14)',
-            boxShadow: phase >= 1 ? '0 0 40px rgba(250,249,246,.08)' : 'none',
+            overflow: 'hidden', background: 'rgba(20,19,16,.06)',
+            border: '1.5px solid rgba(20,19,16,.14)',
+            boxShadow: phase >= 1 ? '0 0 40px rgba(20,19,16,.08)' : 'none',
             transition: 'box-shadow .5s ease',
           }}>
             <img src={av('Catherine Blackwell', 120)} alt="Catherine Blackwell" width={96} height={96} style={{ display: 'block' }} />
@@ -685,7 +693,7 @@ function S2Voice({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: 
       <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: CREAM, letterSpacing: 1, marginBottom: 4, animation: 'dUp .5s ease .15s both' }}>
         Catherine Blackwell
       </div>
-      <div style={{ fontFamily: SANS, fontSize: 10, color: 'rgba(250,249,246,.35)', letterSpacing: .5, marginBottom: 32, animation: 'dUp .5s ease .2s both' }}>
+      <div style={{ fontFamily: SANS, fontSize: 10, color: 'rgba(20,19,16,.35)', letterSpacing: .5, marginBottom: 32, animation: 'dUp .5s ease .2s both' }}>
         Managing Partner
       </div>
 
@@ -697,7 +705,7 @@ function S2Voice({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: 
         {BARS.map((h, i) => (
           <div key={i} style={{
             width: 3, borderRadius: 2,
-            background: phase >= 1 && phase < 4 ? 'rgba(250,249,246,.7)' : 'rgba(250,249,246,.18)',
+            background: phase >= 1 && phase < 4 ? 'rgba(20,19,16,.7)' : 'rgba(20,19,16,.18)',
             height: phase >= 1 && phase < 4 ? `${h * 32}px` : '4px',
             transition: 'height .3s ease, background .3s ease',
             animation: phase >= 1 && phase < 4 ? `dPulse ${0.8 + (i % 4) * 0.15}s ease ${i * 0.06}s infinite` : 'none',
@@ -713,7 +721,7 @@ function S2Voice({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: 
       }}>
         {phase >= 2 && (
           <div style={{ animation: 'dBubble .4s ease both' }}>
-            <div style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(250,249,246,.65)', marginBottom: 8 }}>You</div>
+            <div style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(20,19,16,.65)', marginBottom: 8 }}>You</div>
             <p style={{ fontFamily: SERIF, fontSize: isMobile ? 17 : 20, fontWeight: 300, color: CREAM, lineHeight: 1.4, margin: 0 }}>
               {c.voiceUser}
             </p>
@@ -721,15 +729,15 @@ function S2Voice({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId: 
         )}
         {phase >= 4 && (
           <div style={{ animation: 'dBubble .4s ease both', marginTop: 16 }}>
-            <div style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(250,249,246,.65)', marginBottom: 8 }}>Lavern</div>
-            <p style={{ fontFamily: SERIF, fontSize: isMobile ? 17 : 20, fontWeight: 300, color: 'rgba(250,249,246,.75)', lineHeight: 1.4, margin: 0 }}>
+            <div style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(20,19,16,.65)', marginBottom: 8 }}>Lavern</div>
+            <p style={{ fontFamily: SERIF, fontSize: isMobile ? 17 : 20, fontWeight: 300, color: 'rgba(20,19,16,.75)', lineHeight: 1.4, margin: 0 }}>
               {c.voiceReply}
             </p>
           </div>
         )}
         {phase < 2 && (
           <div style={{ animation: 'dPulse 2s ease infinite' }}>
-            <div style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: 'rgba(250,249,246,.25)' }}>Listening</div>
+            <div style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: 'rgba(20,19,16,.25)' }}>Listening</div>
           </div>
         )}
       </div>
@@ -1248,40 +1256,40 @@ function S4Builder({ isMobile, caseId, onLaunch }: { isMobile: boolean; caseId: 
 // ── Slide 5 — Clawern Reveal ──────────────────────────────────────────────
 const TERM_LINES: Record<CaseId, { delay: number; text: string; col: string }[]> = {
   heartconnect: [
-    { delay: 400,  text: '⚙  Daemon started  ·  PID 42847  ·  11:02 PM', col: 'rgba(250,249,246,.55)' },
-    { delay: 1100, text: '📁  Watching  ~/Documents/Contracts/', col: 'rgba(250,249,246,.55)' },
-    { delay: 1900, text: '📄  heartconnect-tos-v3.pdf  ·  218 KB  ·  queued', col: 'rgba(250,249,246,.7)' },
-    { delay: 2700, text: '🤖  Privacy Counsel, Red Teamer, Regulatory +2 dispatched', col: 'rgba(250,249,246,.55)' },
+    { delay: 400,  text: '⚙  Daemon started  ·  PID 42847  ·  11:02 PM', col: 'rgba(20,19,16,.55)' },
+    { delay: 1100, text: '📁  Watching  ~/Documents/Contracts/', col: 'rgba(20,19,16,.55)' },
+    { delay: 1900, text: '📄  heartconnect-tos-v3.pdf  ·  218 KB  ·  queued', col: 'rgba(20,19,16,.7)' },
+    { delay: 2700, text: '🤖  Privacy Counsel, Red Teamer, Regulatory +2 dispatched', col: 'rgba(20,19,16,.55)' },
     { delay: 3800, text: '⚠️  RED  GDPR Art. 7 — consent bundled with ToS acceptance', col: '#FF6B6B' },
     { delay: 4600, text: '⚠️  RED  Age verification — self-certification insufficient', col: '#FF6B6B' },
     { delay: 5300, text: '⚖️  2 debates resolved  ·  avg confidence 0.94', col: '#74C0FC' },
     { delay: 6100, text: '✅  Delivered  ·  $4.20  ·  3 findings  ·  11:54 PM', col: '#69DB7C' },
-    { delay: 7000, text: '📱  Telegram sent  →  "3 critical issues found in HeartConnect ToS"', col: 'rgba(250,249,246,.38)' },
-    { delay: 7900, text: '💾  Precedent indexed  "GDPR Consent Bundling"', col: 'rgba(250,249,246,.28)' },
+    { delay: 7000, text: '📱  Telegram sent  →  "3 critical issues found in HeartConnect ToS"', col: 'rgba(20,19,16,.38)' },
+    { delay: 7900, text: '💾  Precedent indexed  "GDPR Consent Bundling"', col: 'rgba(20,19,16,.28)' },
   ],
   medivault: [
-    { delay: 400,  text: '⚙  Daemon started  ·  PID 38291  ·  11:14 PM', col: 'rgba(250,249,246,.55)' },
-    { delay: 1100, text: '📁  Watching  ~/Documents/Legal/', col: 'rgba(250,249,246,.55)' },
-    { delay: 1900, text: '📄  medivault-privacy-policy-v2.pdf  ·  94 KB  ·  queued', col: 'rgba(250,249,246,.7)' },
-    { delay: 2700, text: '🤖  Privacy Counsel, Compliance Officer, HIPAA Specialist +3 dispatched', col: 'rgba(250,249,246,.55)' },
+    { delay: 400,  text: '⚙  Daemon started  ·  PID 38291  ·  11:14 PM', col: 'rgba(20,19,16,.55)' },
+    { delay: 1100, text: '📁  Watching  ~/Documents/Legal/', col: 'rgba(20,19,16,.55)' },
+    { delay: 1900, text: '📄  medivault-privacy-policy-v2.pdf  ·  94 KB  ·  queued', col: 'rgba(20,19,16,.7)' },
+    { delay: 2700, text: '🤖  Privacy Counsel, Compliance Officer, HIPAA Specialist +3 dispatched', col: 'rgba(20,19,16,.55)' },
     { delay: 3800, text: '⚠️  RED  HIPAA §164.308 — third-party safeguard agreement missing', col: '#FF6B6B' },
     { delay: 4600, text: '⚠️  RED  GDPR cross-border transfers — SCC basis undocumented', col: '#FF6B6B' },
     { delay: 5300, text: '⚖️  2 debates resolved  ·  avg confidence 0.95', col: '#74C0FC' },
     { delay: 6100, text: '✅  Delivered  ·  $3.80  ·  4 findings  ·  12:01 AM', col: '#69DB7C' },
-    { delay: 7000, text: '📱  Telegram sent  →  "HIPAA gap + GDPR transfer risk in MediVault"', col: 'rgba(250,249,246,.38)' },
-    { delay: 7900, text: '💾  Precedent indexed  "HIPAA Third-Party Risk"', col: 'rgba(250,249,246,.28)' },
+    { delay: 7000, text: '📱  Telegram sent  →  "HIPAA gap + GDPR transfer risk in MediVault"', col: 'rgba(20,19,16,.38)' },
+    { delay: 7900, text: '💾  Precedent indexed  "HIPAA Third-Party Risk"', col: 'rgba(20,19,16,.28)' },
   ],
   cloudmsa: [
-    { delay: 400,  text: '⚙  Daemon started  ·  PID 51204  ·  11:31 PM', col: 'rgba(250,249,246,.55)' },
-    { delay: 1100, text: '📁  Watching  ~/Documents/Contracts/', col: 'rgba(250,249,246,.55)' },
-    { delay: 1900, text: '📄  cloud-services-msa-draft.pdf  ·  312 KB  ·  queued', col: 'rgba(250,249,246,.7)' },
-    { delay: 2700, text: '🤖  Contract Reviewer, Red Teamer, IP Counsel +1 dispatched', col: 'rgba(250,249,246,.55)' },
+    { delay: 400,  text: '⚙  Daemon started  ·  PID 51204  ·  11:31 PM', col: 'rgba(20,19,16,.55)' },
+    { delay: 1100, text: '📁  Watching  ~/Documents/Contracts/', col: 'rgba(20,19,16,.55)' },
+    { delay: 1900, text: '📄  cloud-services-msa-draft.pdf  ·  312 KB  ·  queued', col: 'rgba(20,19,16,.7)' },
+    { delay: 2700, text: '🤖  Contract Reviewer, Red Teamer, IP Counsel +1 dispatched', col: 'rgba(20,19,16,.55)' },
     { delay: 3800, text: '⚠️  RED  Unlimited liability — Section 8.2  (sign Friday — flag now)', col: '#FF6B6B' },
     { delay: 4600, text: '⚠️  YELLOW  Indemnity scope ambiguous — counterparty could read broadly', col: '#FEBC2E' },
     { delay: 5300, text: '⚖️  1 debate resolved  ·  confidence 0.91', col: '#74C0FC' },
     { delay: 6100, text: '✅  Delivered  ·  $3.40  ·  2 critical findings  ·  12:08 AM', col: '#69DB7C' },
-    { delay: 7000, text: '📱  Telegram sent  →  "Unlimited liability in CloudMSA — do NOT sign yet"', col: 'rgba(250,249,246,.38)' },
-    { delay: 7900, text: '💾  Precedent indexed  "Unlimited Indemnification"', col: 'rgba(250,249,246,.28)' },
+    { delay: 7000, text: '📱  Telegram sent  →  "Unlimited liability in CloudMSA — do NOT sign yet"', col: 'rgba(20,19,16,.38)' },
+    { delay: 7900, text: '💾  Precedent indexed  "Unlimited Indemnification"', col: 'rgba(20,19,16,.28)' },
   ],
 };
 
@@ -1400,11 +1408,11 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
   /* ── Mobile ─────────────────────────────────────────────────────── */
   if (isMobile) {
     return (
-      <div style={{ position: 'absolute', inset: 0, backgroundColor: '#050505' }}>
+      <div style={{ position: 'absolute', inset: 0, backgroundColor: '#FAFAFA' }}>
         {/* Mac Mini photo — top 40%, fades into dark */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', overflow: 'hidden', zIndex: 1 }}>
           <img src="/mac-mini-dark.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 35%', opacity: 0.75 }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(5,5,5,0) 30%, #050505 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(250,250,250,0) 30%, #FAFAFA 100%)' }} />
         </div>
 
         {/* Content — sits below photo, no scroll needed */}
@@ -1416,10 +1424,10 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18, opacity: showSteps ? 1 : 0, transform: showSteps ? 'none' : 'translateY(10px)', transition: 'opacity .5s ease, transform .5s ease' }}>
               {STEPS.map(s => (
                 <div key={s.n} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(250,249,246,.38)', lineHeight: 1.8, flexShrink: 0, letterSpacing: 1 }}>{s.n}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(20,19,16,.38)', lineHeight: 1.8, flexShrink: 0, letterSpacing: 1 }}>{s.n}</span>
                   <div>
                     <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: CREAM, lineHeight: 1.3, marginBottom: 3 }}>{s.title}</div>
-                    <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(250,249,246,.72)', lineHeight: 1.6 }}>{s.body}</div>
+                    <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(20,19,16,.72)', lineHeight: 1.6 }}>{s.body}</div>
                   </div>
                 </div>
               ))}
@@ -1438,7 +1446,7 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
 
   /* ── Desktop ─────────────────────────────────────────────────────── */
   return (
-    <div style={{ position: 'absolute', inset: 0, backgroundColor: '#050505', overflowY: 'auto', overflowX: 'hidden' }}>
+    <div style={{ position: 'absolute', inset: 0, backgroundColor: '#FAFAFA', overflowY: 'auto', overflowX: 'hidden' }}>
 
       {/* ── Hero photo — top 42% of screen ── */}
       <div style={{ position: 'relative', width: '100%', height: '42vh', overflow: 'hidden', flexShrink: 0 }}>
@@ -1448,7 +1456,7 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 35%', opacity: 0.85 }}
         />
         {/* Fade out at bottom */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%', background: 'linear-gradient(to top, #050505, transparent)' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%', background: 'linear-gradient(to top, #FAFAFA, transparent)' }} />
         {/* Headline overlaid bottom-left of photo */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 80px 32px', zIndex: 10 }}>
           <h2 style={{
@@ -1481,10 +1489,10 @@ function S5Clawern({ isMobile, caseId, onExit, onNext }: { isMobile: boolean; ca
                 display: 'flex', gap: 20, alignItems: 'flex-start',
                 animation: showSteps ? `dUp .5s ease ${i * 0.12 + 0.1}s both` : undefined,
               }}>
-                <span style={{ fontFamily: MONO, fontSize: 11, color: 'rgba(250,249,246,.38)', lineHeight: 1.8, flexShrink: 0, letterSpacing: 1 }}>{s.n}</span>
+                <span style={{ fontFamily: MONO, fontSize: 11, color: 'rgba(20,19,16,.38)', lineHeight: 1.8, flexShrink: 0, letterSpacing: 1 }}>{s.n}</span>
                 <div>
                   <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: CREAM, lineHeight: 1.3, marginBottom: 5 }}>{s.title}</div>
-                  <div style={{ fontFamily: SANS, fontSize: 13, color: 'rgba(250,249,246,.72)', lineHeight: 1.7 }}>{s.body}</div>
+                  <div style={{ fontFamily: SANS, fontSize: 13, color: 'rgba(20,19,16,.72)', lineHeight: 1.7 }}>{s.body}</div>
                 </div>
               </div>
             ))}
@@ -1546,11 +1554,11 @@ function SIntro({ isMobile, onContinue }: { isMobile: boolean; onContinue: () =>
                 style={{
                   width: avatarSize, height: avatarSize,
                   borderRadius: '50%',
-                  border: '2px solid rgba(8,8,8,1)',
+                  border: `2px solid ${BG}`,
                   marginLeft: i === 0 ? 0 : -(avatarSize * 0.28),
-                  background: 'rgba(255,255,255,.06)',
-                  filter: 'saturate(0.6) brightness(0.9)',
-                  boxShadow: '0 2px 12px rgba(0,0,0,.6)',
+                  background: 'rgba(20,19,16,.04)',
+                  filter: 'saturate(0.85)',
+                  boxShadow: '0 2px 12px rgba(20,19,16,.10)',
                   opacity: 0,
                   animation: `dIn .4s ease ${i * 80}ms both`,
                 }}
@@ -1558,11 +1566,11 @@ function SIntro({ isMobile, onContinue }: { isMobile: boolean; onContinue: () =>
             ))}
             <div style={{
               width: avatarSize, height: avatarSize, borderRadius: '50%',
-              border: '2px solid rgba(255,255,255,.08)',
+              border: '2px solid rgba(20,19,16,.10)',
               marginLeft: -(avatarSize * 0.28),
-              background: 'rgba(255,255,255,.05)',
+              background: 'rgba(20,19,16,.04)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: SANS, fontSize: 9, color: 'rgba(250,249,246,.35)', letterSpacing: 0.5,
+              fontFamily: SANS, fontSize: 9, color: 'rgba(20,19,16,.35)', letterSpacing: 0.5,
               opacity: 0,
               animation: `dIn .4s ease ${avatarCount * 80}ms both`,
             }}>+58</div>
@@ -1583,7 +1591,7 @@ function SIntro({ isMobile, onContinue }: { isMobile: boolean; onContinue: () =>
         {/* Sub */}
         <p style={{
           fontFamily: SANS, fontSize: isMobile ? 14 : 15,
-          color: 'rgba(250,249,246,.72)', lineHeight: 1.8,
+          color: 'rgba(20,19,16,.72)', lineHeight: 1.8,
           margin: '0 0 36px', maxWidth: 480,
           animation: 'dIn .7s ease .5s both',
         }}>
@@ -1624,8 +1632,9 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
 
   const card1 = (
     <div style={{
-      flex: 1, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)',
+      flex: 1, background: '#FFFFFF', border: '1px solid rgba(20,19,16,.10)',
       borderRadius: 16, padding: isMobile ? '28px 24px' : '32px 32px',
+      boxShadow: '0 1px 2px rgba(20,19,16,.06), 0 12px 28px rgba(20,19,16,.08)',
       opacity: phase >= 1 ? 1 : 0, transform: phase >= 1 ? 'none' : 'translateY(20px)',
       transition: 'opacity .6s ease .1s, transform .6s ease .1s',
     }}>
@@ -1634,7 +1643,7 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
         The billable<br />hour.
       </div>
       <div style={{ fontFamily: SERIF, fontSize: 40, color: '#69DB7C', fontWeight: 300, letterSpacing: -1, marginBottom: 12 }}>$1 / hour</div>
-      <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(250,249,246,.38)', lineHeight: 1.6 }}>
+      <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(20,19,16,.38)', lineHeight: 1.6 }}>
         A typical document review runs $3–5.
       </div>
     </div>
@@ -1642,8 +1651,9 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
 
   const card2 = (
     <div style={{
-      flex: 1, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)',
+      flex: 1, background: '#FFFFFF', border: '1px solid rgba(20,19,16,.10)',
       borderRadius: 16, padding: isMobile ? '28px 24px' : '32px 32px',
+      boxShadow: '0 1px 2px rgba(20,19,16,.06), 0 12px 28px rgba(20,19,16,.08)',
       opacity: phase >= 2 ? 1 : 0, transform: phase >= 2 ? 'none' : 'translateY(20px)',
       transition: 'opacity .6s ease .2s, transform .6s ease .2s',
     }}>
@@ -1652,7 +1662,7 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
         The retainer.
       </div>
       <div style={{ fontFamily: SERIF, fontSize: 40, color: CREAM, fontWeight: 300, letterSpacing: -1, marginBottom: 12 }}>$0</div>
-      <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(250,249,246,.38)', lineHeight: 1.6 }}>
+      <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(20,19,16,.38)', lineHeight: 1.6 }}>
         Local models. Except the electricity for your Mac Mini.
       </div>
     </div>
@@ -1666,8 +1676,8 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
     }}>
       <button
         onClick={() => { window.location.hash = '#/demo'; window.location.reload(); }}
-        style={{ ...PILL_STYLE, padding: '16px 28px', background: 'transparent', border: '1px solid rgba(255,255,255,.28)', color: 'rgba(250,249,246,.72)', flex: isMobile ? undefined : '0 0 auto' }}
-        onMouseEnter={pillEnter} onMouseLeave={pillLeave}>Try another case</button>
+        style={{ ...PILL_STYLE, padding: '16px 28px', background: 'transparent', border: '1px solid rgba(20,19,16,.22)', color: 'rgba(20,19,16,.72)', boxShadow: 'none', flex: isMobile ? undefined : '0 0 auto' }}
+        onMouseEnter={ghostEnter} onMouseLeave={ghostLeave}>Try another case</button>
       <button
         onClick={() => window.open('mailto:hello@lavern.ai?subject=Knock%20Knock', '_blank')}
         style={{ ...PILL_STYLE, padding: '16px 28px', flex: isMobile ? undefined : '0 0 auto' }}
@@ -1682,7 +1692,7 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
   /* ── Mobile ──────────────────────────────────────────────────── */
   if (isMobile) {
     return (
-      <div style={{ position: 'absolute', inset: 0, background: '#090706', overflowY: 'auto' }}>
+      <div style={{ position: 'absolute', inset: 0, background: BG, overflowY: 'auto' }}>
         <div style={{ padding: '60px 22px 80px', display: 'flex', flexDirection: 'column', gap: 20 }}>
           <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(40px,10vw,52px)', fontWeight: 300, lineHeight: 0.95, letterSpacing: -1.5, color: CREAM, margin: '0 0 4px', animation: 'dReveal .9s ease .1s both' }}>
             What does<br />this cost?
@@ -1697,7 +1707,7 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
 
   /* ── Desktop ─────────────────────────────────────────────────── */
   return (
-    <div style={{ position: 'absolute', inset: 0, background: '#090706', overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', inset: 0, background: BG, overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 15% 70%, rgba(196,93,62,.05) 0%, transparent 50%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 85% 30%, rgba(116,192,252,.04) 0%, transparent 50%)', pointerEvents: 'none' }} />
 
@@ -1714,7 +1724,7 @@ function SPricing({ isMobile, onExit }: { isMobile: boolean; onExit: () => void 
             }}>
               What does this cost?
             </h2>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: 'rgba(250,249,246,.42)', lineHeight: 1.6, margin: 0, animation: 'dIn .7s ease .3s both' }}>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: 'rgba(20,19,16,.42)', lineHeight: 1.6, margin: 0, animation: 'dIn .7s ease .3s both' }}>
               Two ways to work with Lavern.
             </p>
           </div>
