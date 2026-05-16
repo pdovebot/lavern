@@ -1,17 +1,19 @@
 /**
- * RalphLoopView — Ralph Wiggum, Esq. He keeps going until done.
+ * RalphLoopView — Ralph mode.
+ *
+ * An experimental way of working with legal documents, borrowed from
+ * software development: state a goal, set hard limits, and a small fast
+ * model decides "done or keep going" after every cycle until the goal
+ * is met. Standard Lavern editorial chrome — nothing cartoony except
+ * the "I'm helping!" tagline.
  *
  * Three phases:
- *   1. Setup    — goal entry + hard limits + danger acknowledgment
- *   2. Running  — live iteration / budget / time, Ralph's commentary,
- *                 evaluator verdicts, always-visible STOP button
- *   3. Resolved — completed / stopped / exceeded — with a summary
- *
- * Ralph mode (the font/theme swap) activates whenever the user is on
- * this view, via a CSS class on <html>. Toggle in nav also persists.
+ *   1. Setup    — goal + hard limits + acknowledgment
+ *   2. Running  — live iteration / budget / time + cycle feed + STOP
+ *   3. Resolved — completed / stopped / exceeded + summary + findings
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRalphLoop, DEFAULT_LIMITS } from './useRalphLoop.js';
 import type { RalphLimits } from './useRalphLoop.js';
@@ -21,22 +23,12 @@ interface Props {
   onBack: () => void;
 }
 
-const RALPH_YELLOW = '#FED90F';     // Simpsons-yellow accent
-const RALPH_PURPLE = '#3F2A56';     // Lisa's dress purple, secondary accent
-const RALPH_RED = '#D62828';        // Marge / lunchbox red — warning
-
 export default function RalphLoopView({ onBack }: Props) {
   const [goal, setGoal] = useState('');
   const [limits, setLimits] = useState<RalphLimits>(DEFAULT_LIMITS);
   const [acknowledged, setAcknowledged] = useState(false);
 
   const loop = useRalphLoop({ goal, limits });
-
-  // Apply ralph-mode class to <html> for the duration of this view
-  useEffect(() => {
-    document.documentElement.classList.add('ralph-mode');
-    return () => { document.documentElement.classList.remove('ralph-mode'); };
-  }, []);
 
   const isRunning = loop.state === 'running';
   const isResolved = loop.state === 'completed' || loop.state === 'stopped' || loop.state === 'exceeded';
@@ -52,64 +44,49 @@ export default function RalphLoopView({ onBack }: Props) {
     : 0;
 
   const resolvedTitle = useMemo(() => {
-    if (loop.state === 'completed') return 'Goal met. Ralph rests his case.';
-    if (loop.state === 'stopped')   return 'You stopped him.';
-    if (loop.state === 'exceeded')  return 'Hit a limit. Ralph stopped.';
+    if (loop.state === 'completed') return 'Goal met.';
+    if (loop.state === 'stopped')   return 'Stopped.';
+    if (loop.state === 'exceeded')  return 'Hit a limit.';
     return '';
   }, [loop.state]);
 
   return (
     <div style={styles.page}>
-      {/* Background flourish — yellow → red gradient blob top right */}
-      <div style={styles.bgFlourish} aria-hidden />
-
       <div style={styles.container}>
-        {/* ── Header ─────────────────────────────────────────────── */}
-        <div style={styles.header}>
+        {/* Nav row */}
+        <div style={styles.navRow}>
           <button onClick={onBack} style={styles.backBtn}>
             {'←'} Back
           </button>
-          <div style={styles.modeBadge}>
-            <span style={styles.modeDot} />
-            Ralph mode
-          </div>
         </div>
 
-        {/* ── Hero ───────────────────────────────────────────────── */}
-        <section style={styles.hero}>
-          <motion.div
-            animate={{ rotate: [0, -2, 2, -1, 1, 0] }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            style={styles.avatar}
-            aria-hidden
-          >
-            👨‍⚖️
-          </motion.div>
+        {/* Title block */}
+        <header style={styles.titleBlock}>
           <h1 style={styles.title}>
-            Ralph Wiggum, Esq.
+            Ralph Wiggum <span style={styles.titleAccent}>mode</span>
           </h1>
-          <p style={styles.subtitle}>
-            He bent his wookie. He keeps going.
+          <p style={styles.quote}>&ldquo;I&rsquo;m helping!&rdquo;</p>
+          <p style={styles.intro}>
+            An experimental way of working with legal documents.
+            An idea taken from software development: state a goal, set
+            hard limits, and a small fast model decides &ldquo;done&rdquo;
+            or &ldquo;keep going&rdquo; after every cycle until the
+            condition is met. Persistent, monolithic, deterministic —
+            and bounded by the caps you set.
           </p>
-          <p style={styles.tagline}>
-            A goal-driven loop: state the goal, set the limits, hit start.
-            Ralph runs one bounded cycle after another. A small fast
-            evaluator decides "done" or "keep going" between each.
-            He stops when the goal is met — or when a limit is hit.
-          </p>
-        </section>
+        </header>
 
-        {/* ── Phase 1: SETUP ─────────────────────────────────────── */}
+        {/* ── Phase 1: SETUP ───────────────────────────────────── */}
         {!isRunning && (
           <section style={styles.card}>
-            <div style={styles.cardEyebrow}>Step 1 · The goal</div>
+            <div style={styles.cardEyebrow}>1 · The goal</div>
             <label style={styles.label}>
-              What should Ralph keep doing until he's done?
+              What should Ralph keep doing until it&rsquo;s done?
             </label>
             <textarea
               value={goal}
               onChange={e => setGoal(e.target.value)}
-              placeholder="e.g. Find every penalty clause in ~/Documents/Contracts and stop when none remain. Stop after 25 iterations or $2 spent."
+              placeholder="e.g. Review every contract in ~/Documents/Vendors and stop when each one has at least one annotated finding or has been confirmed clean."
               style={styles.textarea}
               rows={4}
               disabled={isRunning}
@@ -129,10 +106,10 @@ export default function RalphLoopView({ onBack }: Props) {
 
             <div style={styles.divider} />
 
-            <div style={styles.cardEyebrow}>Step 2 · The limits</div>
+            <div style={styles.cardEyebrow}>2 · The limits</div>
             <p style={styles.helper}>
-              Ralph won't stop on his own until the evaluator says done.
-              These are the safety rails.
+              Ralph won&rsquo;t stop on his own until the evaluator says
+              done. These caps protect you from a runaway loop.
             </p>
             <div style={styles.limitsGrid}>
               <LimitInput
@@ -165,28 +142,19 @@ export default function RalphLoopView({ onBack }: Props) {
 
             <div style={styles.divider} />
 
-            <div style={styles.cardEyebrow}>Step 3 · The warning</div>
-            <div style={styles.warning}>
-              <div style={styles.warningHeader}>
-                <span style={styles.warningIcon}>⚠</span>
-                <span style={styles.warningTitle}>Ralph does not know when to stop.</span>
-              </div>
-              <ul style={styles.warningList}>
-                <li>Each cycle calls a model. Real money. Real time.</li>
-                <li>The evaluator can be wrong. A bad "done" criterion can loop forever.</li>
-                <li>The Stop button is always there. Use it.</li>
-                <li>The limits above are <strong>hard caps</strong>. Pick conservative numbers.</li>
-              </ul>
-              <label style={styles.ackLabel}>
-                <input
-                  type="checkbox"
-                  checked={acknowledged}
-                  onChange={e => setAcknowledged(e.target.checked)}
-                  style={styles.ackCheckbox}
-                />
-                <span>I understand. Run him within the limits I set.</span>
-              </label>
-            </div>
+            <div style={styles.cardEyebrow}>3 · Acknowledge</div>
+            <label style={styles.ackLabel}>
+              <input
+                type="checkbox"
+                checked={acknowledged}
+                onChange={e => setAcknowledged(e.target.checked)}
+                style={styles.ackCheckbox}
+              />
+              <span style={styles.ackText}>
+                I understand each cycle calls a model. Cost and time can add up.
+                The limits above are hard caps. The Stop button works at any moment.
+              </span>
+            </label>
 
             <button
               onClick={loop.start}
@@ -197,22 +165,22 @@ export default function RalphLoopView({ onBack }: Props) {
                 cursor: canStart ? 'pointer' : 'not-allowed',
               }}
             >
-              {isResolved ? 'Run Ralph again →' : 'Start Ralph →'}
+              {isResolved ? 'Run again' : 'Start'} {'→'}
             </button>
           </section>
         )}
 
-        {/* ── Phase 2: RUNNING ───────────────────────────────────── */}
+        {/* ── Phase 2: RUNNING ─────────────────────────────────── */}
         {isRunning && (
           <>
             <section style={styles.runningHero}>
               <div style={styles.runningRow}>
-                <div>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={styles.runningLabel}>Goal</div>
                   <div style={styles.runningGoal}>{goal}</div>
                 </div>
                 <button onClick={loop.stop} style={styles.stopBtn}>
-                  ◼ Stop Ralph
+                  ◼ Stop
                 </button>
               </div>
 
@@ -236,7 +204,8 @@ export default function RalphLoopView({ onBack }: Props) {
 
               {loop.reason && (
                 <div style={styles.evalNote}>
-                  <span style={styles.evalLabel}>Evaluator:</span> {loop.reason}
+                  <span style={styles.evalLabel}>Evaluator</span>
+                  <span>{loop.reason}</span>
                 </div>
               )}
             </section>
@@ -245,7 +214,7 @@ export default function RalphLoopView({ onBack }: Props) {
           </>
         )}
 
-        {/* ── Phase 3: RESOLVED ──────────────────────────────────── */}
+        {/* ── Phase 3: RESOLVED ────────────────────────────────── */}
         {isResolved && (
           <section style={styles.resolved}>
             <div style={styles.resolvedTitle}>{resolvedTitle}</div>
@@ -272,7 +241,7 @@ export default function RalphLoopView({ onBack }: Props) {
 
             {loop.findings.length > 0 && (
               <div style={styles.findingsBox}>
-                <div style={styles.findingsTitle}>What Ralph found</div>
+                <div style={styles.findingsTitle}>Findings</div>
                 <ul style={styles.findingsList}>
                   {loop.findings.map((f, i) => (
                     <li key={i} style={styles.findingItem}>{f}</li>
@@ -282,7 +251,7 @@ export default function RalphLoopView({ onBack }: Props) {
             )}
 
             <button onClick={loop.reset} style={styles.resetBtn}>
-              ↺ Run another goal
+              Run another goal
             </button>
           </section>
         )}
@@ -296,7 +265,7 @@ export default function RalphLoopView({ onBack }: Props) {
 function Meter({ label, value, pct }: { label: string; value: string; pct: number }) {
   const danger = pct >= 80;
   const warn = pct >= 60 && pct < 80;
-  const fill = danger ? RALPH_RED : warn ? '#E58F2D' : RALPH_YELLOW;
+  const fill = danger ? colors.danger : warn ? colors.warning : colors.accent;
   return (
     <div style={styles.meter}>
       <div style={styles.meterHeader}>
@@ -353,14 +322,16 @@ function LimitInput({
   );
 }
 
-// ── Feed ──────────────────────────────────────────────────────────────
+// ── Feed (cycles + evaluator only — no catchphrase quotes) ────────────
 
 function RalphFeed({ log }: { log: ReturnType<typeof useRalphLoop>['log'] }) {
+  const filtered = log.filter(e => e.kind === 'cycle' || e.kind === 'eval' || e.kind === 'stop');
+  if (filtered.length === 0) return null;
   return (
     <section style={styles.feed}>
       <div style={styles.feedHeader}>Loop</div>
       <AnimatePresence initial={false}>
-        {log.map((entry, i) => (
+        {filtered.map((entry, i) => (
           <motion.div
             key={`${entry.ts}-${i}`}
             initial={{ opacity: 0, x: -8 }}
@@ -368,7 +339,6 @@ function RalphFeed({ log }: { log: ReturnType<typeof useRalphLoop>['log'] }) {
             transition={{ duration: 0.3, ease: [0.28, 0.11, 0.32, 1] }}
             style={{
               ...styles.feedItem,
-              ...(entry.kind === 'quote' ? styles.feedItemQuote : {}),
               ...(entry.kind === 'eval' ? styles.feedItemEval : {}),
               ...(entry.kind === 'stop' ? styles.feedItemStop : {}),
             }}
@@ -377,20 +347,12 @@ function RalphFeed({ log }: { log: ReturnType<typeof useRalphLoop>['log'] }) {
               <>
                 <span style={styles.feedCycleNum}>#{entry.cycle}</span>
                 <span style={styles.feedCycleText}>{entry.text}</span>
-                {entry.finding && (
-                  <div style={styles.feedFinding}>✦ {entry.finding}</div>
-                )}
                 {entry.cost != null && (
                   <span style={styles.feedCost}>${entry.cost.toFixed(2)}</span>
                 )}
-              </>
-            )}
-            {entry.kind === 'quote' && (
-              <>
-                <span style={styles.feedQuoteMark}>"</span>
-                <span style={styles.feedQuoteText}>{entry.text}</span>
-                <span style={styles.feedQuoteMark}>"</span>
-                <span style={styles.feedQuoteAttrib}>— Ralph</span>
+                {entry.finding && (
+                  <div style={styles.feedFinding}>{entry.finding}</div>
+                )}
               </>
             )}
             {entry.kind === 'eval' && (
@@ -415,36 +377,23 @@ const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
     backgroundColor: colors.bg,
-    position: 'relative',
-    overflow: 'hidden',
-    fontFamily: 'var(--ralph-font, ' + fonts.sans + ')',
-  },
-  bgFlourish: {
-    position: 'fixed',
-    top: -200,
-    right: -200,
-    width: 600,
-    height: 600,
-    background: `radial-gradient(circle at 50% 50%, ${RALPH_YELLOW}40, transparent 60%)`,
-    pointerEvents: 'none',
-    zIndex: 0,
+    fontFamily: fonts.sans,
+    color: colors.text,
   },
   container: {
     maxWidth: 880,
     margin: '0 auto',
     padding: `${spacing.xl}px ${spacing.lg}px ${spacing.xxxl}px`,
-    position: 'relative',
-    zIndex: 1,
     display: 'flex',
     flexDirection: 'column',
     gap: spacing.xl,
   },
 
-  // ── Header ──
-  header: {
+  navRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: spacing.lg,
   },
   backBtn: {
     padding: '6px 14px',
@@ -459,64 +408,40 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
-  modeBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    padding: '6px 14px',
-    borderRadius: radii.pill,
-    backgroundColor: '#FFF8C8',
-    border: `1.5px solid ${RALPH_YELLOW}`,
-    fontFamily: fonts.sans,
-    fontSize: 11,
-    fontWeight: 600,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    color: '#5B4A0A',
-  },
-  modeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    backgroundColor: RALPH_YELLOW,
-    boxShadow: `0 0 10px ${RALPH_YELLOW}`,
-  },
 
-  // ── Hero ──
-  hero: {
-    textAlign: 'center',
+  // ── Title block ──
+  titleBlock: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: `${spacing.xl}px 0 ${spacing.lg}px`,
-  },
-  avatar: {
-    fontSize: 72,
-    lineHeight: 1,
-    filter: `drop-shadow(0 6px 16px ${RALPH_YELLOW}90)`,
+    gap: spacing.sm,
+    paddingBottom: spacing.md,
   },
   title: {
-    fontSize: 'clamp(36px, 6vw, 56px)',
-    fontFamily: 'var(--ralph-display, ' + fonts.serif + ')',
+    fontSize: 'clamp(28px, 5.5vw, 40px)',
+    fontFamily: fonts.sans,
     fontWeight: 400,
     color: colors.text,
-    margin: 0,
-    lineHeight: 1.05,
     letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontFamily: 'var(--ralph-display, ' + fonts.serif + ')',
-    color: RALPH_PURPLE,
     margin: 0,
-    fontStyle: 'normal',
+    lineHeight: 1.1,
   },
-  tagline: {
-    fontSize: 14,
+  titleAccent: {
+    fontFamily: fonts.serif,
+    fontWeight: 400,
+  },
+  quote: {
+    fontSize: 16,
+    fontFamily: fonts.serif,
     color: colors.textMuted,
-    lineHeight: 1.6,
-    maxWidth: 540,
+    margin: 0,
+    lineHeight: 1.4,
+  },
+  intro: {
+    fontSize: 14,
+    fontFamily: fonts.sans,
+    color: colors.textSecondary,
+    lineHeight: 1.65,
+    maxWidth: 640,
     margin: `${spacing.sm}px 0 0`,
   },
 
@@ -525,7 +450,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.bgCard,
     border: `1px solid ${colors.border}`,
     borderRadius: radii.lg,
-    padding: `${spacing.xxl}px`,
+    padding: spacing.xxl,
     display: 'flex',
     flexDirection: 'column',
     gap: spacing.md,
@@ -535,21 +460,21 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 10.5,
     fontFamily: fonts.sans,
     fontWeight: 600,
-    color: RALPH_PURPLE,
+    color: colors.textMuted,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   label: {
     fontSize: 14,
     color: colors.text,
-    fontFamily: 'var(--ralph-display, ' + fonts.serif + ')',
+    fontFamily: fonts.sans,
     marginBottom: -4,
   },
   textarea: {
     width: '100%',
     padding: '14px 16px',
     fontSize: 14,
-    fontFamily: 'var(--ralph-font, ' + fonts.sans + ')',
+    fontFamily: fonts.sans,
     color: colors.text,
     backgroundColor: colors.bgInput,
     border: `1.5px solid ${colors.border}`,
@@ -577,13 +502,13 @@ const styles: Record<string, React.CSSProperties> = {
   exampleChip: {
     fontSize: 12,
     fontFamily: fonts.sans,
-    backgroundColor: '#FFF8C8',
-    border: `1px solid ${RALPH_YELLOW}`,
-    color: '#5B4A0A',
+    backgroundColor: colors.bgPanel,
+    border: `1px solid ${colors.border}`,
+    color: colors.textSecondary,
     padding: '4px 10px',
     borderRadius: radii.pill,
     cursor: 'pointer',
-    transition: 'all 0.2s cubic-bezier(0.28,0.11,0.32,1)',
+    transition: 'background-color 0.2s cubic-bezier(0.28,0.11,0.32,1), border-color 0.2s cubic-bezier(0.28,0.11,0.32,1)',
   },
   divider: {
     height: 1,
@@ -594,7 +519,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     color: colors.textMuted,
     margin: 0,
-    lineHeight: 1.5,
+    lineHeight: 1.55,
   },
 
   // ── Limits ──
@@ -644,72 +569,47 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.textDim,
   },
 
-  // ── Warning ──
-  warning: {
-    padding: spacing.lg,
-    backgroundColor: '#FFF4F0',
-    border: `1.5px solid ${RALPH_RED}40`,
-    borderLeft: `4px solid ${RALPH_RED}`,
-    borderRadius: radii.md,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: spacing.md,
-  },
-  warningHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-  },
-  warningIcon: {
-    fontSize: 18,
-    color: RALPH_RED,
-  },
-  warningTitle: {
-    fontSize: 14,
-    fontFamily: fonts.sans,
-    fontWeight: 600,
-    color: RALPH_RED,
-    letterSpacing: 0.3,
-  },
-  warningList: {
-    margin: 0,
-    paddingLeft: 24,
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 1.6,
-  },
+  // ── Acknowledge ──
   ackLabel: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 10,
     fontSize: 13,
-    color: colors.text,
-    fontWeight: 500,
+    color: colors.textSecondary,
     cursor: 'pointer',
-    paddingTop: spacing.sm,
-    borderTop: `1px dashed ${RALPH_RED}30`,
+    padding: spacing.md,
+    backgroundColor: colors.bgPanel,
+    border: `1px solid ${colors.border}`,
+    borderRadius: radii.md,
+    lineHeight: 1.55,
   },
   ackCheckbox: {
     width: 16,
     height: 16,
     cursor: 'pointer',
-    accentColor: RALPH_RED,
+    flexShrink: 0,
+    marginTop: 2,
+    accentColor: colors.accent,
+  },
+  ackText: {
+    flex: 1,
   },
 
+  // ── Start CTA ──
   startBtn: {
     marginTop: spacing.md,
-    padding: '16px 32px',
-    fontSize: 14,
+    padding: '14px 28px',
+    fontSize: 12,
     fontFamily: fonts.sans,
     fontWeight: 700,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: '#1A0E00',
-    backgroundColor: RALPH_YELLOW,
-    border: `2px solid ${colors.text}`,
+    color: '#FFFFFF',
+    backgroundColor: colors.accent,
+    border: `2px solid ${colors.accent}`,
     borderRadius: radii.pill,
     cursor: 'pointer',
-    boxShadow: '0 2px 4px rgba(20,18,14,0.14), 0 8px 24px rgba(254,217,15,0.34), 0 24px 56px rgba(254,217,15,0.18)',
+    boxShadow: '0 1px 2px rgba(196, 93, 62, 0.20), 0 8px 24px rgba(196, 93, 62, 0.22), 0 24px 56px rgba(196, 93, 62, 0.14), inset 0 1px 0 rgba(255,255,255,0.18)',
     transition: 'all 0.25s cubic-bezier(0.28,0.11,0.32,1)',
     alignSelf: 'flex-start',
   },
@@ -746,26 +646,25 @@ const styles: Record<string, React.CSSProperties> = {
   },
   runningGoal: {
     fontSize: 15,
-    fontFamily: 'var(--ralph-display, ' + fonts.serif + ')',
+    fontFamily: fonts.serif,
     color: colors.text,
     lineHeight: 1.5,
     maxWidth: 580,
   },
   stopBtn: {
-    padding: '12px 22px',
-    fontSize: 13,
+    padding: '10px 22px',
+    fontSize: 12,
     fontFamily: fonts.sans,
     fontWeight: 700,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     color: '#FFFFFF',
-    backgroundColor: RALPH_RED,
+    backgroundColor: colors.danger,
     border: 'none',
     borderRadius: radii.pill,
     cursor: 'pointer',
-    boxShadow: '0 2px 4px rgba(214,40,40,0.22), 0 8px 24px rgba(214,40,40,0.28), 0 24px 56px rgba(214,40,40,0.18), inset 0 1px 0 rgba(255,255,255,0.16)',
+    boxShadow: '0 1px 2px rgba(196, 93, 62, 0.20), 0 6px 18px rgba(196, 93, 62, 0.22), 0 16px 40px rgba(196, 93, 62, 0.16), inset 0 1px 0 rgba(255,255,255,0.18)',
     flexShrink: 0,
-    transition: 'all 0.25s cubic-bezier(0.28,0.11,0.32,1)',
   },
   metersGrid: {
     display: 'grid',
@@ -797,7 +696,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
   meterTrack: {
-    height: 8,
+    height: 6,
     backgroundColor: colors.bgPanel,
     borderRadius: radii.pill,
     overflow: 'hidden',
@@ -810,20 +709,23 @@ const styles: Record<string, React.CSSProperties> = {
   evalNote: {
     fontSize: 13,
     color: colors.textSecondary,
-    backgroundColor: '#FFF8C8',
-    border: `1px solid ${RALPH_YELLOW}80`,
+    backgroundColor: colors.bgPanel,
+    border: `1px solid ${colors.border}`,
     padding: '10px 14px',
     borderRadius: radii.md,
     lineHeight: 1.5,
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: 10,
   },
   evalLabel: {
     fontFamily: fonts.sans,
     fontWeight: 700,
-    color: '#5B4A0A',
-    letterSpacing: 0.3,
+    color: colors.textMuted,
+    letterSpacing: 1,
     textTransform: 'uppercase',
-    fontSize: 11,
-    marginRight: 8,
+    fontSize: 10.5,
+    flexShrink: 0,
   },
 
   // ── Feed ──
@@ -858,19 +760,13 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
     lineHeight: 1.5,
   },
-  feedItemQuote: {
-    backgroundColor: '#FFF8C8',
-    color: '#3A2F00',
-    fontFamily: 'var(--ralph-display, ' + fonts.serif + ')',
-    fontSize: 15,
-  },
   feedItemEval: {
-    backgroundColor: '#F5F0FF',
-    color: RALPH_PURPLE,
+    backgroundColor: colors.bgPanel,
+    color: colors.textSecondary,
   },
   feedItemStop: {
-    backgroundColor: '#FFF4F0',
-    color: RALPH_RED,
+    backgroundColor: colors.accentLight,
+    color: colors.accent,
     fontWeight: 600,
   },
   feedCycleNum: {
@@ -891,11 +787,10 @@ const styles: Record<string, React.CSSProperties> = {
     width: '100%',
     fontSize: 12.5,
     color: colors.textSecondary,
-    fontStyle: 'normal',
-    backgroundColor: 'rgba(254,217,15,0.12)',
+    backgroundColor: colors.bgPanel,
     padding: '4px 10px',
     borderRadius: radii.sm,
-    borderLeft: `2px solid ${RALPH_YELLOW}`,
+    borderLeft: `2px solid ${colors.accent}`,
     marginTop: 4,
   },
   feedCost: {
@@ -905,34 +800,13 @@ const styles: Record<string, React.CSSProperties> = {
     flexShrink: 0,
     marginLeft: 'auto',
   },
-  feedQuoteMark: {
-    fontFamily: 'var(--ralph-display, ' + fonts.serif + ')',
-    fontSize: 22,
-    color: RALPH_YELLOW,
-    lineHeight: 0.5,
-  },
-  feedQuoteText: {
-    fontStyle: 'normal',
-    flex: '1 1 auto',
-  },
-  feedQuoteAttrib: {
-    fontFamily: fonts.sans,
-    fontSize: 11,
-    color: '#8B7A00',
-    fontStyle: 'normal',
-    fontWeight: 600,
-    marginLeft: 'auto',
-  },
   feedEvalLabel: {
     fontFamily: fonts.sans,
     fontWeight: 700,
     fontSize: 10.5,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    backgroundColor: RALPH_PURPLE,
-    color: '#FFFFFF',
-    padding: '2px 7px',
-    borderRadius: radii.sm,
+    color: colors.textMuted,
     flexShrink: 0,
   },
   feedEvalText: {
@@ -947,7 +821,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.bgCard,
     border: `1px solid ${colors.border}`,
     borderRadius: radii.lg,
-    padding: `${spacing.xxl}px`,
+    padding: spacing.xxl,
     display: 'flex',
     flexDirection: 'column',
     gap: spacing.lg,
@@ -956,10 +830,12 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: shadows.md,
   },
   resolvedTitle: {
-    fontSize: 26,
-    fontFamily: 'var(--ralph-display, ' + fonts.serif + ')',
+    fontSize: 28,
+    fontFamily: fonts.serif,
+    fontWeight: 400,
     color: colors.text,
     lineHeight: 1.2,
+    letterSpacing: -0.3,
   },
   resolvedReason: {
     fontSize: 14,
@@ -984,8 +860,8 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: radii.md,
   },
   resolvedStatValue: {
-    fontSize: 30,
-    fontFamily: 'var(--ralph-display, ' + fonts.serif + ')',
+    fontSize: 28,
+    fontFamily: fonts.serif,
     fontWeight: 400,
     color: colors.text,
     lineHeight: 1,
@@ -1000,8 +876,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   findingsBox: {
     width: '100%',
-    backgroundColor: '#FFFDF0',
-    border: `1px solid ${RALPH_YELLOW}80`,
+    backgroundColor: colors.bgPanel,
+    border: `1px solid ${colors.border}`,
     borderRadius: radii.md,
     padding: spacing.lg,
     textAlign: 'left',
@@ -1010,7 +886,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     fontFamily: fonts.sans,
     fontWeight: 700,
-    color: '#5B4A0A',
+    color: colors.textMuted,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     marginBottom: spacing.sm,
@@ -1027,12 +903,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13.5,
     color: colors.text,
     lineHeight: 1.5,
-    paddingLeft: 18,
+    paddingLeft: 14,
     position: 'relative',
   },
   resetBtn: {
-    padding: '12px 22px',
-    fontSize: 12,
+    padding: '10px 22px',
+    fontSize: 11,
     fontFamily: fonts.sans,
     fontWeight: 700,
     letterSpacing: 1.5,

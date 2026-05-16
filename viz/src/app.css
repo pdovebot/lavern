@@ -109,66 +109,6 @@ body::before {
   }
 }
 
-/* ── Ralph mode ─────────────────────────────────────────────────────── */
-/* Activated by toggling html.ralph-mode. Swaps body to Patrick Hand
-   (hand-drawn) and display to Akbar — the real Matt Groening / Simpsons
-   font, adapted by Jon Bernhardt in 1996, served from /fonts/akbar.ttf.
-   Bangers (Google Fonts) is the fallback if Akbar fails to load. */
-
-@font-face {
-  font-family: 'Akbar';
-  src: url('/fonts/akbar.ttf') format('truetype');
-  font-display: swap;
-  font-weight: normal;
-  font-style: normal;
-}
-
-html.ralph-mode {
-  --font-sans: 'Patrick Hand', 'Geist', -apple-system, sans-serif;
-  --font-serif: 'Akbar', 'Bangers', 'Newsreader', Georgia, serif;
-  --ralph-font: 'Patrick Hand', 'Geist', -apple-system, sans-serif;
-  --ralph-display: 'Akbar', 'Bangers', 'Newsreader', Georgia, serif;
-  --color-accent: #FED90F;
-  --color-accentLight: rgba(254, 217, 15, 0.16);
-  --color-accentMid: rgba(254, 217, 15, 0.28);
-}
-
-html.ralph-mode body {
-  background-color: #FFFBE6;
-}
-
-html.ralph-mode :focus-visible {
-  outline-color: #D62828;
-}
-
-/* Slow the underlying paper-grain texture in Ralph mode — comic style
-   wants less noise. */
-html.ralph-mode body::after { opacity: 0.020; }
-html.ralph-mode body::before { opacity: 0; }
-
-/* Restore the native cursor in Ralph mode — the global "cursor: none"
-   above is for the main editorial site's custom-cursor treatment, but
-   Ralph mode is cartoony and the native pointer is part of the joke. */
-@media (pointer: fine) {
-  html.ralph-mode,
-  html.ralph-mode *,
-  html.ralph-mode *::before,
-  html.ralph-mode *::after {
-    cursor: auto !important;
-  }
-  html.ralph-mode button,
-  html.ralph-mode [role="button"],
-  html.ralph-mode a,
-  html.ralph-mode input[type="checkbox"],
-  html.ralph-mode label {
-    cursor: pointer !important;
-  }
-  html.ralph-mode textarea,
-  html.ralph-mode input[type="text"],
-  html.ralph-mode input[type="number"] {
-    cursor: text !important;
-  }
-}
 
 /* ── Accessibility ─────────────────────────────────────────────────── */
 
