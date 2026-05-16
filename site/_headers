@@ -17,3 +17,9 @@
 
 /demo/assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Install script — served as plain text so curl | sh works cleanly and
+# so security-minded visitors can `curl ... -o install.sh; less` it.
+/install.sh
+  Content-Type: text/x-shellscript; charset=utf-8
+  Cache-Control: public, max-age=300
