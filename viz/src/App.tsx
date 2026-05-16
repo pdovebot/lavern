@@ -1207,6 +1207,7 @@ export function App() {
         {skipLink}
         {toast}
         {offlineBanner}
+        {cursor}
         <Suspense fallback={<ViewFallback text="Loading Ralph..." />}>
           <RalphLoopView onBack={() => { window.location.hash = '#/'; }} />
         </Suspense>
