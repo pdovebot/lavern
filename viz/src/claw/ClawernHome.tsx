@@ -179,11 +179,8 @@ export function ClawernHome({
           {/* The Pipeline — what happens inside, stage by stage */}
           <PipelineSection />
 
-          {/* The Team — 67 specialists */}
-          <TeamSection />
-
-          {/* The Decision — local vs frontier routing */}
-          <RoutingSection />
+          {/* Three Modes — Local / Hybrid / Frontier */}
+          <ModesSection />
 
           {/* Setup */}
           <section style={styles.section}>
@@ -377,23 +374,23 @@ const PIPELINE = [
     detail: 'watcher.ts',
   },
   {
+    name: 'Read',
+    body: 'Parser pulls text from PDF, DOCX, MD. SMAC-L1 sanitization strips zero-width chars and hidden HTML before anything sees the content.',
+    detail: 'documents/parser.ts',
+  },
+  {
     name: 'Triage',
-    body: 'Document type inferred. Sensitivity patterns matched (confidential, privileged, merger, …). A budget plan is drawn up before any model is touched.',
-    detail: 'planner.ts · inference.ts',
+    body: 'On-device Ollama scans every clause. Tags severity (minor / major / critical). Sensitivity check decides if the doc is too confidential to leave the machine.',
+    detail: 'local-analysis.ts · planner.ts',
   },
   {
-    name: 'Dispatch',
-    body: 'Confidential docs route to on-device Ollama. Everything else dispatches to the right specialists in the day-shift team.',
-    detail: 'hybrid-analysis.ts',
-  },
-  {
-    name: 'Review',
-    body: 'Specialist agents read, score, debate, and verify. Each finding cites the exact text that triggered it.',
-    detail: '67 agents',
+    name: 'Escalate',
+    body: 'In hybrid mode, only the major + critical clauses get anonymized and sent to Opus 4.7 — a direct, focused call, not the full agent firm.',
+    detail: 'anonymize.ts · hybrid-analysis.ts',
   },
   {
     name: 'Curate',
-    body: 'The precedent board queries similar past findings, scores relevance, and indexes the new ones. Institutional memory compounds.',
+    body: 'The precedent board queries similar past findings, scores relevance, and indexes the new ones. Institutional memory compounds across documents.',
     detail: 'precedent-board.ts',
   },
   {
@@ -435,104 +432,86 @@ function PipelineSection() {
   );
 }
 
-// ── Architecture: the team ─────────────────────────────────────────────
+// ── Architecture: the three modes ──────────────────────────────────────
 
-const TEAM_GROUPS = [
+const MODES = [
   {
-    label: 'Lawyers',
-    count: 24,
-    examples: 'Managing Partner · Of Counsel · Litigation Partner · Risk Partner',
+    badge: 'Default',
+    badgeTone: 'muted' as const,
+    name: 'Local',
+    body:
+      'Pure on-device Ollama. Nothing leaves the machine. No cloud bill, slower triage, narrower model — but a sealed surface.',
+    suits: 'Suits: high-sensitivity work, privacy-strict practices.',
   },
   {
-    label: 'Specialists',
-    count: 22,
-    examples: 'Plain Language · Legal Design · Privacy · Tax · IP · Antitrust',
+    badge: 'Most common',
+    badgeTone: 'accent' as const,
+    name: 'Hybrid',
+    body:
+      'Local model triages every clause for severity. Only major + critical clauses get anonymized and sent to Opus 4.7 as a single focused call — not the full agent firm. Cost-capped per document.',
+    suits: 'Suits: routine contract intake where you want a senior eye on the few flags that matter.',
   },
   {
-    label: 'Infrastructure',
-    count: 3,
-    examples: 'Engineering · Analytics · Cybersecurity',
-  },
-  {
-    label: 'Orchestrators',
-    count: 7,
-    examples: 'Catherine (intake) · The Fixer · Synthesizer · Adversarial',
+    badge: 'Full firm',
+    badgeTone: 'amber' as const,
+    name: 'Frontier',
+    body:
+      'The same dispatch → router → agents → debate → verify → assemble pipeline as the day shift. Confidential docs still stay local.',
+    suits: 'Suits: high-stakes work where you want the day-shift treatment overnight.',
   },
 ];
 
-function TeamSection() {
+function ModesSection() {
   return (
     <section style={styles.section}>
       <div style={styles.sectionHeader}>
-        <div style={styles.sectionEyebrow}>The team</div>
+        <div style={styles.sectionEyebrow}>Three modes</div>
         <div style={styles.sectionLede}>
-          Clawern dispatches the same 56 specialists that work the day shift —
-          no shortcut models, just the right one for the document type.
+          Picked when you run <code style={styles.inlineCode}>lavern claw init</code>.
+          Tunes how much of the day-shift firm comes along for the night.
         </div>
       </div>
 
-      <div style={styles.teamGrid}>
-        {TEAM_GROUPS.map(group => (
-          <div key={group.label} style={styles.teamCard}>
-            <div style={styles.teamCount}>{group.count}</div>
-            <div style={styles.teamLabel}>{group.label}</div>
-            <div style={styles.teamExamples}>{group.examples}</div>
-          </div>
+      <div style={styles.modesGrid}>
+        {MODES.map((m, i) => (
+          <motion.div
+            key={m.name}
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: i * 0.06, ease: [0.28, 0.11, 0.32, 1] }}
+            style={styles.modeCard}
+          >
+            <div
+              style={{
+                ...styles.modeBadge,
+                color:
+                  m.badgeTone === 'accent'
+                    ? CLAW.accent
+                    : m.badgeTone === 'amber'
+                      ? CLAW.amber
+                      : CLAW.textMuted,
+                borderColor:
+                  m.badgeTone === 'accent'
+                    ? CLAW.accentBorder
+                    : m.badgeTone === 'amber'
+                      ? CLAW.amberBorder
+                      : CLAW.border,
+                backgroundColor:
+                  m.badgeTone === 'accent'
+                    ? CLAW.accentBg
+                    : m.badgeTone === 'amber'
+                      ? CLAW.amberBg
+                      : 'transparent',
+              }}
+            >
+              {m.badge}
+            </div>
+            <div style={styles.modeName}>{m.name}</div>
+            <div style={styles.modeBody}>{m.body}</div>
+            <div style={styles.modeSuits}>{m.suits}</div>
+          </motion.div>
         ))}
-      </div>
-    </section>
-  );
-}
-
-// ── Architecture: routing decision ─────────────────────────────────────
-
-function RoutingSection() {
-  return (
-    <section style={styles.section}>
-      <div style={styles.sectionHeader}>
-        <div style={styles.sectionEyebrow}>The decision</div>
-        <div style={styles.sectionLede}>
-          Every document hits a sensitivity check before it touches a model.
-          Two paths from there.
-        </div>
-      </div>
-
-      <div style={styles.routingDiagram}>
-        <div style={styles.routingDocument}>
-          <span style={styles.routingDocIcon} aria-hidden>📄</span>
-          <span style={styles.routingDocLabel}>Document</span>
-        </div>
-
-        <div style={styles.routingFork}>
-          <div style={styles.routingForkLine} />
-        </div>
-
-        <div style={styles.routingBranches}>
-          <div style={{ ...styles.routingBranch, ...styles.routingLocal }}>
-            <div style={styles.routingBranchKicker}>If confidential</div>
-            <div style={styles.routingBranchTitle}>On-device · Ollama</div>
-            <div style={styles.routingBranchBody}>
-              Never leaves your Mac. Free to run. Slower, narrower model — but
-              the secret stays a secret.
-            </div>
-            <div style={styles.routingBranchTag}>$0.00 per doc</div>
-          </div>
-
-          <div style={{ ...styles.routingBranch, ...styles.routingFrontier }}>
-            <div style={styles.routingBranchKicker}>Otherwise</div>
-            <div style={styles.routingBranchTitle}>Frontier · Claude / Mistral</div>
-            <div style={styles.routingBranchBody}>
-              The full firm. EU sovereign (Mistral) option for jurisdictional
-              comfort. Budget-capped per scan.
-            </div>
-            <div style={styles.routingBranchTag}>≈ $0.05–$1.20 per doc</div>
-          </div>
-        </div>
-
-        <div style={styles.routingNote}>
-          In <strong style={{ color: CLAW.amber, fontWeight: 600 }}>Ethical mode</strong>,
-          every document is treated as confidential — local-only, EU-only.
-        </div>
       </div>
     </section>
   );
@@ -746,151 +725,64 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'none', // hidden by default (column-stack on small grids); kept for narrative
   },
 
-  // ── Team ──
-  teamGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-    gap: spacing.md,
-  },
-  teamCard: {
-    padding: spacing.lg,
-    backgroundColor: CLAW.surface,
+  // ── Modes ──
+  inlineCode: {
+    fontFamily: fonts.mono,
+    fontSize: 12.5,
+    backgroundColor: 'rgba(0,0,0,0.35)',
     border: `1px solid ${CLAW.border}`,
-    borderRadius: radii.lg,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 4,
-  },
-  teamCount: {
-    fontSize: 36,
-    fontFamily: fonts.serif,
-    fontWeight: 300,
     color: CLAW.text,
-    lineHeight: 1,
-    letterSpacing: -1,
+    padding: '1px 6px',
+    borderRadius: 3,
   },
-  teamLabel: {
-    fontSize: 11,
-    fontFamily: fonts.sans,
-    fontWeight: 600,
-    color: CLAW.accent,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    marginTop: 4,
-  },
-  teamExamples: {
-    fontSize: 12,
-    color: CLAW.textMuted,
-    lineHeight: 1.5,
-    marginTop: 4,
-  },
-
-  // ── Routing ──
-  routingDiagram: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+  modesGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
     gap: spacing.md,
-    padding: `${spacing.lg}px 0`,
   },
-  routingDocument: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 6,
-    padding: '12px 20px',
+  modeCard: {
+    padding: spacing.lg,
     backgroundColor: CLAW.surface,
     border: `1px solid ${CLAW.border}`,
-    borderRadius: radii.md,
-  },
-  routingDocIcon: {
-    fontSize: 20,
-    opacity: 0.9,
-  },
-  routingDocLabel: {
-    fontSize: 11,
-    fontFamily: fonts.sans,
-    color: CLAW.textSecondary,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    fontWeight: 600,
-  },
-  routingFork: {
-    height: 36,
-    width: '60%',
-    maxWidth: 480,
-    position: 'relative',
-  },
-  routingForkLine: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: '50%',
-    right: '50%',
-    width: 1,
-    height: '100%',
-    background: `linear-gradient(180deg, ${CLAW.border}, transparent 50%, ${CLAW.border} 50%)`,
-    transform: 'translateX(-0.5px)',
-  },
-  routingBranches: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: spacing.lg,
-    width: '100%',
-    position: 'relative',
-  },
-  routingBranch: {
-    padding: spacing.lg,
     borderRadius: radii.lg,
-    border: '1px solid',
     display: 'flex',
     flexDirection: 'column',
-    gap: 6,
+    gap: 8,
   },
-  routingLocal: {
-    backgroundColor: 'rgba(92, 158, 110, 0.06)',
-    borderColor: 'rgba(92, 158, 110, 0.22)',
-  },
-  routingFrontier: {
-    backgroundColor: CLAW.accentBg,
-    borderColor: CLAW.accentBorder,
-  },
-  routingBranchKicker: {
-    fontSize: 10.5,
+  modeBadge: {
+    alignSelf: 'flex-start',
+    fontSize: 10,
     fontFamily: fonts.sans,
     fontWeight: 600,
-    color: CLAW.textMuted,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
+    padding: '3px 9px',
+    borderRadius: radii.pill,
+    border: '1px solid',
   },
-  routingBranchTitle: {
-    fontSize: 17,
+  modeName: {
+    fontSize: 22,
     fontFamily: fonts.serif,
     fontWeight: 400,
     color: CLAW.text,
-    letterSpacing: -0.2,
+    letterSpacing: -0.3,
+    lineHeight: 1.1,
+    marginTop: 4,
   },
-  routingBranchBody: {
-    fontSize: 12.5,
+  modeBody: {
+    fontSize: 13,
     color: CLAW.textSecondary,
     lineHeight: 1.55,
     marginTop: 2,
   },
-  routingBranchTag: {
-    fontSize: 11,
-    fontFamily: fonts.mono,
-    color: CLAW.textMuted,
-    marginTop: 4,
-    letterSpacing: 0.3,
-  },
-  routingNote: {
-    marginTop: spacing.md,
-    fontSize: 12.5,
+  modeSuits: {
+    fontSize: 12,
     fontFamily: fonts.serif,
-    color: CLAW.textSecondary,
-    textAlign: 'center',
-    maxWidth: 560,
-    lineHeight: 1.55,
+    color: CLAW.textMuted,
+    lineHeight: 1.5,
+    marginTop: 6,
+    paddingTop: 10,
+    borderTop: `1px solid ${CLAW.border}`,
   },
 
   // ── How it works ──
