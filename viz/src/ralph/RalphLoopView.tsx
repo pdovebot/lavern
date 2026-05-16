@@ -436,8 +436,7 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.1,
   },
   titleAccent: {
-    fontFamily: fonts.serif,
-    fontWeight: 400,
+    fontWeight: 600,
   },
   quote: {
     fontSize: 16,

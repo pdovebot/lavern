@@ -310,8 +310,7 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: -0.5,
   },
   titleItalic: {
-    fontFamily: fonts.serif,
-    fontWeight: 400,
+    fontWeight: 600,
   },
   refreshBtn: {
     background: 'none',

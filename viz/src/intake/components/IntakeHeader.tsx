@@ -27,7 +27,7 @@ export function IntakeHeader({ phase, mode, onBack, onSkip }: Props) {
         <div style={styles.center}>
           <div style={styles.logoType}><LavernIlluminated color={colors.textMuted} /></div>
           <h1 style={styles.title}>
-            Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Intake</span>
+            Lavern <span style={{ fontWeight: 600 }}>Intake</span>
           </h1>
         </div>
 

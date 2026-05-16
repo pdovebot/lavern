@@ -48,7 +48,7 @@ export function BriefingHeader({ matterNumber, matterTitle, workflowId, jurisdic
         </button>
 
         <h1 style={styles.title}>
-          Lavern <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 400 }}>Briefing</span>
+          Lavern <span style={{ fontWeight: 600 }}>Briefing</span>
         </h1>
 
         {onSkip ? (
