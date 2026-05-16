@@ -31,7 +31,8 @@
     "typecheck:all": "tsc --noEmit && cd viz && npx tsc --noEmit",
     "serve": "tsx --env-file=.env src/index.ts --serve",
     "serve:dev": "tsx --env-file=.env src/index.ts --serve --port 3000",
-    "build:viz": "cd viz && npm run build"
+    "build:viz": "cd viz && npm run build",
+    "build:site": "cd viz && VITE_BASE_PATH=/demo/ npm run build && rm -rf ../site/demo && cp -R dist ../site/demo && echo 'site/demo rebuilt. Drag site/ to Netlify when ready.'"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "0.2.38",
