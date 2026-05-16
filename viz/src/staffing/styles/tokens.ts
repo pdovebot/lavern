@@ -93,23 +93,23 @@ export const radii = {
  */
 export const shadows = {
   /** Barely-there elevation. Pills, badges. */
-  xs: '0 1px 1px rgba(20, 18, 14, 0.03), 0 2px 4px rgba(20, 18, 14, 0.02)',
+  xs: '0 1px 2px rgba(20, 18, 14, 0.05), 0 3px 6px rgba(20, 18, 14, 0.04)',
   /** Resting card. Default surface above background. */
-  sm: '0 1px 2px rgba(20, 18, 14, 0.03), 0 4px 12px rgba(20, 18, 14, 0.04), 0 12px 32px rgba(20, 18, 14, 0.04)',
+  sm: '0 1px 2px rgba(20, 18, 14, 0.06), 0 6px 16px rgba(20, 18, 14, 0.07), 0 16px 40px rgba(20, 18, 14, 0.08)',
   /** Standard card. Most surfaces. */
-  md: '0 1px 2px rgba(20, 18, 14, 0.03), 0 8px 24px rgba(20, 18, 14, 0.05), 0 24px 56px rgba(20, 18, 14, 0.06)',
+  md: '0 2px 4px rgba(20, 18, 14, 0.06), 0 10px 28px rgba(20, 18, 14, 0.09), 0 28px 64px rgba(20, 18, 14, 0.11)',
   /** Elevated / hovered card. Lifted, attention-drawing. */
-  lg: '0 2px 4px rgba(20, 18, 14, 0.04), 0 16px 40px rgba(20, 18, 14, 0.06), 0 40px 80px rgba(20, 18, 14, 0.08)',
+  lg: '0 3px 6px rgba(20, 18, 14, 0.08), 0 18px 44px rgba(20, 18, 14, 0.11), 0 44px 88px rgba(20, 18, 14, 0.14)',
   /** Modal / overlay. Floating well above the page. */
-  xl: '0 4px 8px rgba(20, 18, 14, 0.05), 0 24px 64px rgba(20, 18, 14, 0.08), 0 60px 120px rgba(20, 18, 14, 0.10)',
-  /** Primary button — sits on a surface, slight lift. */
-  button: '0 1px 2px rgba(20, 18, 14, 0.06), 0 4px 12px rgba(20, 18, 14, 0.05), 0 12px 28px rgba(20, 18, 14, 0.04)',
-  /** Primary button hover — visible lift. */
-  buttonHover: '0 2px 4px rgba(20, 18, 14, 0.08), 0 8px 20px rgba(20, 18, 14, 0.06), 0 24px 56px rgba(20, 18, 14, 0.06)',
+  xl: '0 6px 12px rgba(20, 18, 14, 0.10), 0 28px 72px rgba(20, 18, 14, 0.14), 0 68px 132px rgba(20, 18, 14, 0.18)',
+  /** Primary button — sits on a surface, distinctive lift. */
+  button: '0 1px 2px rgba(20, 18, 14, 0.10), 0 6px 14px rgba(20, 18, 14, 0.10), 0 16px 32px rgba(20, 18, 14, 0.08)',
+  /** Primary button hover — pronounced lift. */
+  buttonHover: '0 2px 4px rgba(20, 18, 14, 0.14), 0 10px 24px rgba(20, 18, 14, 0.12), 0 28px 60px rgba(20, 18, 14, 0.12)',
   /** Inset rim — top-edge highlight that gives a "specular" feel. */
   rimLight: 'inset 0 1px 0 rgba(255, 255, 255, 0.5)',
   /** Selected card focus ring + lift. */
-  selected: '0 0 0 1.5px rgba(26, 26, 26, 0.92), 0 4px 12px rgba(20, 18, 14, 0.05), 0 24px 56px rgba(20, 18, 14, 0.07)',
+  selected: '0 0 0 1.5px rgba(26, 26, 26, 0.92), 0 6px 16px rgba(20, 18, 14, 0.09), 0 28px 64px rgba(20, 18, 14, 0.13)',
 };
 
 /** Map cost tier to color */
