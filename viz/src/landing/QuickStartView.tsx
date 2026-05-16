@@ -625,12 +625,15 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
                   )}
                   style={{
                     borderColor: active ? colors.text : colors.border,
+                    // Button's own bg matches the fill color when active, so any
+                    // subpixel gap between fill <div> and border still reads as solid.
+                    backgroundColor: active ? colors.text : 'transparent',
                     boxShadow: active
                       ? '0 1px 2px rgba(20,18,14,0.10), 0 8px 24px rgba(20,18,14,0.12), 0 24px 56px rgba(20,18,14,0.10), inset 0 1px 0 rgba(255,255,255,0.06)'
                       : '0 1px 2px rgba(20,18,14,0.03), 0 4px 12px rgba(20,18,14,0.03)',
                     transition: active
-                      ? 'border-color 0.25s ease 0.08s, box-shadow 0.3s ease 0.1s'
-                      : 'border-color 0.2s ease, box-shadow 0.2s ease',
+                      ? 'background-color 0.25s ease 0.08s, border-color 0.25s ease 0.08s, box-shadow 0.3s ease 0.1s'
+                      : 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
                   }}
                   onMouseEnter={e => {
                     if (!active) {
