@@ -19,6 +19,7 @@ export const RALPH_CATCHPHRASES = [
 
 /** Legal-flavored Ralph riffs — keep him sounding like Ralph, doing law. */
 export const RALPH_LEGAL_RIFFS = [
+  'I am lawyering!',
   "I'm reading the contract!",
   'The big words are confusing me but I keep going.',
   "Me fail to find every indemnity? That's unpossible.",
@@ -31,6 +32,10 @@ export const RALPH_LEGAL_RIFFS = [
   'I found a clause! It was hiding behind a paragraph.',
   "When I grow up I'm going to law school. Or Bovine University.",
   'My evidence is admissible. Probably.',
+  'I won! Wait, did I win?',
+  'Your honor, my crayon is bleeding.',
+  'The contract said the word!',
+  'I object! To what? Just everything.',
 ] as const;
 
 /** Pick one at random. */
