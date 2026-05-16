@@ -10,7 +10,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { useAgentBuilder } from './hooks/useAgentBuilder.js';
+import { useAgentBuilder, calculateOVR, ovrToCostTier } from './hooks/useAgentBuilder.js';
 import { useCustomAgents } from './hooks/useCustomAgents.js';
 import { useSoundEffects } from '../staffing/hooks/useSoundEffects.js';
 import { StepIndicator } from './components/StepIndicator.js';
@@ -21,7 +21,7 @@ import { LiveCardPreview } from './components/LiveCardPreview.js';
 import { CardRevealOverlay } from './components/CardRevealOverlay.js';
 import { AgentBuilderHub } from './components/AgentBuilderHub.js';
 import { colors, fonts, radii } from '../staffing/styles/tokens.js';
-import type { AgentProfile } from '../types/agent-profile.js';
+import type { AgentProfile, AgentProvenance } from '../types/agent-profile.js';
 
 interface Props {
   onBack: () => void;
@@ -44,6 +44,9 @@ export default function AgentBuilderView({ onBack, editAgentId }: Props) {
   const [revealOvr, setRevealOvr] = useState<number | null>(null);
   const [revealTier, setRevealTier] = useState<AgentProfile['costTier'] | null>(null);
   const [revealRate, setRevealRate] = useState<number | null>(null);
+  // Explicit provenance for the reveal — set when goblin/Jude is summoned so
+  // handleSave records the right kind instead of defaulting to 'scratch'.
+  const [revealProvenance, setRevealProvenance] = useState<AgentProvenance | null>(null);
   const isEditing = !!editAgentId;
   // Hub is the default entry point for new agents. Edit mode skips straight
   // to the wizard. "Build from scratch" or "Clone" from the hub also switches
@@ -100,6 +103,19 @@ export default function AgentBuilderView({ onBack, editAgentId }: Props) {
     window.location.hash = '#/team';
   }, [addAgent, play]);
 
+  /** Pre-built agent (Goblin, Jude Claw) — show the reveal first. */
+  const handlePreviewPrebuiltAgent = useCallback((profile: AgentProfile, provenance: AgentProvenance) => {
+    const ovr = calculateOVR(profile.skills);
+    setRevealProfile(profile);
+    setRevealOvr(ovr);
+    setRevealTier(profile.costTier ?? ovrToCostTier(ovr));
+    setRevealRate(profile.billingRateUsd ?? 0);
+    setRevealFromClone(false);
+    setRevealProvenance(provenance);
+    setShowReveal(true);
+    play('confirm');
+  }, [play]);
+
   const handleCustomiseFromReveal = useCallback(() => {
     // From the reveal: close and drop the user into the wizard with the
     // already-loaded state. Clear reveal state so a later Forge doesn't
@@ -144,14 +160,18 @@ export default function AgentBuilderView({ onBack, editAgentId }: Props) {
     if (isEditing && editAgentId) {
       updateAgent(editAgentId, revealProfile);
     } else {
-      // Track provenance: clone-from-profile = self-clone, otherwise = from-scratch
-      addAgent(revealProfile, { kind: revealFromClone ? 'self' : 'scratch' });
+      // Explicit provenance (Goblin / Jude Claw) wins; otherwise infer from
+      // whether the reveal came in via the clone shortcut.
+      const provenance: AgentProvenance =
+        revealProvenance ?? { kind: revealFromClone ? 'self' : 'scratch' };
+      addAgent(revealProfile, provenance);
     }
     play('confirm');
     setShowReveal(false);
+    setRevealProvenance(null);
     // Navigate to team to see the agent
     window.location.hash = '#/team';
-  }, [revealProfile, addAgent, updateAgent, play, isEditing, editAgentId, revealFromClone]);
+  }, [revealProfile, revealProvenance, addAgent, updateAgent, play, isEditing, editAgentId, revealFromClone]);
 
   const handleBuildAnother = useCallback(() => {
     builder.reset();
@@ -245,7 +265,7 @@ export default function AgentBuilderView({ onBack, editAgentId }: Props) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '16px 32px',
+          padding: '16px 32px 16px 80px',
           borderBottom: `1px solid ${colors.border}`,
         }}>
           <button
@@ -267,7 +287,7 @@ export default function AgentBuilderView({ onBack, editAgentId }: Props) {
           <div style={{
             fontSize: 15,
             fontFamily: fonts.serif,
-            fontWeight: 600,
+            fontWeight: 500,
             color: colors.text,
             letterSpacing: 1,
           }}>
@@ -279,6 +299,7 @@ export default function AgentBuilderView({ onBack, editAgentId }: Props) {
           onBuildFromScratch={handleBuildFromScratch}
           onCloneComplete={handleCloneComplete}
           onFirmCloneComplete={handleFirmCloneComplete}
+          onPreviewAgent={handlePreviewPrebuiltAgent}
         />
       </div>
       {revealEl}
@@ -300,7 +321,7 @@ export default function AgentBuilderView({ onBack, editAgentId }: Props) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '16px 32px',
+          padding: '16px 32px 16px 80px',
           borderBottom: `1px solid ${colors.border}`,
         }}>
           <button
@@ -323,7 +344,7 @@ export default function AgentBuilderView({ onBack, editAgentId }: Props) {
           <div style={{
             fontSize: 15,
             fontFamily: fonts.serif,
-            fontWeight: 600,
+            fontWeight: 500,
             color: colors.text,
             letterSpacing: 1,
           }}>

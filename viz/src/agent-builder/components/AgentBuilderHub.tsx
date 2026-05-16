@@ -22,7 +22,7 @@ import { ImportAgentModal } from './ImportAgentModal.js';
 import { GOBLIN_PROFILE, GOBLIN_AVATAR_URL } from '../data/goblinProfile.js';
 import { JUDE_CLAW_PROFILE } from '../data/judeClawProfile.js';
 import type { CustomAgent } from '../hooks/useCustomAgents.js';
-import type { AgentProfile } from '../../types/agent-profile.js';
+import type { AgentProfile, AgentProvenance } from '../../types/agent-profile.js';
 
 interface CloneData {
   displayName?: string;
@@ -43,11 +43,14 @@ interface Props {
   onCloneComplete: (data: CloneData) => void;
   /** Called with the N firm-cloned profiles the user wants saved to their roster. */
   onFirmCloneComplete: (profiles: AgentProfile[], firmName: string) => void;
+  /** Called when a pre-built profile (Goblin / Jude Claw) is summoned — opens
+   *  the card reveal in the parent view instead of adding silently. */
+  onPreviewAgent?: (profile: AgentProfile, provenance: AgentProvenance) => void;
 }
 
 type HubMode = 'menu' | 'clone' | 'clone-firm';
 
-export function AgentBuilderHub({ onBuildFromScratch, onCloneComplete, onFirmCloneComplete }: Props) {
+export function AgentBuilderHub({ onBuildFromScratch, onCloneComplete, onFirmCloneComplete, onPreviewAgent }: Props) {
   const [mode, setMode] = useState<HubMode>('menu');
   const { agents: customAgents, addAgent, removeAgent, setShareToken, clearShareToken } = useCustomAgents();
   const [goblinSummoned, setGoblinSummoned] = useState(false);
@@ -61,18 +64,26 @@ export function AgentBuilderHub({ onBuildFromScratch, onCloneComplete, onFirmClo
   }, [removeAgent]);
 
   const handleSummonGoblin = useCallback(() => {
-    addAgent(GOBLIN_PROFILE, { kind: 'goblin' });
     setGoblinSummoned(true);
-    // Reset the "summoned" pulse after the animation
     setTimeout(() => setGoblinSummoned(false), 2000);
-  }, [addAgent]);
+    if (onPreviewAgent) {
+      onPreviewAgent(GOBLIN_PROFILE, { kind: 'goblin' });
+    } else {
+      // Fallback for old call sites without the preview callback wired.
+      addAgent(GOBLIN_PROFILE, { kind: 'goblin' });
+    }
+  }, [addAgent, onPreviewAgent]);
 
   const [judeHired, setJudeHired] = useState(false);
   const handleHireJudeClaw = useCallback(() => {
-    addAgent(JUDE_CLAW_PROFILE, { kind: 'scratch' });
     setJudeHired(true);
     setTimeout(() => setJudeHired(false), 2000);
-  }, [addAgent]);
+    if (onPreviewAgent) {
+      onPreviewAgent(JUDE_CLAW_PROFILE, { kind: 'scratch' });
+    } else {
+      addAgent(JUDE_CLAW_PROFILE, { kind: 'scratch' });
+    }
+  }, [addAgent, onPreviewAgent]);
 
   if (mode === 'clone') {
     return (
