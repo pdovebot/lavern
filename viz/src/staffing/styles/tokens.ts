@@ -82,28 +82,34 @@ export const radii = {
 
 /**
  * Shadow scale — Apple-inspired multi-layer drop shadows.
- * Each level uses two layers: a tight contact shadow + a soft ambient shadow.
- * This produces depth that feels physical, not stamped-on.
+ *
+ * Recipe (the part most teams get wrong):
+ *   - huge blur radius (40–120px)
+ *   - very low opacity (0.02–0.08)
+ *   - 3 stacked layers: contact + mid + ambient
+ *   - warm-toned, not pure black (matches our cream palette)
+ *
+ * The shadow should never *look* like a shadow. It should feel like depth.
  */
 export const shadows = {
   /** Barely-there elevation. Pills, badges. */
-  xs: '0 1px 2px rgba(20, 18, 14, 0.04), 0 1px 1px rgba(20, 18, 14, 0.03)',
+  xs: '0 1px 1px rgba(20, 18, 14, 0.03), 0 2px 4px rgba(20, 18, 14, 0.02)',
   /** Resting card. Default surface above background. */
-  sm: '0 2px 4px rgba(20, 18, 14, 0.04), 0 4px 12px rgba(20, 18, 14, 0.06)',
+  sm: '0 1px 2px rgba(20, 18, 14, 0.03), 0 4px 12px rgba(20, 18, 14, 0.04), 0 12px 32px rgba(20, 18, 14, 0.04)',
   /** Standard card. Most surfaces. */
-  md: '0 4px 8px rgba(20, 18, 14, 0.05), 0 12px 24px rgba(20, 18, 14, 0.08)',
+  md: '0 1px 2px rgba(20, 18, 14, 0.03), 0 8px 24px rgba(20, 18, 14, 0.05), 0 24px 56px rgba(20, 18, 14, 0.06)',
   /** Elevated / hovered card. Lifted, attention-drawing. */
-  lg: '0 8px 16px rgba(20, 18, 14, 0.06), 0 24px 48px rgba(20, 18, 14, 0.12)',
+  lg: '0 2px 4px rgba(20, 18, 14, 0.04), 0 16px 40px rgba(20, 18, 14, 0.06), 0 40px 80px rgba(20, 18, 14, 0.08)',
   /** Modal / overlay. Floating well above the page. */
-  xl: '0 16px 32px rgba(20, 18, 14, 0.10), 0 40px 80px rgba(20, 18, 14, 0.18)',
+  xl: '0 4px 8px rgba(20, 18, 14, 0.05), 0 24px 64px rgba(20, 18, 14, 0.08), 0 60px 120px rgba(20, 18, 14, 0.10)',
   /** Primary button — sits on a surface, slight lift. */
-  button: '0 1px 2px rgba(20, 18, 14, 0.10), 0 2px 6px rgba(20, 18, 14, 0.08)',
+  button: '0 1px 2px rgba(20, 18, 14, 0.06), 0 4px 12px rgba(20, 18, 14, 0.05), 0 12px 28px rgba(20, 18, 14, 0.04)',
   /** Primary button hover — visible lift. */
-  buttonHover: '0 2px 4px rgba(20, 18, 14, 0.12), 0 6px 14px rgba(20, 18, 14, 0.12)',
+  buttonHover: '0 2px 4px rgba(20, 18, 14, 0.08), 0 8px 20px rgba(20, 18, 14, 0.06), 0 24px 56px rgba(20, 18, 14, 0.06)',
   /** Inset rim — top-edge highlight that gives a "specular" feel. */
   rimLight: 'inset 0 1px 0 rgba(255, 255, 255, 0.5)',
   /** Selected card focus ring + lift. */
-  selected: '0 0 0 1.5px rgba(26, 26, 26, 0.95), 0 8px 16px rgba(20, 18, 14, 0.08), 0 24px 48px rgba(20, 18, 14, 0.12)',
+  selected: '0 0 0 1.5px rgba(26, 26, 26, 0.92), 0 4px 12px rgba(20, 18, 14, 0.05), 0 24px 56px rgba(20, 18, 14, 0.07)',
 };
 
 /** Map cost tier to color */

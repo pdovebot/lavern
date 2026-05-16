@@ -108,10 +108,14 @@ export function SessionList({ onBeginEngagement, onYoloLaunch }: SessionListProp
         {onBeginEngagement && (
           <button
             onClick={onBeginEngagement}
-            className="mt-8 sm:mt-10 lg:mt-12 px-8 py-4 sm:px-12 sm:py-4.5 lg:px-16 lg:py-[18px] rounded-sm border-2 border-text font-sans text-xs sm:text-sm font-semibold tracking-[2px] uppercase cursor-pointer transition-[background-color,color,border-color] duration-250"
+            className="mt-8 sm:mt-10 lg:mt-12 px-8 py-4 sm:px-12 sm:py-4.5 lg:px-16 lg:py-[18px] rounded-sm border-2 border-text font-sans text-xs sm:text-sm font-semibold tracking-[2px] uppercase cursor-pointer transition-all duration-[250ms] ease-[cubic-bezier(0.28,0.11,0.32,1)]"
             style={{
               backgroundColor: hoveredBtn === 'cta' ? 'transparent' : colors.text,
               color: hoveredBtn === 'cta' ? colors.text : '#fff',
+              boxShadow: hoveredBtn === 'cta'
+                ? '0 2px 4px rgba(20,18,14,0.08), 0 16px 40px rgba(20,18,14,0.10), 0 40px 80px rgba(20,18,14,0.10)'
+                : '0 1px 2px rgba(20,18,14,0.12), 0 8px 24px rgba(20,18,14,0.10), 0 24px 56px rgba(20,18,14,0.08), inset 0 1px 0 rgba(255,255,255,0.08)',
+              transform: hoveredBtn === 'cta' ? 'translateY(-1px)' : 'none',
             }}
             onMouseEnter={() => setHoveredBtn('cta')}
             onMouseLeave={() => setHoveredBtn(null)}

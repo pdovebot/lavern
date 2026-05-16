@@ -152,5 +152,5 @@ const faceBase: React.CSSProperties = {
   borderRadius: radii.lg,
   backgroundColor: colors.bgCard,
   overflow: 'hidden',
-  transition: 'border-color 0.2s ease, box-shadow 0.3s ease',
+  transition: 'border-color 0.25s cubic-bezier(0.28,0.11,0.32,1), box-shadow 0.35s cubic-bezier(0.28,0.11,0.32,1), transform 0.35s cubic-bezier(0.28,0.11,0.32,1)',
 };

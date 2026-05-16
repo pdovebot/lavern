@@ -336,20 +336,20 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
                 onClick={advanceToInterviewer}
                 className="px-10 py-3.5 rounded-full border-2 border-text bg-text text-white font-sans text-[11px] font-semibold tracking-[3px] uppercase cursor-pointer transition-all duration-200 w-full sm:w-auto text-center"
                 style={{
-                  boxShadow: '0 6px 16px rgba(20,18,14,0.22), 0 2px 4px rgba(20,18,14,0.16), inset 0 1px 0 rgba(255,255,255,0.06)',
+                  boxShadow: '0 1px 2px rgba(20,18,14,0.12), 0 8px 24px rgba(20,18,14,0.10), 0 24px 56px rgba(20,18,14,0.08), inset 0 1px 0 rgba(255,255,255,0.06)',
                 }}
                 onMouseEnter={e => {
                   const b = e.currentTarget;
                   b.style.backgroundColor = 'transparent';
                   b.style.color = colors.text;
-                  b.style.boxShadow = '0 10px 24px rgba(20,18,14,0.28), 0 3px 8px rgba(20,18,14,0.18)';
+                  b.style.boxShadow = '0 2px 4px rgba(20,18,14,0.14), 0 12px 32px rgba(20,18,14,0.12), 0 32px 72px rgba(20,18,14,0.10)';
                   b.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={e => {
                   const b = e.currentTarget;
                   b.style.backgroundColor = colors.text;
                   b.style.color = '#fff';
-                  b.style.boxShadow = '0 6px 16px rgba(20,18,14,0.22), 0 2px 4px rgba(20,18,14,0.16), inset 0 1px 0 rgba(255,255,255,0.06)';
+                  b.style.boxShadow = '0 1px 2px rgba(20,18,14,0.12), 0 8px 24px rgba(20,18,14,0.10), 0 24px 56px rgba(20,18,14,0.08), inset 0 1px 0 rgba(255,255,255,0.06)';
                   b.style.transform = 'none';
                 }}
               >
