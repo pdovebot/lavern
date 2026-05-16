@@ -154,7 +154,7 @@ export function ClawernHome({
 
       {demoMode ? (
         <>
-          {/* "How it works" */}
+          {/* "How it works" — the user-facing story */}
           <section style={styles.section}>
             <div style={styles.sectionEyebrow}>How it works</div>
             <div style={styles.steps}>
@@ -175,6 +175,15 @@ export function ClawernHome({
               />
             </div>
           </section>
+
+          {/* The Pipeline — what happens inside, stage by stage */}
+          <PipelineSection />
+
+          {/* The Team — 67 specialists */}
+          <TeamSection />
+
+          {/* The Decision — local vs frontier routing */}
+          <RoutingSection />
 
           {/* Setup */}
           <section style={styles.section}>
@@ -359,6 +368,176 @@ export function ClawernHome({
 
 // ── Subcomponents ───────────────────────────────────────────────────────
 
+// ── Architecture: the 6-stage pipeline ─────────────────────────────────
+
+const PIPELINE = [
+  {
+    name: 'Watch',
+    body: 'A filesystem watcher debounces changes and protects against symlink escapes. Sees PDFs, Word, Markdown, plain text.',
+    detail: 'watcher.ts',
+  },
+  {
+    name: 'Triage',
+    body: 'Document type inferred. Sensitivity patterns matched (confidential, privileged, merger, …). A budget plan is drawn up before any model is touched.',
+    detail: 'planner.ts · inference.ts',
+  },
+  {
+    name: 'Dispatch',
+    body: 'Confidential docs route to on-device Ollama. Everything else dispatches to the right specialists in the day-shift team.',
+    detail: 'hybrid-analysis.ts',
+  },
+  {
+    name: 'Review',
+    body: 'Specialist agents read, score, debate, and verify. Each finding cites the exact text that triggered it.',
+    detail: '67 agents',
+  },
+  {
+    name: 'Curate',
+    body: 'The precedent board queries similar past findings, scores relevance, and indexes the new ones. Institutional memory compounds.',
+    detail: 'precedent-board.ts',
+  },
+  {
+    name: 'Deliver',
+    body: 'A bundle written to the delivery folder — DOCX, HTML, manifest. Telegram, email, or macOS push if you want a nudge.',
+    detail: 'delivery.ts · notify.ts',
+  },
+];
+
+function PipelineSection() {
+  return (
+    <section style={styles.section}>
+      <div style={styles.sectionHeader}>
+        <div style={styles.sectionEyebrow}>The pipeline</div>
+        <div style={styles.sectionLede}>Six stages from filesystem to morning briefing.</div>
+      </div>
+
+      <div style={styles.pipelineRail}>
+        {PIPELINE.map((stage, i) => (
+          <motion.div
+            key={stage.name}
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: i * 0.05, ease: [0.28, 0.11, 0.32, 1] }}
+            style={styles.pipelineCard}
+          >
+            <div style={styles.pipelineNum}>{String(i + 1).padStart(2, '0')}</div>
+            <div style={styles.pipelineName}>{stage.name}</div>
+            <div style={styles.pipelineBody}>{stage.body}</div>
+            <div style={styles.pipelineDetail}>{stage.detail}</div>
+            {i < PIPELINE.length - 1 && (
+              <div style={styles.pipelineConnector} aria-hidden>{'→'}</div>
+            )}
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Architecture: the team ─────────────────────────────────────────────
+
+const TEAM_GROUPS = [
+  {
+    label: 'Lawyers',
+    count: 24,
+    examples: 'Managing Partner · Of Counsel · Litigation Partner · Risk Partner',
+  },
+  {
+    label: 'Specialists',
+    count: 22,
+    examples: 'Plain Language · Legal Design · Privacy · Tax · IP · Antitrust',
+  },
+  {
+    label: 'Infrastructure',
+    count: 3,
+    examples: 'Engineering · Analytics · Cybersecurity',
+  },
+  {
+    label: 'Orchestrators',
+    count: 7,
+    examples: 'Catherine (intake) · The Fixer · Synthesizer · Adversarial',
+  },
+];
+
+function TeamSection() {
+  return (
+    <section style={styles.section}>
+      <div style={styles.sectionHeader}>
+        <div style={styles.sectionEyebrow}>The team</div>
+        <div style={styles.sectionLede}>
+          Clawern dispatches the same 56 specialists that work the day shift —
+          no shortcut models, just the right one for the document type.
+        </div>
+      </div>
+
+      <div style={styles.teamGrid}>
+        {TEAM_GROUPS.map(group => (
+          <div key={group.label} style={styles.teamCard}>
+            <div style={styles.teamCount}>{group.count}</div>
+            <div style={styles.teamLabel}>{group.label}</div>
+            <div style={styles.teamExamples}>{group.examples}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Architecture: routing decision ─────────────────────────────────────
+
+function RoutingSection() {
+  return (
+    <section style={styles.section}>
+      <div style={styles.sectionHeader}>
+        <div style={styles.sectionEyebrow}>The decision</div>
+        <div style={styles.sectionLede}>
+          Every document hits a sensitivity check before it touches a model.
+          Two paths from there.
+        </div>
+      </div>
+
+      <div style={styles.routingDiagram}>
+        <div style={styles.routingDocument}>
+          <span style={styles.routingDocIcon} aria-hidden>📄</span>
+          <span style={styles.routingDocLabel}>Document</span>
+        </div>
+
+        <div style={styles.routingFork}>
+          <div style={styles.routingForkLine} />
+        </div>
+
+        <div style={styles.routingBranches}>
+          <div style={{ ...styles.routingBranch, ...styles.routingLocal }}>
+            <div style={styles.routingBranchKicker}>If confidential</div>
+            <div style={styles.routingBranchTitle}>On-device · Ollama</div>
+            <div style={styles.routingBranchBody}>
+              Never leaves your Mac. Free to run. Slower, narrower model — but
+              the secret stays a secret.
+            </div>
+            <div style={styles.routingBranchTag}>$0.00 per doc</div>
+          </div>
+
+          <div style={{ ...styles.routingBranch, ...styles.routingFrontier }}>
+            <div style={styles.routingBranchKicker}>Otherwise</div>
+            <div style={styles.routingBranchTitle}>Frontier · Claude / Mistral</div>
+            <div style={styles.routingBranchBody}>
+              The full firm. EU sovereign (Mistral) option for jurisdictional
+              comfort. Budget-capped per scan.
+            </div>
+            <div style={styles.routingBranchTag}>≈ $0.05–$1.20 per doc</div>
+          </div>
+        </div>
+
+        <div style={styles.routingNote}>
+          In <strong style={{ color: CLAW.amber, fontWeight: 600 }}>Ethical mode</strong>,
+          every document is treated as confidential — local-only, EU-only.
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Step({ num, title, body }: { num: string; title: string; body: string }) {
   return (
     <motion.div
@@ -490,6 +669,11 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: spacing.lg,
   },
+  sectionHeader: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+  },
   sectionEyebrow: {
     fontSize: 11,
     fontFamily: fonts.sans,
@@ -497,6 +681,216 @@ const styles: Record<string, React.CSSProperties> = {
     color: CLAW.textMuted,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
+  },
+  sectionLede: {
+    fontSize: 14,
+    fontFamily: fonts.serif,
+    color: CLAW.textSecondary,
+    lineHeight: 1.55,
+    maxWidth: 640,
+  },
+
+  // ── Pipeline ──
+  pipelineRail: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: spacing.md,
+    position: 'relative',
+  },
+  pipelineCard: {
+    position: 'relative',
+    padding: spacing.lg,
+    backgroundColor: CLAW.surface,
+    border: `1px solid ${CLAW.border}`,
+    borderRadius: radii.lg,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+  },
+  pipelineNum: {
+    fontSize: 10,
+    fontFamily: fonts.mono,
+    color: CLAW.accent,
+    letterSpacing: 2,
+    fontWeight: 600,
+  },
+  pipelineName: {
+    fontSize: 18,
+    fontFamily: fonts.serif,
+    fontWeight: 400,
+    color: CLAW.text,
+    letterSpacing: -0.2,
+  },
+  pipelineBody: {
+    fontSize: 12.5,
+    color: CLAW.textSecondary,
+    lineHeight: 1.5,
+    marginTop: 2,
+  },
+  pipelineDetail: {
+    fontSize: 10.5,
+    fontFamily: fonts.mono,
+    color: CLAW.textDim,
+    marginTop: 4,
+    letterSpacing: 0.3,
+  },
+  pipelineConnector: {
+    position: 'absolute',
+    right: -18,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    fontSize: 14,
+    color: CLAW.textDim,
+    zIndex: 1,
+    pointerEvents: 'none',
+    display: 'none', // hidden by default (column-stack on small grids); kept for narrative
+  },
+
+  // ── Team ──
+  teamGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+    gap: spacing.md,
+  },
+  teamCard: {
+    padding: spacing.lg,
+    backgroundColor: CLAW.surface,
+    border: `1px solid ${CLAW.border}`,
+    borderRadius: radii.lg,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+  },
+  teamCount: {
+    fontSize: 36,
+    fontFamily: fonts.serif,
+    fontWeight: 300,
+    color: CLAW.text,
+    lineHeight: 1,
+    letterSpacing: -1,
+  },
+  teamLabel: {
+    fontSize: 11,
+    fontFamily: fonts.sans,
+    fontWeight: 600,
+    color: CLAW.accent,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    marginTop: 4,
+  },
+  teamExamples: {
+    fontSize: 12,
+    color: CLAW.textMuted,
+    lineHeight: 1.5,
+    marginTop: 4,
+  },
+
+  // ── Routing ──
+  routingDiagram: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: `${spacing.lg}px 0`,
+  },
+  routingDocument: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 6,
+    padding: '12px 20px',
+    backgroundColor: CLAW.surface,
+    border: `1px solid ${CLAW.border}`,
+    borderRadius: radii.md,
+  },
+  routingDocIcon: {
+    fontSize: 20,
+    opacity: 0.9,
+  },
+  routingDocLabel: {
+    fontSize: 11,
+    fontFamily: fonts.sans,
+    color: CLAW.textSecondary,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    fontWeight: 600,
+  },
+  routingFork: {
+    height: 36,
+    width: '60%',
+    maxWidth: 480,
+    position: 'relative',
+  },
+  routingForkLine: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: '50%',
+    right: '50%',
+    width: 1,
+    height: '100%',
+    background: `linear-gradient(180deg, ${CLAW.border}, transparent 50%, ${CLAW.border} 50%)`,
+    transform: 'translateX(-0.5px)',
+  },
+  routingBranches: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: spacing.lg,
+    width: '100%',
+    position: 'relative',
+  },
+  routingBranch: {
+    padding: spacing.lg,
+    borderRadius: radii.lg,
+    border: '1px solid',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+  },
+  routingLocal: {
+    backgroundColor: 'rgba(92, 158, 110, 0.06)',
+    borderColor: 'rgba(92, 158, 110, 0.22)',
+  },
+  routingFrontier: {
+    backgroundColor: CLAW.accentBg,
+    borderColor: CLAW.accentBorder,
+  },
+  routingBranchKicker: {
+    fontSize: 10.5,
+    fontFamily: fonts.sans,
+    fontWeight: 600,
+    color: CLAW.textMuted,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  routingBranchTitle: {
+    fontSize: 17,
+    fontFamily: fonts.serif,
+    fontWeight: 400,
+    color: CLAW.text,
+    letterSpacing: -0.2,
+  },
+  routingBranchBody: {
+    fontSize: 12.5,
+    color: CLAW.textSecondary,
+    lineHeight: 1.55,
+    marginTop: 2,
+  },
+  routingBranchTag: {
+    fontSize: 11,
+    fontFamily: fonts.mono,
+    color: CLAW.textMuted,
+    marginTop: 4,
+    letterSpacing: 0.3,
+  },
+  routingNote: {
+    marginTop: spacing.md,
+    fontSize: 12.5,
+    fontFamily: fonts.serif,
+    color: CLAW.textSecondary,
+    textAlign: 'center',
+    maxWidth: 560,
+    lineHeight: 1.55,
   },
 
   // ── How it works ──
