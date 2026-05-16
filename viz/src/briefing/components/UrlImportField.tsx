@@ -91,7 +91,7 @@ export function UrlImportField({ onImport }: Props) {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
   },
   row: {
     display: 'flex',

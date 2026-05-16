@@ -45,11 +45,11 @@ export function TemplatePicker({ onSelect }: Props) {
   };
 
   return (
-    <div className="mb-5">
-      <div className="text-[11px] font-sans text-text-dim uppercase tracking-[1px] mb-3">
+    <div className="mt-10 mb-8">
+      <div className="text-[11px] font-sans text-text-dim uppercase tracking-[1px] mb-4">
         Or start from a template
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {templates.map(t => (
           <button
             key={t.id}

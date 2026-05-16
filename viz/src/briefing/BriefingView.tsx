@@ -276,7 +276,7 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
 
       {/* Smart suggestion chips — only during early phases */}
       {suggestions.length > 0 && (phase === 'documents' || phase === 'questions') && (
-        <div className="flex flex-wrap gap-2 mb-5">
+        <div className="flex flex-wrap gap-2 mb-8">
           {suggestions.map(s => (
             <SuggestionChip
               key={s.id}
@@ -292,7 +292,7 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
         'mb-6 transition-[background-color,color,border-color] duration-300',
         phase === 'documents' ? 'opacity-100' : 'opacity-50 pb-2 border-b border-border mb-5',
       )}>
-        <div className="text-xs font-sans font-medium text-text-muted uppercase tracking-[0.5px] mb-4">
+        <div className="text-[11px] font-sans font-semibold text-text-muted uppercase tracking-[1px] mb-5">
           {phase === 'documents' ? 'Upload relevant documents' : `${upload.documents.length} document${upload.documents.length !== 1 ? 's' : ''} attached`}
         </div>
 
@@ -326,7 +326,7 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
               <div className="text-xs font-sans text-danger mt-2">{upload.error}</div>
             )}
 
-            <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3 mt-5">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3 mt-10">
               <span className="text-xs font-sans text-text-dim">
                 {upload.documents.length === 0
                   ? 'You can skip this step if you have no documents to upload.'
