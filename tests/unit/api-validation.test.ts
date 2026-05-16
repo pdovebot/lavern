@@ -152,9 +152,11 @@ describe('API Validation', () => {
       });
 
       it('should reject budget above maximum', () => {
+        // Schema is .max(500) — inclusive. Use a value above 500
+        // to assert the upper bound rejects values above it.
         const result = CreateSessionSchema.safeParse({
           documentPath: '/doc.pdf',
-          options: { budget: 500 },
+          options: { budget: 501 },
         });
         expect(result.success).toBe(false);
       });

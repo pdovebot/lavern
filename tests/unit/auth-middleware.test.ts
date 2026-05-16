@@ -170,277 +170,55 @@ describe('parseCookieToken', () => {
 
 // ── createAuthMiddleware — Public Path Matching ─────────────────────────
 
-describe('createAuthMiddleware', () => {
-  // We test the path-matching logic by calling the middleware with mock request/reply objects.
-  // The middleware throws a 401 error when auth fails, so we can check whether it does or doesn't.
+// ── createAuthMiddleware ────────────────────────────────────────────────
+//
+// Auth was deliberately removed for the OSS local-first release. The
+// middleware is now a no-op that injects a synthetic local user on every
+// request. Bearer-token, cookie, and public-path matching tests from the
+// pre-OSS version live in git history (commit 25bef1a^).
+//
+// If multi-user auth ever lands again, restore the pre-OSS test block
+// alongside the restored middleware logic.
 
+describe('createAuthMiddleware (local-mode no-op)', () => {
   const registry = new ClientRegistry();
+  const middleware = createAuthMiddleware(registry);
 
-  function createMockRequest(method: string, url: string, headers: Record<string, string> = {}): any {
-    return {
-      method,
-      url,
-      headers: {
-        ...headers,
-      },
-    };
+  function req(method: string, url: string, headers: Record<string, string> = {}): any {
+    return { method, url, headers };
   }
+  function reply(): any { return {}; }
 
-  function createMockReply(): any {
-    return {};
-  }
+  it('injects request.userId = "local-user"', async () => {
+    const r = req('GET', '/api/whatever');
+    await middleware(r, reply());
+    expect((r as any).userId).toBe('local-user');
+  });
 
-  describe('exact path matching', () => {
-    const middleware = createAuthMiddleware(registry, ['/health', '/']);
-
-    it('should allow exact match paths without auth', async () => {
-      const req = createMockRequest('GET', '/health');
-      // Should not throw
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-
-    it('should allow root path', async () => {
-      const req = createMockRequest('GET', '/');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-
-    it('should reject non-public paths without auth', async () => {
-      const req = createMockRequest('GET', '/api/secret');
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
+  it('injects request.user with id, email, displayName', async () => {
+    const r = req('GET', '/api/whatever');
+    await middleware(r, reply());
+    expect((r as any).user).toEqual({
+      id: 'local-user',
+      email: 'local@localhost',
+      displayName: 'Local User',
     });
   });
 
-  describe('prefix path matching (trailing /)', () => {
-    const middleware = createAuthMiddleware(registry, ['/dashboard/']);
-
-    it('should allow paths starting with the prefix', async () => {
-      const req = createMockRequest('GET', '/dashboard/index.html');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-
-    it('should allow the prefix itself', async () => {
-      const req = createMockRequest('GET', '/dashboard/');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-
-    it('should allow deep paths under the prefix', async () => {
-      const req = createMockRequest('GET', '/dashboard/assets/app.js');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-
-    it('should not match /dashboard without trailing slash', async () => {
-      const req = createMockRequest('GET', '/dashboard');
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
-    });
+  it('never rejects — even on a path that used to require auth', async () => {
+    const r = req('POST', '/api/sessions');
+    await expect(middleware(r, reply())).resolves.toBeUndefined();
   });
 
-  describe('method-specific exact matching', () => {
-    const middleware = createAuthMiddleware(registry, ['GET /api/sessions']);
-
-    it('should allow GET request to the exact path', async () => {
-      const req = createMockRequest('GET', '/api/sessions');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-
-    it('should reject POST to the same path', async () => {
-      const req = createMockRequest('POST', '/api/sessions');
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
-    });
-
-    it('should reject DELETE to the same path', async () => {
-      const req = createMockRequest('DELETE', '/api/sessions');
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
-    });
+  it('ignores Authorization header (auth path is removed)', async () => {
+    const r = req('GET', '/api/private', { authorization: 'Bearer obviously-bad' });
+    await expect(middleware(r, reply())).resolves.toBeUndefined();
+    expect((r as any).userId).toBe('local-user');
   });
 
-  describe('method-specific wildcard matching', () => {
-    const middleware = createAuthMiddleware(registry, ['GET /api/sessions/*']);
-
-    it('should allow GET to a wildcard sub-path', async () => {
-      const req = createMockRequest('GET', '/api/sessions/abc');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-
-    it('should allow GET to a deeply nested wildcard path', async () => {
-      const req = createMockRequest('GET', '/api/sessions/abc/events');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-
-    it('should reject GET to the wildcard base path (without sub-path)', async () => {
-      // "GET /api/sessions/*" does NOT match /api/sessions (the base listing path)
-      // This is intentional — session listing requires auth, only per-session access is public
-      const req = createMockRequest('GET', '/api/sessions');
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
-    });
-
-    it('should reject POST to wildcard paths', async () => {
-      const req = createMockRequest('POST', '/api/sessions/abc');
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
-    });
-  });
-
-  describe('query string stripping', () => {
-    const middleware = createAuthMiddleware(registry, ['/health']);
-
-    it('should strip query strings before matching', async () => {
-      const req = createMockRequest('GET', '/health?check=true');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-    });
-  });
-
-  describe('Bearer token authentication', () => {
-    const authRegistry = new ClientRegistry();
-    const middleware = createAuthMiddleware(authRegistry, ['/health']);
-
-    it('should authenticate with valid Bearer token', async () => {
-      const { apiKey } = authRegistry.registerClient('agent', { name: 'API Bot' });
-      const req = createMockRequest('GET', '/api/protected', {
-        authorization: `Bearer ${apiKey}`,
-      });
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-      // Client should be attached to request
-      expect((req as any).client).toBeDefined();
-      expect((req as any).client.name).toBe('API Bot');
-    });
-
-    it('should reject invalid Bearer token', async () => {
-      const req = createMockRequest('GET', '/api/protected', {
-        authorization: 'Bearer invalid_token_xyz',
-      });
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
-    });
-
-    it('should reject empty Bearer token', async () => {
-      const req = createMockRequest('GET', '/api/protected', {
-        authorization: 'Bearer ',
-      });
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
-    });
-  });
-
-  describe('combined public paths (production-like config)', () => {
-    const middleware = createAuthMiddleware(registry, [
-      '/health',
-      '/',
-      '/api/clients',
-      'GET /api/sessions',
-      'GET /api/sessions/*',
-      'POST /api/auth/signup',
-      'POST /api/auth/login',
-      '/dashboard/',
-    ]);
-
-    it('should allow health check', async () => {
-      await expect(
-        middleware(createMockRequest('GET', '/health'), createMockReply())
-      ).resolves.toBeUndefined();
-    });
-
-    it('should allow GET session listing', async () => {
-      await expect(
-        middleware(createMockRequest('GET', '/api/sessions'), createMockReply())
-      ).resolves.toBeUndefined();
-    });
-
-    it('should allow GET session detail', async () => {
-      await expect(
-        middleware(createMockRequest('GET', '/api/sessions/abc123'), createMockReply())
-      ).resolves.toBeUndefined();
-    });
-
-    it('should block POST to sessions (not in public list)', async () => {
-      await expect(
-        middleware(createMockRequest('POST', '/api/sessions'), createMockReply())
-      ).rejects.toThrow('Authentication required');
-    });
-
-    it('should block DELETE to sessions', async () => {
-      await expect(
-        middleware(createMockRequest('DELETE', '/api/sessions/abc'), createMockReply())
-      ).rejects.toThrow('Authentication required');
-    });
-
-    it('should allow POST to auth signup', async () => {
-      await expect(
-        middleware(createMockRequest('POST', '/api/auth/signup'), createMockReply())
-      ).resolves.toBeUndefined();
-    });
-
-    it('should allow POST to auth login', async () => {
-      await expect(
-        middleware(createMockRequest('POST', '/api/auth/login'), createMockReply())
-      ).resolves.toBeUndefined();
-    });
-
-    it('should allow dashboard static files', async () => {
-      await expect(
-        middleware(createMockRequest('GET', '/dashboard/assets/app.js'), createMockReply())
-      ).resolves.toBeUndefined();
-    });
-
-    it('should block API routes not in public list', async () => {
-      await expect(
-        middleware(createMockRequest('POST', '/api/matters'), createMockReply())
-      ).rejects.toThrow('Authentication required');
-    });
-  });
-
-  // ── Opportunistic auth on public routes ────────────────────────────────
-  //
-  // Regression test for the bug fixed in commit (this commit's SHA): public
-  // routes like `GET /api/sessions/:id/download` previously did an early
-  // `return` from the auth middleware without ever populating
-  // `request.userId`. Per-route ownership checks (which return 404 to mask
-  // existence) then failed for any logged-in user accessing their own
-  // archived session via a capability-token URL. The fix: even on public
-  // routes, opportunistically try Bearer + cookie auth and attach userId
-  // if available — never throw on failure.
-  describe('opportunistic auth on public routes', () => {
-    const oppRegistry = new ClientRegistry();
-    const middleware = createAuthMiddleware(oppRegistry, [
-      '/health',
-      'GET /api/sessions/*',
-    ]);
-
-    it('should populate request.client when a valid Bearer token is present on a public route', async () => {
-      const { apiKey } = oppRegistry.registerClient('agent', { name: 'Public-Route Bot' });
-      const req = createMockRequest('GET', '/api/sessions/abc123', {
-        authorization: `Bearer ${apiKey}`,
-      });
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-      expect((req as any).userId).toBeDefined();
-      expect((req as any).client?.name).toBe('Public-Route Bot');
-    });
-
-    it('should ignore an invalid Bearer token on a public route (no throw, no userId)', async () => {
-      const req = createMockRequest('GET', '/api/sessions/abc123', {
-        authorization: 'Bearer invalid_token_xyz',
-      });
-      // Public route — silent failure, no throw, userId stays undefined.
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-      expect((req as any).userId).toBeUndefined();
-      expect((req as any).client).toBeUndefined();
-    });
-
-    it('should ignore a malformed cookie on a public route (no throw, no userId)', async () => {
-      const req = createMockRequest('GET', '/api/sessions/abc123', {
-        cookie: 'lavern_token=garbage_not_real_token',
-      });
-      // dbGetUserByToken throws or returns undefined for unknown tokens;
-      // the public-route branch catches/silences both. No userId is set.
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-      expect((req as any).userId).toBeUndefined();
-    });
-
-    it('should still resolve without auth on a public route when no credentials are present', async () => {
-      const req = createMockRequest('GET', '/api/sessions/abc123');
-      await expect(middleware(req, createMockReply())).resolves.toBeUndefined();
-      expect((req as any).userId).toBeUndefined();
-    });
-
-    it('should not call auth at all on non-public routes — still throws when auth missing', async () => {
-      const req = createMockRequest('GET', '/api/secret');
-      await expect(middleware(req, createMockReply())).rejects.toThrow('Authentication required');
-    });
+  it('ignores cookies (auth path is removed)', async () => {
+    const r = req('GET', '/api/private', { cookie: 'lavern_token=garbage' });
+    await expect(middleware(r, reply())).resolves.toBeUndefined();
+    expect((r as any).userId).toBe('local-user');
   });
 });

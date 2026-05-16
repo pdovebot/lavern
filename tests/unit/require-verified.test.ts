@@ -1,147 +1,67 @@
 /**
- * Unit Tests — Email Verification Middleware (src/api/middleware/require-verified.ts)
+ * Unit Tests — Email Verification Middleware
+ *   (src/api/middleware/require-verified.ts)
  *
- * Tests:
- * - Skips when no userId (anonymous/public)
- * - Skips for API clients (Bearer auth)
- * - Skips for GET/HEAD/OPTIONS methods
- * - Skips for exempt paths
- * - Blocks unverified user with 403 + EMAIL_NOT_VERIFIED
- * - Allows verified user through
+ * Email verification was deliberately removed for the OSS local-first
+ * release — there are no user accounts to verify when the firm runs on
+ * your own machine. The middleware is now a no-op pass-through.
+ *
+ * The original block-unverified-users-with-403 test suite lives in git
+ * history (commit 25bef1a^). Restore it alongside the middleware logic
+ * if multi-user auth ever returns.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-// Mock database module before importing
-vi.mock('../../src/db/database.js', () => ({
-  isEmailVerified: vi.fn(),
-}));
+import { describe, it, expect } from 'vitest';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 
 import { createRequireVerifiedHook } from '../../src/api/middleware/require-verified.js';
-import { isEmailVerified } from '../../src/db/database.js';
 
-const mockedIsEmailVerified = vi.mocked(isEmailVerified);
-
-function mockRequest(overrides: Record<string, unknown> = {}) {
+function mockRequest(overrides: Record<string, unknown> = {}): FastifyRequest {
   return {
     method: 'POST',
     url: '/api/sessions',
+    headers: {},
     ...overrides,
-  } as unknown as Parameters<ReturnType<typeof createRequireVerifiedHook>>[0];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
 }
 
-function mockReply() {
-  const reply: Record<string, unknown> = {};
-  reply.status = vi.fn().mockReturnValue(reply);
-  reply.send = vi.fn().mockReturnValue(reply);
-  return reply as unknown as Parameters<ReturnType<typeof createRequireVerifiedHook>>[1];
+function mockReply(): FastifyReply {
+  // The new middleware never touches reply, but provide chainable stubs
+  // so a future re-introduction of the hook fails loudly instead of
+  // silently no-op'ing the assertion.
+  const reply = {
+    status: () => reply,
+    send: () => reply,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
+  return reply;
 }
 
-describe('createRequireVerifiedHook', () => {
-  const exemptPrefixes = ['/api/auth/', '/api/billing/'];
-  let hook: ReturnType<typeof createRequireVerifiedHook>;
+describe('createRequireVerifiedHook (local-mode no-op)', () => {
+  const hook = createRequireVerifiedHook(['/api/auth/']);
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    hook = createRequireVerifiedHook(exemptPrefixes);
+  it('resolves without throwing for an anonymous request', async () => {
+    await expect(hook(mockRequest(), mockReply())).resolves.toBeUndefined();
   });
 
-  it('skips when no userId (anonymous request)', async () => {
-    const req = mockRequest();
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
-    expect(mockedIsEmailVerified).not.toHaveBeenCalled();
+  it('resolves for an authenticated request regardless of verified state', async () => {
+    const req = mockRequest({ userId: 'local-user', user: { id: 'local-user' } });
+    await expect(hook(req, mockReply())).resolves.toBeUndefined();
   });
 
-  it('skips for API clients (Bearer auth)', async () => {
-    const req = mockRequest({ userId: 'user-1', client: { type: 'agent' } });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
-    expect(mockedIsEmailVerified).not.toHaveBeenCalled();
+  it('resolves for non-exempt paths just the same', async () => {
+    const req = mockRequest({ url: '/api/sessions', userId: 'local-user' });
+    await expect(hook(req, mockReply())).resolves.toBeUndefined();
   });
 
-  it('skips for GET requests', async () => {
-    const req = mockRequest({ userId: 'user-1', method: 'GET' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
+  it('resolves for non-GET methods just the same', async () => {
+    const req = mockRequest({ method: 'POST', userId: 'local-user' });
+    await expect(hook(req, mockReply())).resolves.toBeUndefined();
   });
 
-  it('skips for HEAD requests', async () => {
-    const req = mockRequest({ userId: 'user-1', method: 'HEAD' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
-  });
-
-  it('skips for OPTIONS requests', async () => {
-    const req = mockRequest({ userId: 'user-1', method: 'OPTIONS' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
-  });
-
-  it('skips for exempt path /api/auth/login', async () => {
-    const req = mockRequest({ userId: 'user-1', url: '/api/auth/login' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
-    expect(mockedIsEmailVerified).not.toHaveBeenCalled();
-  });
-
-  it('skips for exempt path /api/billing/webhook', async () => {
-    const req = mockRequest({ userId: 'user-1', url: '/api/billing/webhook' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
-  });
-
-  it('blocks unverified user with 403', async () => {
-    mockedIsEmailVerified.mockReturnValue(false);
-    const req = mockRequest({ userId: 'user-1' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).toHaveBeenCalledWith(403);
-    expect(reply.send).toHaveBeenCalledWith(expect.objectContaining({
-      code: 'EMAIL_NOT_VERIFIED',
-    }));
-  });
-
-  it('allows verified user through', async () => {
-    mockedIsEmailVerified.mockReturnValue(true);
-    const req = mockRequest({ userId: 'user-1' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
-    expect(mockedIsEmailVerified).toHaveBeenCalledWith('user-1');
-  });
-
-  it('strips query params before matching exempt paths', async () => {
-    const req = mockRequest({ userId: 'user-1', url: '/api/auth/resend-verification?retry=1' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).not.toHaveBeenCalled();
-  });
-
-  it('does not exempt non-matching paths', async () => {
-    mockedIsEmailVerified.mockReturnValue(false);
-    const req = mockRequest({ userId: 'user-1', url: '/api/engage' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.status).toHaveBeenCalledWith(403);
-  });
-
-  it('returns correct error shape', async () => {
-    mockedIsEmailVerified.mockReturnValue(false);
-    const req = mockRequest({ userId: 'user-1' });
-    const reply = mockReply();
-    await hook(req, reply);
-    expect(reply.send).toHaveBeenCalledWith({
-      error: 'Email verification required',
-      code: 'EMAIL_NOT_VERIFIED',
-      detail: 'Please verify your email address before using Lavern.',
-    });
+  it('resolves even with a Bearer Authorization header', async () => {
+    const req = mockRequest({ headers: { authorization: 'Bearer shem_agent_xyz' } });
+    await expect(hook(req, mockReply())).resolves.toBeUndefined();
   });
 });
