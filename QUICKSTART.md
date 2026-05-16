@@ -102,7 +102,7 @@ Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/a
 - **`npm install` fails on `better-sqlite3`** → you need a working C/C++ toolchain. macOS: `xcode-select --install`. Linux: `apt install build-essential`. Windows: WSL2 is easier than native.
 - **Dashboard loads but shows "Connection lost"** → the API server didn't start, or stopped. Check the terminal where you ran `npm run dev -- --serve`. The dashboard talks to it over WebSocket.
 - **An engagement won't start** → most often this means `ANTHROPIC_API_KEY` isn't set. Demo mode shows the UI; real processing needs the key (or `MISTRAL_API_KEY` if you're on the EU provider).
-- **402 Payment Required when creating a session** → Lavern enforces a per-session budget hold against your account's billable-hours balance. New accounts get 10 free trial hours (~2 quick engagements). To top up: My Page → Billing.
+- **402 Payment Required when creating a session** → only fires when `LAVERN_AUTH_ENABLED=true`. In that mode Lavern enforces a per-session budget hold against your account's billable-hours balance. New accounts get 10 free trial hours (~2 quick engagements). To top up: My Page → Billing. In default LOCAL MODE there is no balance and no 402.
 - **Agents are slow, or seem to stall** → Lavern auto-retries Claude API calls on transient 429/500s with exponential backoff (1s → 2s → 4s). Watch the terminal logs for retry events. Sustained retries mean your API key is rate-limited.
 - **I want to try without installing** → there is no hosted demo right now. Watch the video at [lavern.ai](https://lavern.ai); the install above is 60 seconds.
 

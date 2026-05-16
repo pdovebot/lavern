@@ -84,7 +84,13 @@ npm install
 (cd viz && npm install)
 ```
 
-Demo mode gives you the full dashboard, auth, and Clawern monitoring without an API key. To process documents, add `ANTHROPIC_API_KEY` (or `MISTRAL_API_KEY` for the EU sovereign provider) to `.env` — it's auto-created from `.env.example` on first run.
+Demo mode gives you the full dashboard, Clawern monitoring, and the cinematic guided tour without an API key. To process documents, add `ANTHROPIC_API_KEY` (or `MISTRAL_API_KEY` for the EU sovereign provider) to `.env` — it's auto-created from `.env.example` on first run.
+
+### LOCAL MODE (the default)
+
+Out of the box, Lavern runs as a single-user firm on your machine. There's no login, no signup, no cookies — every request is the synthetic `local-user`. Account routes, Google OAuth, email verification, password reset, Stripe billing, and the referral system are all gated behind `LAVERN_AUTH_ENABLED=true` and don't register at startup.
+
+That flag re-enables the v0.14 cookie-based multi-user flow if you want to host Lavern for a team. The DB schema is unchanged, so flipping `LAVERN_AUTH_ENABLED=true` and restarting brings everything back online — no migration needed.
 
 ## Clawern (Autonomous Mode)
 
@@ -121,14 +127,15 @@ npm run dev -- --serve    # Start API server (default: localhost:3000)
 | `POST /api/sessions/:id/gate` | Submit gate decision |
 | `GET /api/sessions/:id/download` | Download work product |
 | `POST /api/engage` | Agent-native engagement (sync + webhook) |
-| `POST /api/auth/signup` | User registration |
+| `POST /api/auth/signup` | User registration (only when `LAVERN_AUTH_ENABLED=true`) |
 | `GET /.well-known/agent.json` | A2A agent card |
 
 See [`.env.example`](.env.example) for full configuration. Key variables:
 
 - `ANTHROPIC_API_KEY` — Anthropic API key (optional in demo mode)
 - `MISTRAL_API_KEY` — Mistral API key (optional; required if `LAVERN_PROVIDER=mistral`)
-- `LAVERN_PROVIDER` — `anthropic` (default) or `mistral`
+- `LAVERN_PROVIDER` — `anthropic` (default), `mistral`, or `local` (Ollama)
+- `LAVERN_AUTH_ENABLED` — `true` to enable the multi-user cookie auth + Stripe billing (default: off / LOCAL MODE)
 - `SHEM_PORT` — Server port (default: 3000)
 - `SHEM_DEFAULT_BUDGET` — Per-session budget in USD (default: 5.0)
 
