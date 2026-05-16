@@ -367,6 +367,10 @@ export function ClawernHome({
 
 // ── Architecture: the 6-stage pipeline ─────────────────────────────────
 
+// The Lighthouse architecture — three on-device personas (Watchman / Reader /
+// Curator) plus a grounding pass and an optional frontier escalation. This is
+// what runs on every document in local + hybrid modes (frontier mode swaps the
+// Reader for the day-shift agent firm). Names match the modules in src/claw/.
 const PIPELINE = [
   {
     name: 'Watch',
@@ -374,24 +378,32 @@ const PIPELINE = [
     detail: 'watcher.ts',
   },
   {
-    name: 'Read',
-    body: 'Parser pulls text from PDF, DOCX, MD. SMAC-L1 sanitization strips zero-width chars and hidden HTML before anything sees the content.',
-    detail: 'documents/parser.ts',
+    name: 'Watchman',
+    persona: true,
+    body: 'First persona. Reads the filename + first ~1500 chars and decides what the document is, what jurisdiction, how urgent, and whether to skip / quick-scan / deep-read. Picks the Reader template.',
+    detail: 'watchman.ts',
   },
   {
-    name: 'Triage',
-    body: 'On-device Ollama scans every clause. Tags severity (minor / major / critical). Sensitivity check decides if the doc is too confidential to leave the machine.',
-    detail: 'local-analysis.ts · planner.ts',
+    name: 'Reader',
+    persona: true,
+    body: 'Second persona. Goes through the document clause by clause using a template matched to the doc type — JV, NDA, SaaS, lease, employment, privacy. Tags each clause minor / major / critical.',
+    detail: 'local-analysis.ts · reader-templates.ts',
+  },
+  {
+    name: 'Grounding',
+    body: 'Verifies every finding cites text that actually appears in the document. Anything the Reader hallucinated gets stripped before it ever reaches you.',
+    detail: 'local-analysis.ts (Phase 2)',
+  },
+  {
+    name: 'Curator',
+    persona: true,
+    body: 'Third persona. Looks across documents — recurring patterns, precedents to reinforce, things worth surfacing. Decides whether to ping you and what to say.',
+    detail: 'curator.ts · precedent-board.ts',
   },
   {
     name: 'Escalate',
-    body: 'In hybrid mode, only the major + critical clauses get anonymized and sent to Opus 4.7 — a direct, focused call, not the full agent firm.',
+    body: 'Hybrid mode only. Major + critical clauses get anonymized and sent to Opus 4.7 as a single focused call — not the full agent firm. Frontier mode dispatches the day-shift firm instead.',
     detail: 'anonymize.ts · hybrid-analysis.ts',
-  },
-  {
-    name: 'Curate',
-    body: 'The precedent board queries similar past findings, scores relevance, and indexes the new ones. Institutional memory compounds across documents.',
-    detail: 'precedent-board.ts',
   },
   {
     name: 'Deliver',
@@ -404,8 +416,15 @@ function PipelineSection() {
   return (
     <section style={styles.section}>
       <div style={styles.sectionHeader}>
-        <div style={styles.sectionEyebrow}>The pipeline</div>
-        <div style={styles.sectionLede}>Six stages from filesystem to morning briefing.</div>
+        <div style={styles.sectionEyebrow}>The pipeline · lighthouse architecture</div>
+        <div style={styles.sectionLede}>
+          Every document passes through three on-device personas — the{' '}
+          <span style={styles.personaInline}>Watchman</span>, the{' '}
+          <span style={styles.personaInline}>Reader</span>, the{' '}
+          <span style={styles.personaInline}>Curator</span> — plus a grounding
+          pass that strips anything the Reader can't actually cite. Frontier
+          escalation is optional and surgical.
+        </div>
       </div>
 
       <div style={styles.pipelineRail}>
@@ -416,15 +435,18 @@ function PipelineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: i * 0.05, ease: [0.28, 0.11, 0.32, 1] }}
-            style={styles.pipelineCard}
+            style={{
+              ...styles.pipelineCard,
+              ...(stage.persona ? styles.pipelineCardPersona : {}),
+            }}
           >
-            <div style={styles.pipelineNum}>{String(i + 1).padStart(2, '0')}</div>
+            <div style={styles.pipelineCardHeader}>
+              <div style={styles.pipelineNum}>{String(i + 1).padStart(2, '0')}</div>
+              {stage.persona && <div style={styles.personaBadge}>Persona</div>}
+            </div>
             <div style={styles.pipelineName}>{stage.name}</div>
             <div style={styles.pipelineBody}>{stage.body}</div>
             <div style={styles.pipelineDetail}>{stage.detail}</div>
-            {i < PIPELINE.length - 1 && (
-              <div style={styles.pipelineConnector} aria-hidden>{'→'}</div>
-            )}
           </motion.div>
         ))}
       </div>
@@ -686,12 +708,38 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: 6,
   },
+  pipelineCardPersona: {
+    backgroundColor: CLAW.accentBg,
+    border: `1px solid ${CLAW.accentBorder}`,
+  },
+  pipelineCardHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
   pipelineNum: {
     fontSize: 10,
     fontFamily: fonts.mono,
     color: CLAW.accent,
     letterSpacing: 2,
     fontWeight: 600,
+  },
+  personaBadge: {
+    fontSize: 9.5,
+    fontFamily: fonts.sans,
+    fontWeight: 600,
+    color: CLAW.accent,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    padding: '2px 7px',
+    borderRadius: radii.pill,
+    border: `1px solid ${CLAW.accentBorder}`,
+    backgroundColor: 'rgba(232,132,92,0.04)',
+  },
+  personaInline: {
+    color: CLAW.accent,
+    fontWeight: 500,
   },
   pipelineName: {
     fontSize: 18,
