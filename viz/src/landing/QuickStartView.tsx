@@ -119,6 +119,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
   const [pricingHovered, setPricingHovered] = useState(false);
   const [agentsHovered, setAgentsHovered] = useState(false);
   const [challengeHovered, setChallengeHovered] = useState(false);
+  const [ralphHovered, setRalphHovered] = useState(false);
 
   // Tier fill animation — black slides inside each pill
   const prevTierRef = useRef<EngagementTier>(tier);
@@ -346,28 +347,26 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
               The Challenge
             </button>
           )}
-          <button
-            onClick={() => { window.location.hash = '#/ralph'; }}
-            className="hidden sm:inline-flex items-center gap-1.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]"
-            style={{
-              padding: '4px 10px',
-              fontFamily: fonts.sans,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: 1,
-              textTransform: 'uppercase',
-              color: '#5B4A0A',
-              backgroundColor: '#FFF8C8',
-              border: '1px solid #FED90F',
-              borderRadius: 999,
-            }}
-            title="Ralph Wiggum, Esq. — the goal-driven loop"
-          >
-            🎓 Ralph mode
-          </button>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Ralph — goal loop, "I'm a unicorn!" */}
+          <button
+            onClick={() => { window.location.hash = '#/ralph'; }}
+            className="hidden sm:inline-flex cursor-pointer bg-transparent border-none transition-all duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]"
+            style={{
+              fontSize: 18,
+              padding: '2px 6px',
+              opacity: ralphHovered ? 1 : 0.45,
+              transform: ralphHovered ? 'scale(1.15) rotate(8deg)' : 'scale(1)',
+            }}
+            onMouseEnter={() => setRalphHovered(true)}
+            onMouseLeave={() => setRalphHovered(false)}
+            title="Ralph Wiggum, Esq. — the goal-driven loop"
+          >
+            {'🦄'}
+          </button>
+
           {/* Claw — the night shift */}
           <button
             onClick={() => { window.location.hash = '#/claw'; }}
