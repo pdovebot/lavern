@@ -13,49 +13,35 @@ import { buildPartnerSystemPrompt, buildPartnerFinalizationPrompt } from '../par
 import { config } from '../../config.js';
 import { createApiKeyAccessor } from '../../utils/ensure-api-key.js';
 import { createLogger } from '../../utils/logger.js';
+import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 
 const logger = createLogger('PARTNER');
 const API_KEY_LAZY = createApiKeyAccessor('partner consultation');
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
+// Streaming model alias — same as INTERVIEW_MODEL above; only the
+// Anthropic streaming branch references it directly. Non-streaming
+// finalization + the Mistral/local fallback go through crossProviderChat.
 const PARTNER_MODEL = config.routerModel;
 
-// ── Non-streaming Anthropic call ─────────────────────────────────────────
+// ── Multi-turn provider call (non-streaming) ─────────────────────────────
 
-async function callAnthropic(params: {
+/**
+ * Run a multi-turn partner consult through the active provider. Used by
+ * the non-streaming finalization branch. When `LAVERN_PROVIDER=mistral`
+ * the conversation goes to Mistral (EU sovereign) instead of Anthropic.
+ */
+async function callProvider(params: {
   system: string;
   messages: Array<{ role: 'user' | 'assistant'; content: string }>;
   maxTokens?: number;
 }): Promise<string> {
-  const maxTokens = params.maxTokens ?? 4096;
-  const res = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'x-api-key': API_KEY_LAZY.value,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: PARTNER_MODEL,
-      max_tokens: maxTokens,
-      thinking: { type: 'enabled', budget_tokens: Math.min(2048, Math.floor(maxTokens * 0.5)) },
-      system: params.system,
-      messages: params.messages,
-    }),
+  const { text } = await crossProviderChat({
+    system: params.system,
+    messages: params.messages,
+    tier: 'sonnet', // PARTNER_MODEL was config.routerModel — same tier
+    maxTokens: params.maxTokens ?? 4096,
   });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Anthropic API error (${res.status}): ${errText}`);
-  }
-
-  const data = await res.json() as {
-    content: Array<{ type: string; text?: string }>;
-  };
-
-  const textBlock = Array.isArray(data.content)
-    ? data.content.find(b => b.type === 'text')
-    : undefined;
-  return textBlock?.text ?? '';
+  return text;
 }
 
 // ── Route registration ───────────────────────────────────────────────────
@@ -88,7 +74,7 @@ export function registerPartnerRoutes(fastify: FastifyInstance): void {
           .map(m => `${m.role === 'user' ? 'Client' : 'Partner'}: ${m.content}`)
           .join('\n\n');
 
-        const text = await callAnthropic({
+        const text = await callProvider({
           system: systemPrompt,
           messages: [{
             role: 'user',
@@ -149,6 +135,33 @@ export function registerPartnerRoutes(fastify: FastifyInstance): void {
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
       });
+
+      // Non-Anthropic providers: one-shot fallback (same envelope as
+      // briefing.ts). Streaming with extended thinking is Anthropic-only;
+      // for Mistral / local we run a single crossProviderChat call and
+      // emit the whole reply as one text event so no data leaks to
+      // api.anthropic.com.
+      if (config.provider === 'mistral' || config.provider === 'local') {
+        try {
+          const { text } = await crossProviderChat({
+            system: systemPrompt,
+            messages: apiMessages,
+            tier: 'sonnet',
+            maxTokens: 1600,
+          });
+          if (text) {
+            reply.raw.write(`data: ${JSON.stringify({ type: 'text', content: text })}\n\n`);
+          }
+          reply.raw.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+        } catch (err) {
+          reply.raw.write(`data: ${JSON.stringify({
+            type: 'error',
+            content: err instanceof Error ? err.message : String(err),
+          })}\n\n`);
+        }
+        reply.raw.end();
+        return;
+      }
 
       const apiRes = await fetch(ANTHROPIC_API_URL, {
         method: 'POST',

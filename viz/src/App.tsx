@@ -194,6 +194,25 @@ export function App() {
   const [view, setView] = useState<AppView>(getViewFromHash);
   const [errorToast, setErrorToast] = useState<string | null>(null);
   const [showTopUp, setShowTopUp] = useState(false);
+  // Server-advertised capabilities. The backend's /api/capabilities tells
+  // us whether the auth/billing/Google-OAuth routes are wired up on this
+  // deployment. Default to `auth: false` (LOCAL MODE) so the first paint
+  // matches the OSS-default; a probe in the effect below corrects the
+  // value if the operator set LAVERN_AUTH_ENABLED=true.
+  const [capabilities, setCapabilities] = useState<{ auth: boolean; billing: boolean }>(
+    { auth: false, billing: false },
+  );
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/capabilities', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (cancelled || !data) return;
+        setCapabilities({ auth: !!data.auth, billing: !!data.billing });
+      })
+      .catch(() => { /* offline / pre-server-up — keep the LOCAL MODE default */ });
+    return () => { cancelled = true; };
+  }, []);
   const { isOnline } = useOnlineStatus();
   const userCtx = useContext(UserContext);
   const userRef = useRef(userCtx?.user);
@@ -969,6 +988,16 @@ export function App() {
   }
 
   // ── Login — standalone login page ──────────────────────────────────────
+  // In LOCAL MODE (LAVERN_AUTH_ENABLED off) the backend doesn't register
+  // the auth routes — the form would submit to a 404. Skip the LoginView
+  // entirely and send the user back to the landing page.
+  if (view === 'login' && !capabilities.auth) {
+    if (typeof window !== 'undefined') {
+      // Fire-and-forget; hashchange listener will pick up the new view.
+      window.location.hash = '#/';
+    }
+    return <ViewFallback text="Local mode — you're already signed in." />;
+  }
   if (view === 'login') {
     return (
       <ErrorBoundary>
@@ -1297,6 +1326,7 @@ export function App() {
             onEnter={() => { window.location.hash = '#/lobby'; }}
             onMyPage={() => { window.location.hash = '#/my-page'; }}
             onAgentDocs={() => { window.location.hash = '#/agent-docs'; }}
+            authEnabled={capabilities.auth}
           />
         </Suspense>
       </ErrorBoundary>

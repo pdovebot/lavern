@@ -38,7 +38,7 @@ Demo mode gets you the full UI — landing page, auth, Clawern dashboard, agent 
 2. Open `.env` and set `ANTHROPIC_API_KEY=sk-ant-...`.
 3. Restart Terminal 1 (`npm run serve:dev`).
 
-EU teams: set `LAVERN_PROVIDER=mistral` and `MISTRAL_API_KEY=...` to route the core engagement workflows (orchestrator, agents, debate, verification, Clawern processing) through Mistral instead of Anthropic. Three auxiliary routes — briefing analysis, partner-mode chat, and the agent-builder personality generator — still call Anthropic directly in v0.15.0 and will be migrated in v0.15.1 (tracked at [issues/7](https://github.com/AnttiHero/lavern/issues/7)). If your engagement involves none of those three paths, no document content reaches Anthropic.
+EU teams: set `LAVERN_PROVIDER=mistral` and `MISTRAL_API_KEY=...` to route every LLM call — orchestrator, agents, debate, verification, briefing analyser, partner-mode chat, agent-builder personality, Clawern processing — through Mistral instead of Anthropic. The Anthropic-streaming paths (briefing interview, partner consult) fall back to a one-shot completion that the route then SSE-emits as a single chunk, so the UI stays identical; no document content reaches `api.anthropic.com` when Mistral is the configured provider.
 
 ## First engagement
 

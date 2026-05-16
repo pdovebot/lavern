@@ -16,9 +16,9 @@ import { workflowRegistry } from '../../workflows/registry.js';
 import { INTENSITY_PROFILES, type IntensityLevel } from '../../types/engagement.js';
 import { config } from '../../config.js';
 import { createLogger } from '../../utils/logger.js';
+import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 
 const logger = createLogger('AGENTS');
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
 const CLONE_SYSTEM_PROMPT = `You are a legal talent analyst. Given a person's professional profile text, extract their details and map them to an AI agent configuration for a legal AI platform.
 
@@ -59,33 +59,21 @@ Calibration notes:
 - personality axes are 1=left side, 10=right side
 - If the text is not a professional profile, still do your best with whatever information is present`;
 
-async function callAnthropicForClone(profileText: string): Promise<string> {
-  const apiKey = config.anthropic.apiKey;
-  if (!apiKey) throw new Error('API key not configured');
-
-  const res = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: config.routerModel,
-      max_tokens: 1024,
-      system: CLONE_SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: `Here is the profile text:\n\n${profileText}` }],
-    }),
+/**
+ * Run the firm-clone analyst over a chunk of profile text.
+ *
+ * Routes through `crossProviderChat`, so when `LAVERN_PROVIDER=mistral` is
+ * set the call goes to Mistral (EU) instead of Anthropic. No data crosses
+ * a non-EU boundary when the EU sovereign provider is selected.
+ */
+async function callProviderForClone(profileText: string): Promise<string> {
+  const { text } = await crossProviderChat({
+    system: CLONE_SYSTEM_PROMPT,
+    user: `Here is the profile text:\n\n${profileText}`,
+    tier: 'sonnet', // Router-class model — used to be config.routerModel directly
+    maxTokens: 1024,
   });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Anthropic API error (${res.status}): ${errText}`);
-  }
-
-  const data = await res.json() as { content: Array<{ type: string; text?: string }> };
-  const textBlock = data.content.find(b => b.type === 'text');
-  return textBlock?.text ?? '';
+  return text;
 }
 
 export function registerAgentRoutes(fastify: FastifyInstance): void {
@@ -349,7 +337,7 @@ export function registerAgentRoutes(fastify: FastifyInstance): void {
     }
 
     try {
-      const raw = await callAnthropicForClone(trimmed);
+      const raw = await callProviderForClone(trimmed);
 
       // Strip markdown code fences if the model added them
       const clean = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();

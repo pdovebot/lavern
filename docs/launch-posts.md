@@ -222,10 +222,11 @@ What it gives you:
 · Institutional memory. The Precedent Board reinforces what recurs
   and decays what doesn't. The thirtieth review is sharper than the
   first.
-· EU sovereignty (if you need it). A one-flag switch routes the
-  core engagement workflow through Mistral; all state stays on-disk.
-  Three auxiliary routes are still Anthropic in v0.15.0; disclosed
-  in QUICKSTART and tracked for the next release.
+· EU sovereignty (if you need it). A one-flag switch routes every
+  model call — orchestrator, agents, debate, verification, briefing,
+  partner consult, Clawern — through Mistral. All state stays on
+  disk in ~/.lavern/. No document content reaches api.anthropic.com
+  when LAVERN_PROVIDER=mistral.
 
 Free, Apache 2.0, https://lavern.ai. Architecture deep-dive on the
 same domain.

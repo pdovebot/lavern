@@ -17,6 +17,13 @@ interface Props {
   onEnter: () => void;
   onMyPage: () => void;
   onAgentDocs?: () => void;
+  /**
+   * Whether the backend has the auth/login routes registered. Drives
+   * whether the "Already have an invite?" link renders — in LOCAL MODE
+   * (auth off) the login route 404s, so the link would be a dead end.
+   * Defaults to false so the first paint matches the OSS-default state.
+   */
+  authEnabled?: boolean;
 }
 
 // ── Lavern Logo — Typography wordmark (kept for LoginView import) ──────────
@@ -66,7 +73,7 @@ export function LavernLogoSmall({
 
 // ── The Dark Door ──────────────────────────────────────────────────────────
 
-export default function LandingView({ onEnter, onMyPage, onAgentDocs }: Props) {
+export default function LandingView({ onEnter, onMyPage, onAgentDocs, authEnabled = false }: Props) {
   const [ready, setReady] = useState(false);
   const [hoveredChoice, setHoveredChoice] = useState<'human' | 'agent' | null>(null);
   const [exiting, setExiting] = useState(false);
@@ -409,21 +416,23 @@ export default function LandingView({ onEnter, onMyPage, onAgentDocs }: Props) {
           </>
         )}
 
-        {/* Already have an invite? */}
-        <button
-          onClick={() => { window.location.hash = '#/login'; }}
-          className="bg-transparent border-none cursor-pointer font-serif text-[11px] tracking-wide mt-4"
-          style={{
-            color: 'rgba(250, 249, 246, 0.18)',
-            transition: 'color 0.3s ease',
-            padding: '8px 12px',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.color = 'rgba(250, 249, 246, 0.4)'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(250, 249, 246, 0.18)'; }}
-          aria-label="Sign in with an invite code"
-        >
-          Already have an invite?
-        </button>
+        {/* Already have an invite? — only when auth routes are live. */}
+        {authEnabled && (
+          <button
+            onClick={() => { window.location.hash = '#/login'; }}
+            className="bg-transparent border-none cursor-pointer font-serif text-[11px] tracking-wide mt-4"
+            style={{
+              color: 'rgba(250, 249, 246, 0.18)',
+              transition: 'color 0.3s ease',
+              padding: '8px 12px',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(250, 249, 246, 0.4)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(250, 249, 246, 0.18)'; }}
+            aria-label="Sign in with an invite code"
+          >
+            Already have an invite?
+          </button>
+        )}
         </div>
       </div>
 

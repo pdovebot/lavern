@@ -637,6 +637,23 @@ export async function startApiServer(port: number): Promise<void> {
     },
   }));
 
+  // ── GET /api/capabilities ────────────────────────────────────────────
+  // Tells the frontend which optional surfaces are wired up on this
+  // server. The dashboard reads this once on boot to decide whether to
+  // render the login link, the billing page, the pricing CTA, etc.
+  // Public — no auth check, no body, cheap to call. Cached aggressively.
+  fastify.get('/api/capabilities', async (_request, reply) => {
+    return reply
+      .header('Cache-Control', 'public, max-age=60')
+      .send({
+        auth: config.authEnabled,
+        billing: config.authEnabled,        // billing routes are co-gated with auth
+        googleOauth: config.authEnabled && Boolean(config.google.clientId),
+        provider: config.provider,
+        version: config.version,
+      });
+  });
+
   // Register route groups
   registerSessionRoutes(fastify, sessionManager);
   registerReplayRoutes(fastify);
