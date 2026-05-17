@@ -9,7 +9,11 @@
 /claw/how-it-works             /architecture/  301
 /claw/how-it-works.html        /architecture/  301
 
-# Embedded demo SPA — hash router lives under /demo/. Any deep path
-# inside /demo/ falls back to the SPA index so refreshes don't 404.
-/demo /demo/ 301!
-/demo/* /demo/index.html 200
+# Embedded demo SPA — hash router lives under /demo/. We use 200
+# REWRITES (not 301 redirects) so the URL doesn't change, and so
+# there's zero risk of Netlify's trailing-slash normaliser fighting
+# a 301 force and producing a "too many redirects" loop in Safari.
+# Both /demo and /demo/<anything> internally serve /demo/index.html;
+# the SPA's hash router takes over once it boots.
+/demo        /demo/index.html  200
+/demo/*      /demo/index.html  200
