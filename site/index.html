@@ -162,7 +162,11 @@
     body{
       font-family:var(--sans);background:var(--bg);color:var(--text);
       -webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.55;
-      font-feature-settings:"ss01","ss02";font-weight:400
+      font-feature-settings:"ss01","ss02";font-weight:400;
+      /* Suppress iOS rubber-band overscroll at the very top — that
+         elastic bounce briefly exposes the area above the fixed nav
+         and reads as a "gap" before the page springs back. */
+      overscroll-behavior-y:none;
     }
     ::selection{background:var(--text);color:var(--bg)}
     a{color:inherit;text-decoration:none}
@@ -770,7 +774,11 @@
       padding:22px 32px;
       background:rgba(250,250,250,0.78);
       backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-      border-bottom:1px solid var(--hair)
+      border-bottom:1px solid var(--hair);
+      /* Force a compositor layer so the nav anchors crisply at top:0
+         instead of jittering during iOS Safari address-bar collapse. */
+      transform:translateZ(0);
+      will-change:transform
     }
     /* Brand sits at the left edge of column 1; nav-links at the right
        edge of column 3. The middle column (nav-meta) is auto-sized and
@@ -819,68 +827,32 @@
     .nav-link.featured:hover .arrow{transform:translate(2px,-2px)}
     .nav-link svg{width:13px;height:13px}
 
-    /* ─── Mobile burger + slide-down menu ─────────────────────────────
-       Hidden on desktop; takes over from .nav-links below 760px. The
-       burger sits where the nav-links pill row used to, transitions to
-       the close-X glyph via simple span rotations. The menu drops down
-       under the nav as an opaque panel covering the rest of the viewport
-       (so any backdrop-blur stacking weirdness from the translucent nav
-       can't bleed into the menu items). ─────────────────────────────── */
-    .nav-burger{
-      display:none;justify-self:end;
-      width:40px;height:40px;
-      border:1px solid var(--hair-strong);border-radius:10px;
-      background:var(--surface-2);box-shadow:var(--shadow-pill);
-      padding:0;cursor:pointer;
-      flex-direction:column;align-items:center;justify-content:center;gap:5px;
-      transition:background .2s var(--ease),border-color .2s var(--ease)
-    }
-    .nav-burger:hover{background:#fff;border-color:var(--text)}
-    .nav-burger span{
-      display:block;width:18px;height:1.5px;background:var(--text);
-      transition:transform .25s var(--ease),opacity .2s var(--ease)
-    }
-    /* Open state — top + bottom lines collapse to an X, middle fades out. */
-    .nav-burger[aria-expanded="true"] span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
-    .nav-burger[aria-expanded="true"] span:nth-child(2){opacity:0}
-    .nav-burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
-    .nav-menu{
-      position:fixed;top:64px;left:0;right:0;bottom:0;
-      z-index:99;
-      background:var(--bg);
-      display:flex;flex-direction:column;align-items:stretch;
-      padding:24px 22px 60px;gap:8px;
-      opacity:0;pointer-events:none;transform:translateY(-8px);
-      transition:opacity .25s var(--ease),transform .25s var(--ease);
-      overflow-y:auto
-    }
-    .nav-menu[aria-hidden="false"]{opacity:1;pointer-events:auto;transform:translateY(0)}
-    .nav-menu-link{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:18px 18px;border-radius:12px;
-      font-family:var(--serif);font-size:22px;font-weight:300;
-      color:var(--text);letter-spacing:-0.01em;
-      border:1px solid var(--hair);background:var(--surface-2);
-      box-shadow:var(--shadow-sm);
-      transition:border-color .2s var(--ease),transform .2s var(--ease)
-    }
-    .nav-menu-link:active{transform:scale(0.98)}
-    .nav-menu-link .arrow{font-size:14px;color:var(--muted)}
-
     @media(max-width:760px){
       .nav{
-        padding:14px 18px;
-        /* Solid background on mobile — the translucent + backdrop-blur
-           combo creates a visible 1px seam on iOS Safari as the address
-           bar collapses while scrolling. Going opaque kills the gap. */
+        padding:12px 16px;
+        /* Mobile-only treatment to kill the perceived "gap" above/at
+           the bar as iOS Safari's URL bar collapses while scrolling:
+           1. Solid opaque background (no rgba/blur stack to leak through)
+           2. No border-bottom (1px hairline reads as a sub-pixel seam)
+           3. Drop a soft shadow instead, for the "lift" line. */
         background:var(--bg);
         backdrop-filter:none;
         -webkit-backdrop-filter:none;
+        border-bottom:none;
+        box-shadow:0 1px 0 rgba(20,19,16,0.06), 0 2px 6px rgba(20,19,16,0.04);
+        /* Flex layout on mobile so the three pills take only the space
+           they need — the 1fr|auto|1fr grid would otherwise constrain
+           the nav-links column to half the viewport. */
+        display:flex;justify-content:space-between;gap:8px;
       }
       .nav-meta{display:none}
-      .nav-links{display:none}       /* the three pills hide on mobile */
-      .nav-burger{display:flex}      /* burger takes their place */
+      .nav-links{gap:6px}
       .nav-link{padding:8px 10px;font-size:12px}
+      .nav-link.featured{padding:7px 11px}
+      /* GitHub label collapses to icon-only on mobile — saves room for
+         Architecture + Demo to keep their full word labels. */
+      .nav-link.primary{padding:8px 11px;gap:0;font-size:0}
+      .nav-link.primary svg{width:15px;height:15px;margin:0}
     }
 
     /* ═══════════════════════════════════════════════════════════════════
@@ -1005,6 +977,14 @@
       max-width:580px;line-height:1.5;margin:0 auto 32px
     }
     .hero-deck strong{color:var(--text);font-weight:600}
+    /* Credit line — a quiet attribution beat between the deck and the
+       CTAs. Small mono caps, low contrast, so it reads as a credit
+       rather than competing with the supporting copy above it. */
+    .hero-byline{
+      font-family:var(--mono);font-size:11px;font-weight:500;
+      letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+      margin:-8px auto 32px;max-width:520px
+    }
 
     /* Hero CTAs */
     .cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center}
@@ -2227,18 +2207,7 @@
         GitHub
       </a>
     </div>
-    <!-- Mobile burger — hidden on desktop, takes over from .nav-links below 760px -->
-    <button class="nav-burger" id="navBurger" type="button"
-            aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
-      <span></span><span></span><span></span>
-    </button>
   </nav>
-  <!-- Mobile slide-down menu — exits to opacity:0 outside <nav> to avoid backdrop-blur stacking surprises. Toggled by #navBurger. -->
-  <div class="nav-menu" id="navMenu" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Menu">
-    <a class='nav-menu-link' href='/architecture/'>Architecture <span class="arrow">↗</span></a>
-    <a class='nav-menu-link' href='/demo/'>Demo</a>
-    <a class='nav-menu-link' href='https://github.com/AnttiHero/lavern' rel="noopener">GitHub <span class="arrow">↗</span></a>
-  </div>
 
   <main id="main">
 
@@ -2257,6 +2226,7 @@
       <strong>Free</strong> for you to use and build.
       <strong style="white-space:nowrap">Open source.</strong>
     </p>
+    <p class="hero-byline r r2 v">Open source. Built by a law firm founder.</p>
     <div class="cta-row r r3 v">
       <a class="btn btn-primary" href="https://github.com/AnttiHero/lavern" rel="noopener">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3Z"/></svg>
@@ -3385,57 +3355,6 @@
     })();
 
 
-    // ──────────────────────────────────────────────────────────────────
-    // MOBILE BURGER MENU — open/close the slide-down nav-menu panel.
-    //   · Click burger → toggle aria-expanded + aria-hidden
-    //   · Click any link inside → close (so navigation lands cleanly)
-    //   · Escape → close
-    //   · Resize past 760px → force-close so desktop nav reads clean
-    // ──────────────────────────────────────────────────────────────────
-    (function(){
-      var burger = document.getElementById('navBurger');
-      var menu = document.getElementById('navMenu');
-      if (!burger || !menu) return;
-
-      function setOpen(open){
-        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-        menu.setAttribute('aria-hidden', open ? 'false' : 'true');
-        // Lock body scroll while the menu is open so the underlying page
-        // doesn't drift behind it on iOS.
-        document.body.style.overflow = open ? 'hidden' : '';
-      }
-
-      burger.addEventListener('click', function(){
-        var open = burger.getAttribute('aria-expanded') !== 'true';
-        setOpen(open);
-      });
-
-      // Close on any link click — the page is about to navigate, so we
-      // want the menu visibly closed by the time the next view paints.
-      menu.querySelectorAll('a').forEach(function(a){
-        a.addEventListener('click', function(){ setOpen(false); });
-      });
-
-      // Esc key closes.
-      document.addEventListener('keydown', function(e){
-        if (e.key === 'Escape' && burger.getAttribute('aria-expanded') === 'true') {
-          setOpen(false);
-          burger.focus();
-        }
-      });
-
-      // If the user resizes/rotates past the mobile breakpoint while
-      // the menu is open, snap it shut. addEventListener on
-      // MediaQueryList is supported widely; older Safari needs the
-      // deprecated addListener path.
-      var mql = window.matchMedia('(min-width:761px)');
-      var onMql = function(e){ if (e.matches) setOpen(false); };
-      if (mql.addEventListener) {
-        mql.addEventListener('change', onMql);
-      } else if (mql.addListener) {
-        mql.addListener(onMql);
-      }
-    })();
 
 
   </script>
