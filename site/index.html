@@ -1229,6 +1229,26 @@
       #tldr{display:none}
     }
 
+    /* ─── Chip rows inside mockup cards — wrap the long-text span to its
+       own line on narrow phones. Without this the row tries to fit
+       [avatar 22px][RED badge ~30px][long sentence] on a ~250px line
+       and the sentence wraps awkwardly *next to* the badge as a
+       second column. With flex-wrap, the badge+avatar sit on line 1,
+       the full-width text drops to line 2 and reads naturally. ─── */
+    @media(max-width:480px){
+      .m-card .m-row{flex-wrap:wrap}
+      .m-card .m-row > span:last-child{
+        flex-basis:100%;
+        margin-top:2px
+      }
+      /* Trim chip padding so we don't waste horizontal pixels on cards
+         that ship to a 315px-wide carousel slide. */
+      .m-card{padding:10px 12px}
+      /* Tighten the mockup body padding too — Mac-chrome + 32px gutters
+         was Apple-keynote-class on desktop, suffocating at 84vw. */
+      .feature-body{padding:30px 18px}
+    }
+
     .feature{
       background:var(--surface-2);
       border:1px solid var(--hair);
