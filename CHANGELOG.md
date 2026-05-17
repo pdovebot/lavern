@@ -13,10 +13,11 @@ request runs as a synthetic `local-user`, no cookies, no tokens, no
 emails. Single-user installs (the dominant OSS use case) get a clean
 straight-to-dashboard experience.
 
-**Test suite reconciled to the staging port.** 1,665/1,665 passing on
-`main`. Four test files were testing pre-OSS behaviour (Bearer-token
-auth, verified-email gating, an older `buildToolRegistry` signature,
-an off-by-one budget bound) — updated to the new contracts.
+**Test suite reconciled to the staging port.** 1,677/1,677 passing on
+`main` (12 new tests pinning the LAVERN_AUTH_ENABLED route-registration
+contract). Four pre-OSS test files (Bearer-token auth, verified-email
+gating, an older `buildToolRegistry` signature, an off-by-one budget
+bound) were updated to the new contracts.
 
 **Build artefacts out of git.** `site/demo/` is no longer committed.
 A new `npm run build:site` script and `netlify.toml` regenerate the

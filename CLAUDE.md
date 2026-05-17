@@ -185,7 +185,7 @@ Native macOS SwiftUI status bar app for monitoring Clawern. Polls Claw API every
 - `scripts/seed-knowledge-base.ts` — Legal dataset seeder (6 datasets)
 
 ### Tests
-- `tests/` — 1,695 tests across 108 files (98 unit + 9 integration). 96 new tests landed alongside the lighthouse architecture (claw-watchman, claw-curator, claw-reader-precedent, claw-reader-templates, claw-reader-grounding, claw-precedent-lifecycle, claw-skip-route).
+- `tests/` — 1,677 tests across 109 files. Coverage spans the engine, dashboard hooks, Claw, MCP bridge, auth-gate route registration, and the broader API surface. `npm test` is green.
 
 ## Version History
 
@@ -194,9 +194,16 @@ Native macOS SwiftUI status bar app for monitoring Clawern. Polls Claw API every
 Apache 2.0. Auth, billing, and verified-email enforcement gated behind
 `LAVERN_AUTH_ENABLED` (default off in LOCAL MODE). Dead-code sweep
 (office-scene + 2.1 MB of unused Phaser sprites removed). Test suite
-green at 1,665/1,665 after the staging-port reconciliation. Build
-artifacts moved out of git into a Netlify build step. GitHub Release
-notes live at https://github.com/AnttiHero/lavern/releases/tag/v0.15.0.
+green at 1,677/1,677 (12 new auth-gate tests added on top of the
+staging-port reconciliation). Build artifacts moved out of git into a
+Netlify build step. First-90-seconds polish: bin/lavern.js shim so
+`lavern --help` and `lavern doctor` work immediately after install,
+samples/ at repo root, server-boot banner pointing at next steps,
+serve scripts switched to `--env-file-if-exists` so they survive a
+fresh clone with no .env. `/api/capabilities` merged (was duplicated
+between server.ts and routes/capabilities.ts, causing a fatal Fastify
+boot error). GitHub Release notes live at
+https://github.com/AnttiHero/lavern/releases/tag/v0.15.0.
 
 ### v0.14.3 — Claude Opus 4.7 Upgrade + Quality Bumps
 

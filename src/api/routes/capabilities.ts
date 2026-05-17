@@ -22,14 +22,31 @@ import { config } from '../../config.js';
 export function registerCapabilitiesRoutes(fastify: FastifyInstance): void {
 
   // ── GET /api/capabilities — Machine-readable service manifest ────────
+  // Two audiences, one endpoint:
+  //   1. Frontend dashboard — reads the top-level runtime flags (auth,
+  //      billing, googleOauth, provider, version) on boot to decide
+  //      whether to render the login link, billing page, etc.
+  //   2. AI agents — read the rich `service`, `workflows`, `api`,
+  //      `pricing` blocks for autonomous integration.
   fastify.get('/api/capabilities', async (_request, reply) => {
     const templates = workflowRegistry.list();
 
-    return reply.send({
+    return reply
+      .header('Cache-Control', 'public, max-age=60')
+      .send({
+      // ── Runtime flags (dashboard) ──
+      // Top-level so the frontend can read `data.auth`, `data.billing`
+      // without traversing nested manifest data. Stays cheap to parse.
+      auth: config.authEnabled,
+      billing: config.authEnabled,
+      googleOauth: config.authEnabled && Boolean(config.google.clientId),
+      provider: config.provider,
+      version: config.version,
+
       service: {
         name: 'Lavern',
-        tagline: 'AI law firm — structured legal intelligence for humans and agents.',
-        version: '10.0.0',
+        tagline: 'AI law firm. Structured legal intelligence for humans and agents.',
+        version: config.version,
         description: 'Multi-agent legal orchestration platform. Upload documents, describe tasks, and receive structured legal analysis. Same engine serves human clients through a visual interface and AI agents through this API.',
         provider: config.provider,
         providerModel: config.provider === 'mistral' ? config.mistral.defaultModel : config.defaultModel,

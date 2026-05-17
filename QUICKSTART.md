@@ -112,7 +112,7 @@ Customize:
 
 ## What's in the box
 
-**67 agents** · **21 MCP tools** · **9 workflows** · **6 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · ContractNLI · LEDGAR) · **2 LLM providers** (Claude · Mistral EU) · **1,665 tests** across 108 files.
+**67 agents** · **21 MCP tools** · **9 workflows** · **6 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · ContractNLI · LEDGAR) · **2 LLM providers** (Claude · Mistral EU) · **1,677 tests** across 109 files.
 
 Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/architecture/](https://lavern.ai/architecture/).
 

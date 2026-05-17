@@ -44,7 +44,7 @@ Demo mode runs the full dashboard, Clawern monitoring, and the cinematic guided 
 - **9 workflows** from quick legal questions to full adversarial review
 - **6 legal datasets** seeded out of the box: CUAD, MAUD, ACORD, UNFAIR-ToS, ContractNLI, LEDGAR
 - **2 LLM providers**: Anthropic Claude (US) and Mistral AI (EU sovereign)
-- **1,665 tests** across 108 files. Clean `tsc --noEmit` on backend and frontend.
+- **1,677 tests** across 109 files. Clean `tsc --noEmit` on backend and frontend.
 
 ## Three modes
 
@@ -136,7 +136,7 @@ Features: 30-minute heartbeat, Telegram bot, email alerts, weekly digest, schedu
 ## Development
 
 ```bash
-npm test                  # 1,665 tests across 108 files
+npm test                  # 1,677 tests across 109 files
 npm run typecheck:all     # TypeScript check (backend plus frontend)
 npm run build             # Build backend
 cd viz && npm run build   # Build dashboard
@@ -165,7 +165,7 @@ src/
 viz/                    React dashboard
 site/                   Marketing site (static, Netlify)
 menubar/                macOS menu bar app (SwiftUI)
-tests/                  1,665 tests across 108 files
+tests/                  1,677 tests across 109 files
 ```
 
 Full architectural detail in [CLAUDE.md](CLAUDE.md), the same context Claude Code reads when working on this repo.
@@ -178,7 +178,7 @@ Lavern's 21 MCP tools, 6 bundled legal datasets, 2 LLM providers, and the remote
 
 Lavern is at **v0.15.0**, the initial public open-source release. The codebase was developed privately for several months before this point and has been running in production-like environments throughout. The engine, Clawern daemon, and dashboard are stable. The remote MCP bridge for Anthropic Managed Agents is gated behind a feature flag and considered preview. The HTTP API is evolving. Expect non-breaking additions before a v1.0 freeze. Pin a tag if you depend on it.
 
-Test coverage is 1,665 across 108 files. `npm run typecheck:all` is clean on both backend and frontend.
+Test coverage is 1,677 across 109 files. `npm run typecheck:all` is clean on both backend and frontend.
 
 ## Contributing
 
