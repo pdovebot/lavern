@@ -79,6 +79,15 @@ type AppView = 'foyer' | 'partner' | 'quickstart' | 'landing' | 'lobby' | 'login
 
 function getViewFromHash(): AppView {
   const hash = window.location.hash;
+  // The marketing site embeds this SPA at lavern.ai/demo/ via
+  // VITE_BASE_PATH=/demo/ — so when the bundle is served from that
+  // subpath AND no hash route is set, the visitor is here for the
+  // cinematic tour. Surface it as the default view, otherwise the
+  // bare URL lavern.ai/demo/ would render `foyer` (or `landing`)
+  // and the nav-pill click would feel broken.
+  if (typeof window !== 'undefined' && !hash && window.location.pathname.startsWith('/demo/')) {
+    return 'demo';
+  }
   if (hash.startsWith('#/quickstart')) return 'quickstart';
   if (hash.startsWith('#/partner')) return 'partner';
   if (hash.startsWith('#/lobby')) return 'lobby';
