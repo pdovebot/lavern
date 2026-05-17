@@ -826,6 +826,11 @@ export async function startApiServer(port: number): Promise<void> {
     await fastify.listen({ port, host: config.host });
 
     const dashboardAvailable = fs.existsSync(frontendDir);
+    const hasAnthropicKey = !!config.anthropic.apiKey && config.anthropic.apiKey.length > 10;
+    const hasMistralKey = !!config.mistral.apiKey && config.mistral.apiKey.length > 10;
+    const provider = config.provider;
+    const authEnabled = config.authEnabled === true;
+
     console.log(`
 ╔══════════════════════════════════════════════════════════════╗
 ║                       LAVERN API SERVER                      ║
@@ -837,18 +842,25 @@ export async function startApiServer(port: number): Promise<void> {
   Health:    http://localhost:${port}/health
 ${dashboardAvailable ? `  Dashboard: http://localhost:${port}/dashboard/` : '  Dashboard: Not built (run "cd viz && npm run build")'}
 
-  Create a session:
-    curl -X POST http://localhost:${port}/api/sessions \\
-      -H 'Content-Type: application/json' \\
-      -d '{"documentPath": "./doc.txt", "context": {"moment": "signup"}}'
+  ┌─ First 90 seconds ─────────────────────────────────────────┐
+  │                                                            │
+  │  1.  In another terminal:                                  │
+  │        cd viz && npm run dev                               │
+  │                                                            │
+  │  2.  Open http://localhost:5173                            │
+  │                                                            │
+  │  3.  Click "Step In" to start an engagement, or try the    │
+  │      cinematic guided tour at http://localhost:5173/#/demo │
+  │                                                            │
+  └────────────────────────────────────────────────────────────┘
 
-  Stream events:
-    wscat -c ws://localhost:${port}/api/sessions/<id>/events
+  Mode:        ${authEnabled ? 'multi-user (LAVERN_AUTH_ENABLED=true)' : 'LOCAL MODE (single-user, auth disabled)'}
+  Provider:    ${provider}${provider === 'anthropic' && !hasAnthropicKey ? ` (no ANTHROPIC_API_KEY — demo only)` : ''}${provider === 'mistral' && !hasMistralKey ? ` (no MISTRAL_API_KEY — set it in .env)` : ''}
+  Bundled try: lavern samples/sample-terms-of-service.txt --workflow review
 
-  Submit gate decision:
-    curl -X POST http://localhost:${port}/api/sessions/<id>/gate \\
-      -d '{"decision": "approve", "notes": "Looks good"}'
-`);
+  ${provider === 'anthropic' && !hasAnthropicKey ? `Tip: set ANTHROPIC_API_KEY in .env to enable real engagements.
+       (.env was auto-created from .env.example on first run.)
+` : ''}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

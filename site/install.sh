@@ -119,21 +119,28 @@ cat <<EOF
 
   cd ${DEST}
 
-  ${BOLD}Terminal 1${RESET}  API server on :3000 (demo mode, no API key needed)
-      npm run serve:dev
+  ${BOLD}Verify the install${RESET}
+      npx lavern --help            print the CLI usage banner
 
-  ${BOLD}Terminal 2${RESET}  Dashboard on :5173
-      cd viz && npm run dev
+  ${BOLD}Run the dashboard${RESET}
+      Terminal 1   ${DIM}# API server on :3000 (LOCAL MODE, no API key needed)${RESET}
+        npm run serve:dev
+      Terminal 2   ${DIM}# Dashboard on :5173, hot reload${RESET}
+        cd viz && npm run dev
+      Then open  ${BOLD}http://localhost:5173${RESET}
 
-  Then open  ${BOLD}http://localhost:5173${RESET}
+  ${BOLD}Try it with the bundled sample${RESET}
+      A short, fabricated SaaS Terms of Service lives in samples/.
+      Set ANTHROPIC_API_KEY in .env first, then:
+        npx lavern samples/sample-terms-of-service.txt --workflow review
 
-  To run real engagements, set ANTHROPIC_API_KEY in .env
-  (.env is auto-created from .env.example on first run).
-
-  EU teams: set LAVERN_PROVIDER=mistral and MISTRAL_API_KEY=... to
-  route through Mistral instead. Data never leaves the EU.
+  ${BOLD}EU teams${RESET}
+      Set LAVERN_PROVIDER=mistral and MISTRAL_API_KEY=... in .env.
+      The entire stack routes through Mistral (Paris). No document
+      content reaches Anthropic.
 
   ${DIM}Full quickstart:  https://github.com/AnttiHero/lavern/blob/main/QUICKSTART.md${RESET}
   ${DIM}Architecture:     https://lavern.ai/architecture/${RESET}
+  ${DIM}Watch the demo:   https://lavern.ai/demo/${RESET}
 
 EOF

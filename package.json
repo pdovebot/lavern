@@ -15,8 +15,8 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "shem": "dist/index.js",
-    "lavern": "dist/index.js"
+    "shem": "bin/lavern.js",
+    "lavern": "bin/lavern.js"
   },
   "scripts": {
     "build": "tsc",

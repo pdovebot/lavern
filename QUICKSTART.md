@@ -40,13 +40,32 @@ Demo mode gets you the full UI — landing page, auth, Clawern dashboard, agent 
 
 EU teams: set `LAVERN_PROVIDER=mistral` and `MISTRAL_API_KEY=...` to route every LLM call — orchestrator, agents, debate, verification, briefing analyser, partner-mode chat, agent-builder personality, Clawern processing — through Mistral instead of Anthropic. The Anthropic-streaming paths (briefing interview, partner consult) fall back to a one-shot completion that the route then SSE-emits as a single chunk, so the UI stays identical; no document content reaches `api.anthropic.com` when Mistral is the configured provider.
 
-## First engagement
+## Verify the install
 
-1. From the landing page, click **Start an engagement**.
-2. Upload a contract (your own — or any sample contract you have lying around).
+```bash
+npx lavern doctor          # Health check: Node version, deps, ports, .env, API key
+npx lavern --help          # Usage banner + option list
+```
+
+`doctor` runs a first-90-seconds preflight: Node version, native sqlite binding, dashboard deps, ports 3000 and 5173, `.env` state, and (informational) whether `ANTHROPIC_API_KEY` is set. If anything is red, fix it before starting the servers.
+
+## First engagement (CLI)
+
+A short, fabricated SaaS Terms of Service ships in `samples/`. With your `ANTHROPIC_API_KEY` set:
+
+```bash
+npx lavern samples/sample-terms-of-service.txt --workflow review
+```
+
+The team picks itself, opens a debate, runs three-layer verification, and lands at a gate before the final deliverable.
+
+## First engagement (dashboard)
+
+1. From the landing page, click **Step In**.
+2. Upload `samples/sample-terms-of-service.txt` (or paste its contents). Bring your own contract if you prefer.
 3. Answer the 3–5 intake questions in the Briefing chat.
 4. Accept the suggested team and workflow, or customize.
-5. Watch the **Working** view — agents analyze, post findings, debate, and resolve disputes in real time.
+5. Watch the **Working** view. Agents analyze, post findings, debate, and resolve disputes in real time.
 6. When a gate fires, approve or reject the team's critical findings.
 7. Read the **Delivery** view: the user-facing document, the legal review package, the scorecard, the full audit trail.
 
@@ -93,7 +112,7 @@ Customize:
 
 ## What's in the box
 
-**67 agents** · **21 MCP tools** · **9 workflows** · **5 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · LEDGAR) · **2 LLM providers** (Claude · Mistral EU) · **1,695 tests** across 108 files.
+**67 agents** · **21 MCP tools** · **9 workflows** · **6 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · ContractNLI · LEDGAR) · **2 LLM providers** (Claude · Mistral EU) · **1,665 tests** across 108 files.
 
 Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/architecture/](https://lavern.ai/architecture/).
 
