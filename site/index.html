@@ -1205,24 +1205,31 @@
       #tldr{display:none}
     }
 
-    /* ─── Chip rows inside mockup cards — wrap the long-text span to its
-       own line on narrow phones. Without this the row tries to fit
-       [avatar 22px][RED badge ~30px][long sentence] on a ~250px line
-       and the sentence wraps awkwardly *next to* the badge as a
-       second column. With flex-wrap, the badge+avatar sit on line 1,
-       the full-width text drops to line 2 and reads naturally. ─── */
+    /* ─── Chip rows inside mockup cards on narrow phones (≤480px).
+       The mockup is fixed at aspect-ratio 5/4, so the body has a
+       hard vertical budget on a 315px-wide carousel slide (~173px
+       inner). We need each chip to fit on a SINGLE line so that two
+       chips + the ↕ arrow stack vertically without clipping.
+       Shrinking avatar, badge, text, and gaps gets the worst-case
+       row ("Indemnification cap is uncapped.") under the available
+       width without wrapping. The chip ends up two lines tall:
+         · row 1: [avatar] [BADGE] [single-line finding]
+         · row 2: italic-feeling quote citation
+       Total ≈ 60-70px per chip. Two chips + arrow ≈ 160px. Fits.
+       ─── */
+    /* Specificity bumped with `.feature-mockup` prefix so these rules
+       win against the default `.m-card{...}` rule that's defined later
+       in the file (~line 1400). Plus `[style]` on the text span beats
+       the inline style="...font-size:11.5px..." attribute the
+       finding-row markup carries. */
     @media(max-width:480px){
-      .m-card .m-row{flex-wrap:wrap}
-      .m-card .m-row > span:last-child{
-        flex-basis:100%;
-        margin-top:2px
-      }
-      /* Trim chip padding so we don't waste horizontal pixels on cards
-         that ship to a 315px-wide carousel slide. */
-      .m-card{padding:10px 12px}
-      /* Tighten the mockup body padding too — Mac-chrome + 32px gutters
-         was Apple-keynote-class on desktop, suffocating at 84vw. */
-      .feature-body{padding:30px 18px}
+      .feature-mockup .m-card{padding:9px 11px;gap:5px}
+      .feature-mockup .m-card .m-row{gap:6px}
+      .feature-mockup .m-card .m-avatar-img.sm{width:18px;height:18px}
+      .feature-mockup .m-card .m-tag{font-size:8px;padding:1px 5px;letter-spacing:.3px}
+      .feature-mockup .m-card .m-row > span[style]:last-child{font-size:10.5px !important;line-height:1.3 !important}
+      .feature-mockup .m-quote{font-size:10px;line-height:1.4}
+      .feature-mockup .feature-body{padding:30px 16px}
     }
 
     .feature{
@@ -2360,7 +2367,7 @@
           <div class="feature-mockup"><div class="feature-body" style="gap:7px">
               <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">Your firm precedents</span><span style="color:var(--dim)">243 docs</span></div>
               <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">Past contracts</span><span style="color:var(--dim)">1,840 docs</span></div>
-              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">CUAD · MAUD · LEDGAR</span><span style="color:var(--dim)">6 datasets</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">CUAD · MAUD · LEDGAR</span><span style="color:var(--dim)">5 datasets</span></div>
               <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">Your client memos</span><span style="color:var(--dim)">412 docs</span></div>
               <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--dim);padding-top:4px;border-top:1px solid var(--hair)"><span class="m-plus-rotate" style="font-size:14px;line-height:1;color:var(--text)">+</span><span style="flex:1">Drop a folder. It indexes.</span></div>
             </div>
@@ -2368,7 +2375,7 @@
           <div class="feature-caption">
             <div class="feature-num"><span>05</span> · Knowledge</div>
             <h3 class="feature-title">Open <em>shelf.</em></h3>
-            <p class="feature-desc">Six public legal datasets out of the box. Plus your firm's precedents, contracts, memos, anything. Drop a folder, it indexes, the agents cite it.</p>
+            <p class="feature-desc">Five public legal datasets out of the box. Plus your firm's precedents, contracts, memos, anything. Drop a folder, it indexes, the agents cite it.</p>
           </div>
         </article>
 
