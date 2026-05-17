@@ -20,8 +20,23 @@ const root = resolve(here, '..');
 const distEntry = resolve(root, 'dist', 'index.js');
 const srcEntry  = resolve(root, 'src', 'index.ts');
 
+// Silence the DEP0040 punycode deprecation warning that surfaces because
+// openai@4 ships node-fetch@2 → whatwg-url@5 → require('punycode'). The
+// warning is cosmetic, prints on every Lavern boot, and openai@4 → v5/v6
+// dropped that chain — but the SDK upgrade carries API-shape risk so we
+// defer it to a follow-up release. Until then, suppress only on the
+// Lavern entry. NODE_OPTIONS is merged with any user-set value so we
+// don't clobber their own flags.
+const preserveOptions = process.env.NODE_OPTIONS ?? '';
+if (!preserveOptions.includes('--no-deprecation')) {
+  process.env.NODE_OPTIONS = (preserveOptions + ' --no-deprecation').trim();
+}
+
 if (existsSync(distEntry)) {
   // Production path: compiled entry, no transpiler overhead.
+  // process.noDeprecation is the in-process equivalent of --no-deprecation;
+  // honoured by both Node ESM and CJS warning emitters.
+  process.noDeprecation = true;
   await import(pathToFileURL(distEntry).href);
 } else if (existsSync(srcEntry)) {
   // Source path: spawn tsx so `.ts` is loaded transparently.
