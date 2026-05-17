@@ -530,7 +530,7 @@ function S1Partner({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId
               <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: 'rgba(196,93,62,.07)', border: '1px solid rgba(196,93,62,.18)' }}>
                 <img src={av('Catherine Blackwell', 40)} alt="CB" width={28} height={28} style={{ display: 'block' }} />
               </div>
-              <div style={{ display: 'flex', gap: 4, padding: '10px 12px', background: CREAM, borderRadius: '12px 12px 12px 4px', border: `1px solid ${BORDER}` }}>
+              <div style={{ display: 'flex', gap: 4, padding: '10px 12px', background: WHITE, borderRadius: '12px 12px 12px 4px', border: `1px solid ${BORDER}` }}>
                 {[0, 1, 2].map(j => <div key={j} style={{ width: 5, height: 5, borderRadius: '50%', background: MUTED, animation: `dDot 1.2s ease ${j * .2}s infinite` }} />)}
               </div>
             </div>
@@ -558,6 +558,13 @@ function S1Partner({ isMobile, caseId, onContinue }: { isMobile: boolean; caseId
 }
 
 function ChatBubble({ align, avatar, text }: { align: 'left' | 'right'; avatar?: string; text: string }) {
+  // iMessage-style colour swap:
+  //   align='right' (you, user)   → solid dark bubble, cream text
+  //   align='left'  (them, agent) → white/surface bubble, dark text
+  // Hardcoded cream `#FAF9F6` here because the CREAM constant was
+  // flipped to dark ink (#141310) when the demo was reskinned to
+  // cream paper, which made dark-on-dark bubbles unreadable.
+  const BUBBLE_FG_ON_DARK = '#FAF9F6';
   return (
     <div style={{
       display: 'flex',
@@ -572,8 +579,8 @@ function ChatBubble({ align, avatar, text }: { align: 'left' | 'right'; avatar?:
       )}
       <div style={{
         maxWidth: '82%',
-        background: align === 'right' ? TEXT : CREAM,
-        color: align === 'right' ? CREAM : TEXT,
+        background: align === 'right' ? TEXT : WHITE,
+        color:      align === 'right' ? BUBBLE_FG_ON_DARK : TEXT,
         borderRadius: align === 'right' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
         padding: '10px 13px',
         fontFamily: SANS, fontSize: 12, lineHeight: 1.55,
@@ -1123,7 +1130,10 @@ function S4Builder({ isMobile, caseId, onLaunch }: { isMobile: boolean; caseId: 
                 fontFamily: SANS, fontSize: 9, letterSpacing: 1, textTransform: 'uppercase',
                 fontWeight: builderStep === s ? 700 : 400,
                 background: builderStep === s ? TEXT : 'transparent',
-                color: builderStep === s ? CREAM : MUTED,
+                // Active state: dark bg needs a light foreground. CREAM is
+                // now dark ink (#141310) since the cream-paper reskin, so
+                // hardcode the cream-paper colour for the active label.
+                color: builderStep === s ? '#FAF9F6' : MUTED,
                 borderRight: i < 2 ? `1px solid ${BORDER}` : 'none',
                 border: 'none', cursor: 'pointer', transition: 'all .2s',
               }}>{s}</button>
