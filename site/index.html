@@ -819,9 +819,68 @@
     .nav-link.featured .arrow{display:inline-block;font-size:11px;transition:transform .25s var(--ease)}
     .nav-link.featured:hover .arrow{transform:translate(2px,-2px)}
     .nav-link svg{width:13px;height:13px}
+
+    /* ─── Mobile burger + slide-down menu ─────────────────────────────
+       Hidden on desktop; takes over from .nav-links below 760px. The
+       burger sits where the nav-links pill row used to, transitions to
+       the close-X glyph via simple span rotations. The menu drops down
+       under the nav as an opaque panel covering the rest of the viewport
+       (so any backdrop-blur stacking weirdness from the translucent nav
+       can't bleed into the menu items). ─────────────────────────────── */
+    .nav-burger{
+      display:none;justify-self:end;
+      width:40px;height:40px;
+      border:1px solid var(--hair-strong);border-radius:10px;
+      background:var(--surface-2);box-shadow:var(--shadow-pill);
+      padding:0;cursor:pointer;
+      flex-direction:column;align-items:center;justify-content:center;gap:5px;
+      transition:background .2s var(--ease),border-color .2s var(--ease)
+    }
+    .nav-burger:hover{background:#fff;border-color:var(--text)}
+    .nav-burger span{
+      display:block;width:18px;height:1.5px;background:var(--text);
+      transition:transform .25s var(--ease),opacity .2s var(--ease)
+    }
+    /* Open state — top + bottom lines collapse to an X, middle fades out. */
+    .nav-burger[aria-expanded="true"] span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+    .nav-burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+    .nav-burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+    .nav-menu{
+      position:fixed;top:64px;left:0;right:0;bottom:0;
+      z-index:99;
+      background:var(--bg);
+      display:flex;flex-direction:column;align-items:stretch;
+      padding:24px 22px 60px;gap:8px;
+      opacity:0;pointer-events:none;transform:translateY(-8px);
+      transition:opacity .25s var(--ease),transform .25s var(--ease);
+      overflow-y:auto
+    }
+    .nav-menu[aria-hidden="false"]{opacity:1;pointer-events:auto;transform:translateY(0)}
+    .nav-menu-link{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:18px 18px;border-radius:12px;
+      font-family:var(--serif);font-size:22px;font-weight:300;
+      color:var(--text);letter-spacing:-0.01em;
+      border:1px solid var(--hair);background:var(--surface-2);
+      box-shadow:var(--shadow-sm);
+      transition:border-color .2s var(--ease),transform .2s var(--ease)
+    }
+    .nav-menu-link:active{transform:scale(0.98)}
+    .nav-menu-link .arrow{font-size:14px;color:var(--muted)}
+
     @media(max-width:760px){
-      .nav{padding:14px 18px}
+      .nav{
+        padding:14px 18px;
+        /* Solid background on mobile — the translucent + backdrop-blur
+           combo creates a visible 1px seam on iOS Safari as the address
+           bar collapses while scrolling. Going opaque kills the gap. */
+        background:var(--bg);
+        backdrop-filter:none;
+        -webkit-backdrop-filter:none;
+      }
       .nav-meta{display:none}
+      .nav-links{display:none}       /* the three pills hide on mobile */
+      .nav-burger{display:flex}      /* burger takes their place */
       .nav-link{padding:8px 10px;font-size:12px}
     }
 
@@ -1039,7 +1098,16 @@
       .hero-meta-label{font-size:11px}
       /* Hero — slight breathing-room tweaks */
       .hero{padding:96px 22px 56px}
-      .hero h1{margin-bottom:32px}
+      .hero h1{
+        /* Smaller min-size + slightly tighter spacing so the desktop
+           composition ("An agentic law firm." / "Yours.") survives on
+           narrow viewports as two lines instead of wrapping to three.
+           At 375px viewport this resolves to ~32-34px. */
+        font-size:clamp(30px,8.4vw,42px);
+        letter-spacing:-0.02em;
+        line-height:1.08;
+        margin-bottom:32px;
+      }
       .hero-deck{margin-bottom:28px}
     }
 
@@ -2131,7 +2199,7 @@
        ═══════════════════════════════════════════════════════════════════ -->
   <nav class="nav" aria-label="Primary">
     <a href="/" class="brand" aria-label="Lavern home">Lavern</a>
-    <div class="nav-meta"><span><span class="dot"></span>v0.14.3 · Apache 2.0</span></div>
+    <div class="nav-meta"><span><span class="dot"></span>v0.15.0 · Apache 2.0</span></div>
     <div class="nav-links">
       <a class='nav-link featured' href='/architecture/'>Architecture <span class="arrow">↗</span></a>
       <a class="nav-link featured" href="/demo/" id="navDemo">Demo</a>
@@ -2140,7 +2208,18 @@
         GitHub
       </a>
     </div>
+    <!-- Mobile burger — hidden on desktop, takes over from .nav-links below 760px -->
+    <button class="nav-burger" id="navBurger" type="button"
+            aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+  <!-- Mobile slide-down menu — exits to opacity:0 outside <nav> to avoid backdrop-blur stacking surprises. Toggled by #navBurger. -->
+  <div class="nav-menu" id="navMenu" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Menu">
+    <a class='nav-menu-link' href='/architecture/'>Architecture <span class="arrow">↗</span></a>
+    <a class='nav-menu-link' href='/demo/'>Demo</a>
+    <a class='nav-menu-link' href='https://github.com/AnttiHero/lavern' rel="noopener">GitHub <span class="arrow">↗</span></a>
+  </div>
 
   <main id="main">
 
@@ -3284,6 +3363,59 @@
       btn.addEventListener('click', function(){
         setGoblin(!root.classList.contains('goblin'));
       });
+    })();
+
+
+    // ──────────────────────────────────────────────────────────────────
+    // MOBILE BURGER MENU — open/close the slide-down nav-menu panel.
+    //   · Click burger → toggle aria-expanded + aria-hidden
+    //   · Click any link inside → close (so navigation lands cleanly)
+    //   · Escape → close
+    //   · Resize past 760px → force-close so desktop nav reads clean
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      var burger = document.getElementById('navBurger');
+      var menu = document.getElementById('navMenu');
+      if (!burger || !menu) return;
+
+      function setOpen(open){
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+        // Lock body scroll while the menu is open so the underlying page
+        // doesn't drift behind it on iOS.
+        document.body.style.overflow = open ? 'hidden' : '';
+      }
+
+      burger.addEventListener('click', function(){
+        var open = burger.getAttribute('aria-expanded') !== 'true';
+        setOpen(open);
+      });
+
+      // Close on any link click — the page is about to navigate, so we
+      // want the menu visibly closed by the time the next view paints.
+      menu.querySelectorAll('a').forEach(function(a){
+        a.addEventListener('click', function(){ setOpen(false); });
+      });
+
+      // Esc key closes.
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && burger.getAttribute('aria-expanded') === 'true') {
+          setOpen(false);
+          burger.focus();
+        }
+      });
+
+      // If the user resizes/rotates past the mobile breakpoint while
+      // the menu is open, snap it shut. addEventListener on
+      // MediaQueryList is supported widely; older Safari needs the
+      // deprecated addListener path.
+      var mql = window.matchMedia('(min-width:761px)');
+      var onMql = function(e){ if (e.matches) setOpen(false); };
+      if (mql.addEventListener) {
+        mql.addEventListener('change', onMql);
+      } else if (mql.addListener) {
+        mql.addListener(onMql);
+      }
     })();
 
 
