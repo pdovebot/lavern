@@ -162,7 +162,7 @@ Static single-page site deployed via Netlify drag-and-drop. Dark cinematic desig
 - `site/index.html` — Entire site in one HTML file (CSS + JS inlined)
   - Hero: LAVERN logo, tagline ("Excellence doesn't scale. Until now."), "Knock" mailto CTA, Log In link
   - Sections: statement, art-quote, video (demo.mp4), CTA ("Speak to Us.")
-  - Footer: Helsinki · Paris
+  - Footer: Helsinki
   - Effects: film grain overlay, parallax scroll, custom cursor (desktop), word-by-word reveal, magnetic buttons, mist/smoke canvas
   - **Mobile (≤768px)**: Single-screen hero + footer only — all mid-sections hidden, no scroll, mist preserved
   - **Desktop**: Full scrolling experience with all sections

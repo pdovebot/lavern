@@ -177,7 +177,7 @@ export default function FoyerView({ onPartner, onQuickStart, onMyPage, onLogin, 
         )}
       </div>
 
-      {/* Helsinki · Paris */}
+      {/* Helsinki */}
       <div style={{
         position: 'absolute', bottom: 28, left: 0, right: 0,
         display: 'flex', justifyContent: 'center', gap: 10,
@@ -185,8 +185,6 @@ export default function FoyerView({ onPartner, onQuickStart, onMyPage, onLogin, 
         animation: 'foyerFade 0.8s ease 2.2s both',
       }}>
         <span style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 3, textTransform: 'uppercase' as const, color: TEXT, opacity: 0.18 }}>Helsinki</span>
-        <span style={{ fontFamily: SANS, fontSize: 9, color: TEXT, opacity: 0.12 }}>&middot;</span>
-        <span style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 3, textTransform: 'uppercase' as const, color: TEXT, opacity: 0.18 }}>Paris</span>
       </div>
 
       <style>{`

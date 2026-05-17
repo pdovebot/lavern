@@ -332,7 +332,7 @@ async function main(): Promise<void> {
       console.log('╚══════════════════════════════════════════════════════════════╝\n');
     } else if (provider === 'mistral') {
       console.log('╔══════════════════════════════════════════════════════════════╗');
-      console.log('║  EU SOVEREIGN MODE — Mistral (Paris)                        ║');
+      console.log('║  EU SOVEREIGN MODE — Mistral                                ║');
       console.log('╚══════════════════════════════════════════════════════════════╝\n');
     } else if (!hasAnthropicKey) {
       console.log('╔══════════════════════════════════════════════════════════════╗');
