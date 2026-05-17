@@ -918,7 +918,7 @@
       position:relative;width:100%;max-width:1000px;margin:28px auto 0;
       border-radius:var(--r-xl);overflow:hidden;
       box-shadow:var(--shadow-2xl), var(--ring-top-strong);
-      opacity:var(--so,0);
+      opacity:var(--so,1);
       transform:scale(var(--ss,.92));
       transition:box-shadow .6s var(--ease),transform .6s var(--ease)
     }
@@ -1184,7 +1184,7 @@
       position:relative;max-width:1180px;margin:0 auto;
       border-radius:var(--r-xl);overflow:hidden;
       box-shadow:var(--shadow-xl), var(--ring-top);
-      opacity:var(--so,0);
+      opacity:var(--so,1);
       transform:scale(var(--ss,.92));
       transition:box-shadow .6s var(--ease)
     }
@@ -1307,6 +1307,13 @@
          the mockup bottom — keeps the "agent is composing" affordance
          visible at the natural reading rhythm. */
       .feature-mockup .m-typing{padding:7px 11px}
+    }
+    /* ↑ Close of @media(max-width:480px). Without this `}`, every
+       rule that follows — .feature, .feature-mockup, .mac-chrome,
+       .m-card, the whole mockup styling system — was trapped inside
+       the narrow-mobile media query and never applied on viewports
+       wider than 480px. The site looked broken on every desktop
+       resolution. Do not delete this brace. */
 
     .feature{
       background:var(--surface-2);
@@ -1317,7 +1324,7 @@
       /* Scroll-choreographed: --sy and --so are written by the rAF
          scroll handler. Cards fade in as they enter, peak when centered,
          fade out as they leave. */
-      opacity:var(--so, 0);
+      opacity:var(--so, 1);
       transform:scale(var(--ss, .9)) translateY(var(--sy, 30px));
       transition:border-color .45s var(--ease),box-shadow .55s var(--ease)
     }
@@ -1626,7 +1633,7 @@
       /* Scroll-choreographed — same vocabulary as .feature and .hero-imac.
          JS rAF handler writes --so, --ss, --sy so the whole Stack scales
          in/out and floats as it approaches the viewport centre. */
-      opacity:var(--so, 0);
+      opacity:var(--so, 1);
       transform:scale(var(--ss, .9)) translateY(var(--sy, 30px));
       transition:opacity .55s var(--ease)
     }
@@ -3041,10 +3048,14 @@
           var el = els[i];
           var r = el.getBoundingClientRect();
           if (r.bottom < -200 || r.top > vh + 200){
-            // Far outside viewport — park at fade-out state and skip
-            el.style.setProperty('--so', '0');
-            el.style.setProperty('--ss', '.9');
-            el.style.setProperty('--sy', '40px');
+            // Far outside viewport — park at neutral state and skip.
+            // CRITICAL: opacity must stay at 1 so cards never go fully
+            // invisible. The old "fade-to-zero" behaviour murdered cards
+            // on wide-but-short viewports where multiple cards are
+            // visible simultaneously and none can be exactly centered.
+            el.style.setProperty('--so', '1');
+            el.style.setProperty('--ss', '.96');
+            el.style.setProperty('--sy', '0px');
             continue;
           }
           var center = r.top + r.height / 2;
@@ -3052,14 +3063,15 @@
           // 0 = element is centered in viewport, +1 = center is at top.
           var d = (center - vc) / vh;
           var absD = Math.abs(d);
-          // Opacity: peak 1 at center, falls to 0 at |d| ~ 0.7
-          var so = clamp(1.25 - absD * 1.7, 0, 1);
-          // Scale: dialled back from cranked, still much more dramatic
-          // than the original (was 0.86→1.0, ~14% swing). Now ~32% swing
-          // with a subtle 1.02 overshoot for the centre-pop.
-          var ss = clamp(1.02 - absD * 0.32, 0.7, 1.02);
-          // Drift: midway between cranked (60) and original (18).
-          var sy = d * 38; // px
+          // Opacity: always 1. Fading via opacity is what broke wide
+          // viewports — left as a CSS var so existing selectors keep
+          // working, but it no longer drives an actual fade.
+          var so = 1;
+          // Scale: very subtle 4% pop at centre. Was 32% swing which
+          // looked dramatic on tall mobile but exaggerated on desktop.
+          var ss = clamp(1.02 - absD * 0.06, 0.96, 1.02);
+          // Drift: 14px max, gentle parallax. Was 38, too much.
+          var sy = d * 14; // px
           el.style.setProperty('--so', so.toFixed(3));
           el.style.setProperty('--ss', ss.toFixed(3));
           el.style.setProperty('--sy', sy.toFixed(1) + 'px');
