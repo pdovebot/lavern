@@ -1440,9 +1440,13 @@ ${buildFullContext(session as SessionState)}`;
 
       // H8 — debit a per-revision estimate (~$0.50 worth of hours) BEFORE
       // the LLM call. Idempotent on `revision:<sessionId>:<version>`.
+      // LOCAL MODE (the default in v0.15.0): userId is always 'local-user'
+      // and there is no billing surface, so the debit would always 402 on
+      // a fresh install. Skip it — matches the pattern at the session-list
+      // route above and `billing: config.authEnabled` in capabilities.ts.
       const REVISION_ESTIMATE_USD = 0.50;
       const userId = sessionRecord.userId;
-      if (userId) {
+      if (userId && userId !== 'local-user') {
         const hoursToDebit = REVISION_ESTIMATE_USD / config.billableHours.rate;
         const referenceId = `revision:${id}:${nextVersion}`;
         const debited = debitBillableHours(userId, hoursToDebit, `Revision v${nextVersion} for session ${id}`, referenceId);
