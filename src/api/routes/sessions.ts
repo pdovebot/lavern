@@ -1436,13 +1436,21 @@ ${instructions}
 Apply the partner's notes following the rules in your system prompt. Preserve everything else verbatim.`;
 
       const startedAt = Date.now();
+      // Revisions are intrinsically slow: Opus has to reproduce most of the
+      // document verbatim with targeted edits, so output length ≈ input
+      // length. Local models are far slower per token. The previous 90s
+      // ceiling cut almost every non-trivial revision short, and the default
+      // retry policy then multiplied a single timeout into a 5–6 minute wait
+      // before the user got a generic 500. Give the call real headroom and
+      // disable retries — retrying a slow call doesn't make it faster.
+      const isLocal = config.provider === 'local';
       const { text: revisedDoc, cost: costUsd } = await crossProviderChat({
         system,
         user,
         tier: 'opus',
         maxTokens: 16_000,
-        // M11: 90s ceiling — most reverse proxies kill connections at 60-100s.
-        timeoutMs: 90_000,
+        timeoutMs: isLocal ? 600_000 : 300_000,
+        maxRetries: 0,
       });
 
       if (!revisedDoc || revisedDoc.trim().length < 200) {
@@ -1477,8 +1485,21 @@ Apply the partner's notes following the rules in your system prompt. Preserve ev
       return reply.send(revision);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      logger.error('Revision failed', { sessionId: id, error: message });
-      // M17: generic client error; full detail goes to server logs only.
+      const stack = err instanceof Error ? err.stack : undefined;
+      logger.error('Revision failed', { sessionId: id, error: message, stack });
+
+      // M17: keep stack traces server-side. But surface *timeout* failures
+      // distinctly so the user knows the call ran out of time rather than
+      // hitting some opaque server error — they can retry with a tighter
+      // scope (smaller doc / fewer changes) instead of just hitting "Try
+      // again" repeatedly with the same input.
+      const isTimeout = /timeout|timed out|aborted/i.test(message);
+      if (isTimeout) {
+        return reply.status(504).send({
+          error: 'Revision is taking longer than expected. Try sending fewer or smaller changes — long revisions sometimes exceed the model time budget.',
+          code: 'REVISION_TIMEOUT',
+        });
+      }
       return reply.status(500).send({ error: 'Revision failed. Please try again.' });
     } finally {
       release();

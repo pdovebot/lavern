@@ -87,6 +87,14 @@ export interface CrossProviderChatOptions {
   temperature?: number;
   /** Optional timeout override (ms). Default 120s for cloud, 240s for local. */
   timeoutMs?: number;
+  /**
+   * Optional override for the Anthropic retry count. Default 3 (via
+   * withRetry), plus the SDK's own 2 internal retries. Pass 0 for
+   * long-running calls where retrying a slow request multiplies the wait
+   * instead of helping (e.g. /revise on a long document).
+   * Ignored for local/mistral providers (no retry wrapper there).
+   */
+  maxRetries?: number;
 }
 
 export interface CrossProviderChatResult {
@@ -191,9 +199,16 @@ export async function crossProviderChat(
   // Audit fix H7: wrap the Anthropic call in withRetry so transient
   // 429/500/502/503/504/529 don't surface as a hard 500 to user-facing
   // routes (revise, conversation, quality gate, document assembler).
+  // Callers can pass `maxRetries: 0` to opt out — appropriate when the
+  // call is intrinsically slow and retrying won't recover (e.g. /revise
+  // on a long document, where a single timeout is genuine, not transient).
+  const sdkMaxRetries = opts.maxRetries ?? 2; // SDK default is 2
   const res = await withRetry(
-    () => client.messages.create(requestBody, { timeout: opts.timeoutMs ?? 120_000 }),
-    { label: `anthropic:${model}` },
+    () => client.messages.create(requestBody, {
+      timeout: opts.timeoutMs ?? 120_000,
+      maxRetries: sdkMaxRetries,
+    }),
+    { label: `anthropic:${model}`, maxRetries: opts.maxRetries },
   );
 
   let text = '';
