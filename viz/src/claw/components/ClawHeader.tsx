@@ -53,7 +53,7 @@ export function ClawHeader({ company, jurisdiction, industry, daemon, demoMode, 
 
       {demoMode && (
         <div style={styles.demoBanner}>
-          Demo mode {'\u2014'} no backend connected
+          {'\u25cf'} Demo data {'\u2014'} run `lavern claw init` to use real documents
         </div>
       )}
     </div>
@@ -130,14 +130,16 @@ const styles: Record<string, React.CSSProperties> = {
     pointerEvents: 'none' as const,
   },
   demoBanner: {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: fonts.sans,
-    fontWeight: 500,
-    letterSpacing: 0.5,
-    color: 'rgba(184, 134, 11, 0.7)',
+    fontWeight: 700,
+    letterSpacing: 1,
+    textTransform: 'uppercase' as const,
+    color: CLAW.amber,
     marginTop: spacing.md,
-    padding: '4px 10px',
-    backgroundColor: 'rgba(184, 134, 11, 0.08)',
+    padding: '6px 12px',
+    backgroundColor: 'rgba(232, 132, 92, 0.12)',
+    border: `1px solid ${CLAW.amber}`,
     borderRadius: radii.sm,
     display: 'inline-block',
   },
