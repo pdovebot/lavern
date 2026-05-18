@@ -87,7 +87,17 @@ export default function MyCasesView({ onConnectSession, onConnectReplay, onBack 
       ]);
 
       if (sessionsRes.status === 'fulfilled' && sessionsRes.value) {
-        setActiveSessions(sessionsRes.value.sessions ?? []);
+        // Finished sessions linger in the in-memory session manager until the
+        // 4h TTL evicts them, so /api/sessions returns them as "active". They
+        // also have an archive row — surfacing them in both lists makes the
+        // same case appear under Active AND Past. Filter terminal states here
+        // so Active only shows truly in-flight work.
+        const TERMINAL_STEPS = new Set(['delivered', 'complete', 'failed']);
+        setActiveSessions(
+          (sessionsRes.value.sessions ?? []).filter(
+            (s: ActiveSession) => !TERMINAL_STEPS.has(s.currentStep),
+          ),
+        );
       } else if (sessionsRes.status === 'rejected') {
         setError('Unable to load active sessions. Please try again.');
       }

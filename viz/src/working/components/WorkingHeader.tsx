@@ -137,14 +137,16 @@ export function WorkingHeader({
                 ))}
               </>
             )}
-            <button
-              onClick={onHalt}
-              style={styles.btnHalt}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = colors.danger; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = colors.danger; }}
-            >
-              &#9632; STOP
-            </button>
+            {!isReplay && (
+              <button
+                onClick={onHalt}
+                style={styles.btnHalt}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = colors.danger; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = colors.danger; }}
+              >
+                &#9632; STOP
+              </button>
+            )}
             <button onClick={onDisconnect} style={styles.btnDanger}>Disconnect</button>
           </>
         )}
@@ -188,12 +190,14 @@ export function WorkingHeader({
             </span>
           </div>
         )}
-        <button
-          onClick={onSkip}
-          style={styles.navButton}
-          onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
-          onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
-        >Skip &rarr;</button>
+        {!isReplay && (
+          <button
+            onClick={onSkip}
+            style={styles.navButton}
+            onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
+            onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
+          >Skip &rarr;</button>
+        )}
       </div>
     </header>
   );
