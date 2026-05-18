@@ -167,6 +167,10 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
     if (state.pendingGate) return 0;
     if (state.currentStep === 'delivered' || state.currentStep === 'complete') return 0;
     if (state.sessionExpired || state.sessionFailed) return 0;
+    // Replay mode plays back events with their ORIGINAL timestamps, which
+    // can be days old — that would falsely trip the idle threshold against
+    // wall-clock now. The rescue is for stalled LIVE work, not playback.
+    if (state.isReplay) return 0;
     // No events yet — use session open time from the first connection signal.
     // lastEventTimestamp is null until first event; treat as "not stuck yet".
     if (!state.lastEventTimestamp) return 0;
@@ -181,7 +185,7 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
     // stuckTick forces re-evaluation on the interval above
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.sessionId, state.pendingGate, state.currentStep, state.sessionExpired,
-      state.sessionFailed, state.lastEventTimestamp, stuckDismissedAt, stuckTick]);
+      state.sessionFailed, state.isReplay, state.lastEventTimestamp, stuckDismissedAt, stuckTick]);
   const showStuckRescue = idleMinutes > 0;
   const handleStuckDismiss = useCallback(() => {
     setStuckDismissedAt(state.lastEventTimestamp);
@@ -319,6 +323,7 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
         findingCount={totalFindings}
         sessionStartTime={state.events[0]?.timestamp ?? null}
         lastEventTimestamp={state.lastEventTimestamp}
+        replayEndTime={state.isReplay ? state.lastEventTimestamp : null}
       />
 
       {/* Connection Lost banner — visible when WS drops during an active session */}
@@ -342,15 +347,23 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
           <div style={styles.expiredCard}>
             <span style={{ fontFamily: fonts.serif, fontSize: 36, fontWeight: 300, color: colors.text, opacity: 0.5 }}>M</span>
             <h2 style={{ fontFamily: fonts.serif, fontSize: 20, fontWeight: 300, color: colors.text, marginTop: 16 }}>
-              Session Expired
+              {state.isReplay ? 'Event Log Unavailable' : 'Session Expired'}
             </h2>
             <p style={{ fontFamily: fonts.sans, fontSize: 13, color: colors.textSecondary, marginTop: 8, lineHeight: 1.5 }}>
-              This session is no longer available on the server.
-              Sessions are kept for 4 hours after creation.
+              {state.isReplay
+                ? 'No agent-work recording was saved for this case, so there’s nothing to replay. The final deliverable is still available in the case archive.'
+                : 'This session is no longer available on the server. Sessions are kept for 4 hours after creation.'}
             </p>
-            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 }}>
               <button
-                onClick={onBack}
+                onClick={() => {
+                  if (state.isReplay) {
+                    sessionStorage.setItem('shem-from-archive', 'true');
+                    window.location.hash = '#/delivery';
+                  } else {
+                    onBack();
+                  }
+                }}
                 style={{
                   padding: '10px 28px',
                   borderRadius: radii.sm,
@@ -368,7 +381,7 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
                 onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = colors.text; }}
                 onMouseLeave={e => { e.currentTarget.style.backgroundColor = colors.text; e.currentTarget.style.color = '#fff'; }}
               >
-                Start New Session
+                {state.isReplay ? 'Back to Case' : 'Start New Session'}
               </button>
             </div>
           </div>
@@ -390,7 +403,7 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
             <p style={{ fontFamily: fonts.sans, fontSize: 12, color: colors.textDim, marginTop: 8, lineHeight: 1.5 }}>
               Any partial analysis may still be available.
             </p>
-            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 }}>
               <button
                 onClick={onBack}
                 style={{

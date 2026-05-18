@@ -20,6 +20,7 @@ import { agentProfiles } from '../agents/profiles.js';
 import { getOrchestratorForWorkflow } from './orchestrator-mapping.js';
 import { createShemMcpServer } from '../mcp/server.js';
 import { createAuditHooks, initAuditLog } from '../hooks/audit-logger.js';
+import { persistAuditEntry } from '../utils/audit-persistence.js';
 import { createCostHooks } from '../hooks/cost-tracker.js';
 import { createGateHooks } from '../hooks/human-gate.js';
 import { createDynamicPermissions } from '../permissions/dynamic-permissions.js';
@@ -52,6 +53,22 @@ export async function runGenericWorkflow(
   // ── Provider Branch — Mistral parallel execution path ──────────────
   // v18: Per-session provider override (options > session > global config)
   const provider = options.provider ?? session.provider ?? config.provider;
+
+  // Initialize the audit log + event-stream bridge for mistral/local. The
+  // Anthropic path does its own init below (driven by SDK PostToolUse hooks).
+  // Mistral/local emit through the event bus instead, so we mirror every
+  // emitted event into the audit JSONL — that's what /api/replay reads when
+  // the user clicks "View Agent Work" on a finished case.
+  if (provider === 'mistral' || provider === 'local') {
+    session.workflowTemplateId = template.id;
+    session.legalRequest = request;
+    initAuditLog(session);
+    session.events.on('event', (ev: import('../events/event-bus.js').ShemEvent) => {
+      try {
+        persistAuditEntry(session, ev as unknown as import('../types/audit.js').AuditEntry);
+      } catch { /* best-effort; never break workflow on audit-write failure */ }
+    });
+  }
 
   // Managed Agents path (Anthropic beta, scaffold only). The executor is not
   // yet implemented — reject early with a clear message so callers can fall

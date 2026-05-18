@@ -377,7 +377,7 @@ function mapApiResponse(sessionId: string, raw: Record<string, unknown>): Delive
     .filter(f => f.severity === 'RED' || f.severity === 'YELLOW')
     .slice(0, 8)
     .map(f => {
-      const evidence = (f.evidence ?? []).join('; ');
+      const evidence = (Array.isArray(f.evidence) ? f.evidence : []).join('; ');
       const hasEvidence = evidence.length > 0;
       return {
         title: `${f.severity === 'RED' ? '\u26D4' : '\u26A0\uFE0F'} ${f.category.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`,
@@ -434,7 +434,7 @@ function mapApiResponse(sessionId: string, raw: Record<string, unknown>): Delive
       heading: r.passed ? 'Quality gate passed' : 'Quality gate failed',
       body: r.passed
         ? `The evaluator approved the ${r.step.replace(/_/g, ' ')} step output.`
-        : `Issues found: ${(r.failureReasons ?? []).join('; ') || 'unspecified'}.`,
+        : `Issues found: ${(Array.isArray(r.failureReasons) ? r.failureReasons : []).join('; ') || 'unspecified'}.`,
       agents: [],
     });
   }
