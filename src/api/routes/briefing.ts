@@ -18,47 +18,32 @@ import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 const logger = createLogger('BRIEFING');
 const API_KEY_LAZY = createApiKeyAccessor('interview calls');
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const INTERVIEW_MODEL = config.routerModel; // Sonnet — old Haiku was too dumb for interviews
+// Streaming model alias — Sonnet 4.5 covers the router tier on Anthropic.
+// Only the Anthropic streaming branch reads this (non-streaming paths use
+// `crossProviderChat({ tier: 'sonnet' })` which resolves the same model).
+const INTERVIEW_MODEL = config.routerModel;
 
 /**
- * Call Anthropic Messages API directly (non-streaming).
+ * Run a multi-turn briefing call against the active provider.
+ *
+ * Used for the non-streaming finalization step. The streaming
+ * conversational turn (below) still hits Anthropic directly when
+ * config.provider === 'anthropic'; other providers fall back to a
+ * one-shot crossProviderChat call wrapped in an SSE envelope so the
+ * route surface stays identical.
  */
-async function callAnthropic(params: {
+async function callProvider(params: {
   system: string;
   messages: Array<{ role: 'user' | 'assistant'; content: string }>;
   maxTokens?: number;
 }): Promise<string> {
-  const maxTokens = params.maxTokens ?? 4096;
-  const res = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'x-api-key': API_KEY_LAZY.value,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: INTERVIEW_MODEL,
-      max_tokens: maxTokens,
-      thinking: { type: 'enabled', budget_tokens: Math.min(1024, Math.floor(maxTokens * 0.25)) },
-      system: params.system,
-      messages: params.messages,
-    }),
+  const { text } = await crossProviderChat({
+    system: params.system,
+    messages: params.messages,
+    tier: 'sonnet', // INTERVIEW_MODEL was config.routerModel — same tier
+    maxTokens: params.maxTokens ?? 4096,
   });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Anthropic API error (${res.status}): ${errText}`);
-  }
-
-  const data = await res.json() as {
-    content: Array<{ type: string; text?: string }>;
-  };
-
-  // Extract only the text block — skip thinking blocks
-  const textBlock = Array.isArray(data.content)
-    ? data.content.find(b => b.type === 'text')
-    : undefined;
-  return textBlock?.text ?? '';
+  return text;
 }
 
 export function registerBriefingRoutes(fastify: FastifyInstance): void {
@@ -119,7 +104,7 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
           .map(m => `${m.role === 'user' ? 'Client' : 'Interviewer'}: ${m.content}`)
           .join('\n\n');
 
-        const text = await callAnthropic({
+        const text = await callProvider({
           system: systemPrompt,
           messages: [{
             role: 'user',
@@ -192,31 +177,38 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
         'Connection': 'keep-alive',
       });
 
-      // ── Non-Anthropic providers (local / mistral) ────────────────────
-      // crossProviderChat is single-turn + non-streaming, so we flatten the
-      // conversation into a single user message and emit the full reply as
-      // one SSE `text` frame followed by `done`. Local/mistral users opted
-      // out of the cloud streaming UX; appearing-at-once is acceptable.
-      if (config.provider !== 'anthropic' && config.provider !== 'managed') {
-        const conversation = apiMessages
-          .map(m => `${m.role === 'user' ? 'Client' : 'Interviewer'}: ${m.content}`)
-          .join('\n\n');
-
-        const chat = await crossProviderChat({
-          system: systemPrompt,
-          user: `${conversation}\n\nContinue as the Interviewer with your next message. Respond with only what the Interviewer would say next — no labels, no preamble.`,
-          tier: 'sonnet',
-          maxTokens: 1600,
-        });
-
-        // Strip any <thinking>…</thinking> tags the model may have emitted.
-        const cleaned = chat.text.replace(/<thinking>[\s\S]*?<\/thinking>/g, '').trim();
-
-        if (!clientDisconnected && cleaned) {
-          reply.raw.write(`data: ${JSON.stringify({ type: 'text', content: cleaned })}\n\n`);
-        }
-        if (!clientDisconnected) {
-          reply.raw.write(`data: ${JSON.stringify({ type: 'done', turn: turnNumber + 1 })}\n\n`);
+      // ── Non-Anthropic providers: one-shot fallback ──────────────────
+      // Anthropic-native streaming with extended thinking blocks (below)
+      // doesn't translate to Mistral / local Ollama. For those providers
+      // we run a single crossProviderChat call and emit the whole reply
+      // as one SSE text event. Same on-wire envelope, no streaming UX.
+      // The "no model data crosses to api.anthropic.com" guarantee holds.
+      // (`managed` keeps the native streaming path below — it uses the
+      // Anthropic API under the hood.)
+      if (config.provider === 'mistral' || config.provider === 'local') {
+        try {
+          const { text } = await crossProviderChat({
+            system: systemPrompt,
+            messages: apiMessages,
+            tier: 'sonnet',
+            maxTokens: 1600,
+          });
+          // Strip any <thinking>…</thinking> tags the model may have
+          // emitted — some local models leak the scratchpad into output.
+          const cleaned = (text ?? '').replace(/<thinking>[\s\S]*?<\/thinking>/g, '').trim();
+          if (!clientDisconnected && cleaned) {
+            reply.raw.write(`data: ${JSON.stringify({ type: 'text', content: cleaned })}\n\n`);
+          }
+          if (!clientDisconnected) {
+            reply.raw.write(`data: ${JSON.stringify({ type: 'done', turn: turnNumber + 1 })}\n\n`);
+          }
+        } catch (err) {
+          if (!clientDisconnected) {
+            reply.raw.write(`data: ${JSON.stringify({
+              type: 'error',
+              content: err instanceof Error ? err.message : String(err),
+            })}\n\n`);
+          }
         }
         reply.raw.end();
         return;

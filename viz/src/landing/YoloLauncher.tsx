@@ -216,7 +216,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   disclaimerAccent: {
     color: colors.accent,
-    fontStyle: 'italic' as const,
     fontWeight: 500,
   },
 };

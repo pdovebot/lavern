@@ -37,19 +37,19 @@ function SentryFallback() {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      minHeight: '100vh', fontFamily: "'Cormorant Garamond', Georgia, serif",
+      minHeight: '100vh', fontFamily: "'Newsreader', Georgia, serif",
       backgroundColor: '#FAF9F6', color: '#1A1A1A', textAlign: 'center', padding: 40,
     }}>
-      <h1 style={{ fontSize: 36, fontWeight: 300, fontStyle: 'italic', marginBottom: 16 }}>
+      <h1 style={{ fontSize: 36, fontWeight: 300, marginBottom: 16 }}>
         Something went wrong
       </h1>
-      <p style={{ fontSize: 14, fontFamily: "'Inter', sans-serif", color: 'rgba(26,26,26,0.5)', marginBottom: 32, maxWidth: 400 }}>
+      <p style={{ fontSize: 14, fontFamily: "'Geist', sans-serif", color: 'rgba(26,26,26,0.5)', marginBottom: 32, maxWidth: 400 }}>
         An unexpected error occurred. Our team has been notified.
       </p>
       <button
         onClick={() => window.location.reload()}
         style={{
-          padding: '12px 36px', fontSize: 12, fontWeight: 600, fontFamily: "'Inter', sans-serif",
+          padding: '12px 36px', fontSize: 12, fontWeight: 600, fontFamily: "'Geist', sans-serif",
           letterSpacing: 2, textTransform: 'uppercase', color: '#fff', backgroundColor: '#1A1A1A',
           border: '2px solid #1A1A1A', borderRadius: 6, cursor: 'pointer',
         }}

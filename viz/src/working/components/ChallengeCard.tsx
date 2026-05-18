@@ -87,7 +87,6 @@ const styles: Record<string, React.CSSProperties> = {
   challengeLabel: {
     fontSize: 11,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: colors.warning,
   },
   targetRef: {
@@ -137,7 +136,6 @@ const styles: Record<string, React.CSSProperties> = {
   evidenceText: {
     fontSize: 11,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: colors.textDim,
     lineHeight: '1.4',
   },

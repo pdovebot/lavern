@@ -87,7 +87,17 @@ export default function MyCasesView({ onConnectSession, onConnectReplay, onBack 
       ]);
 
       if (sessionsRes.status === 'fulfilled' && sessionsRes.value) {
-        setActiveSessions(sessionsRes.value.sessions ?? []);
+        // Finished sessions linger in the in-memory session manager until the
+        // 4h TTL evicts them, so /api/sessions returns them as "active". They
+        // also have an archive row — surfacing them in both lists makes the
+        // same case appear under Active AND Past. Filter terminal states here
+        // so Active only shows truly in-flight work.
+        const TERMINAL_STEPS = new Set(['delivered', 'complete', 'failed']);
+        setActiveSessions(
+          (sessionsRes.value.sessions ?? []).filter(
+            (s: ActiveSession) => !TERMINAL_STEPS.has(s.currentStep),
+          ),
+        );
       } else if (sessionsRes.status === 'rejected') {
         setError('Unable to load active sessions. Please try again.');
       }
@@ -229,10 +239,12 @@ export default function MyCasesView({ onConnectSession, onConnectReplay, onBack 
 
         <div style={styles.pastGrid}>
           {archivedSessions.slice(0, 20).map((s) => {
-            const tierLabel = s.workflowId ? (WORKFLOW_LABELS[s.workflowId] ?? s.workflowId) : '';
+            const tierLabel = s.workflowId ? (WORKFLOW_LABELS[s.workflowId] ?? s.workflowId) : '—';
             const dateStr = s.completedAt
               ? new Date(s.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-              : '';
+              : 'no date';
+            const findingsStr = s.findingsCount > 0 ? `${s.findingsCount} findings` : 'no findings';
+            const durationStr = s.durationMs > 0 ? formatDuration(s.durationMs) : 'no duration';
             return (
               <div
                 key={s.id}
@@ -242,13 +254,13 @@ export default function MyCasesView({ onConnectSession, onConnectReplay, onBack 
               >
                 <div style={styles.pastCardHeader}>
                   <span style={styles.pastTitle}>{s.title}</span>
-                  {tierLabel && <span style={styles.tierBadge}>{tierLabel}</span>}
+                  <span style={styles.tierBadge}>{tierLabel}</span>
                 </div>
                 <div style={styles.pastMetaRow}>
-                  {s.findingsCount > 0 && <span>{s.findingsCount} findings</span>}
+                  <span>{findingsStr}</span>
                   <span>${s.costUsd.toFixed(2)}</span>
-                  {s.durationMs > 0 && <span>{formatDuration(s.durationMs)}</span>}
-                  {dateStr && <span>{dateStr}</span>}
+                  <span>{durationStr}</span>
+                  <span>{dateStr}</span>
                 </div>
                 <button
                   style={styles.replayButton}
@@ -302,16 +314,15 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap' as const,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 300,
-    fontFamily: fonts.serif,
+    fontSize: 'clamp(20px, 5vw, 28px)',
+    fontWeight: 400,
+    fontFamily: fonts.sans,
     color: colors.text,
     margin: 0,
     letterSpacing: -0.5,
   },
   titleItalic: {
-    fontStyle: 'italic' as const,
-    fontWeight: 300,
+    fontWeight: 500,
   },
   refreshBtn: {
     background: 'none',

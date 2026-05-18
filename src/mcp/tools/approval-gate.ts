@@ -23,14 +23,21 @@ export function createApprovalTools(session: SessionState) {
     ethics_critical: 'ETHICS CRITICAL',
     meaning_critical: 'MEANING CRITICAL',
     final_delivery: 'FINAL DELIVERY',
+    engagement_acceptance: 'ENGAGEMENT ACCEPTANCE',
+    team_selection: 'TEAM SELECTION',
   };
 
   const requestApproval = tool(
     'request_approval',
     'Request human approval at a mandatory gate. Presents the decision to the user and waits for their response. MUST be called before proceeding past ethics analysis (if RED findings), before accepting CRITICAL meaning changes, and before final delivery.',
     {
-      gate_type: z.enum(['ethics_critical', 'meaning_critical', 'final_delivery'])
-        .describe('Type of approval gate'),
+      gate_type: z.enum([
+        'ethics_critical',
+        'meaning_critical',
+        'final_delivery',
+        'engagement_acceptance',
+        'team_selection',
+      ]).describe('Type of approval gate'),
       summary: z.string()
         .describe('Human-readable summary of what needs approval'),
       details: z.string()

@@ -111,17 +111,21 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     gap: 0,
     padding: '16px 0',
+    maxWidth: '100%',
+    flexWrap: 'wrap',
   },
   stepGroup: {
     display: 'flex',
     alignItems: 'center',
     gap: 0,
     position: 'relative',
+    minWidth: 0,
   },
   line: {
     width: 48,
+    minWidth: 12,
     height: 1,
-    flexShrink: 0,
+    flexShrink: 1,
     transition: 'background-color 0.3s ease',
   },
   dot: {

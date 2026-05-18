@@ -1,7 +1,7 @@
 /**
  * FilterBar — Category tabs + sub-group pills + sort dropdown + search input.
  *
- * Warm editorial design — Inter font, paper-tone backgrounds, no neon.
+ * Warm editorial design — Geist font, paper-tone backgrounds, no neon.
  */
 
 import { colors, fonts, radii, spacing, categoryColor } from '../styles/tokens.js';

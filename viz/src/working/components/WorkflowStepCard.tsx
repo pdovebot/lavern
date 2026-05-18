@@ -2,7 +2,7 @@
  * WorkflowStepCard — Beautiful phase transition divider in the feed.
  *
  * v18: Upgraded from plain horizontal rule to warm, editorial-style
- * phase separator with serif italic text and gradient rules.
+ * phase separator with serif text and gradient rules.
  * Includes a warm completion message for the previous step.
  */
 
@@ -92,8 +92,7 @@ const styles: Record<string, React.CSSProperties> = {
   narrative: {
     fontSize: 13,
     fontFamily: fonts.serif,
-    fontWeight: 400,
-    fontStyle: 'italic' as const,
+    fontWeight: 400 as const,
     color: colors.textSecondary,
   },
 };

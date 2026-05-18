@@ -106,7 +106,7 @@ const styles: Record<string, React.CSSProperties> = {
   budgetNum: { fontSize: 20, fontFamily: fonts.serif, fontWeight: 300, color: colors.text },
   budgetDash: { fontSize: 14, color: colors.textDim },
   budgetCurrency: { fontSize: 11, fontFamily: fonts.sans, color: colors.textDim },
-  budgetNote: { fontSize: 11, fontFamily: fonts.sans, color: colors.textDim, fontStyle: 'italic', marginTop: 4 },
+  budgetNote: { fontSize: 11, fontFamily: fonts.sans, color: colors.textDim, marginTop: 4 },
   actions: { display: 'flex', justifyContent: 'flex-end' },
   acceptBtn: { padding: '11px 28px', borderRadius: radii.sm, border: `2px solid ${colors.text}`, backgroundColor: colors.text, color: '#fff', fontFamily: fonts.sans, fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.12)', transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease' },
 };

@@ -1,17 +1,22 @@
 /**
- * FlippableCard — Container with flip animation, hover lift, selection ring.
+ * FlippableCard — Agent tile that opens a full-detail modal on click.
  *
- * Click → flip to back. Click again → flip to front.
- * Separate click target for "select/deselect" vs "flip".
+ * Note: kept the file name for backward compat. The original flip behavior
+ * was replaced with a modal viewer (AgentDetailModal) that shows the full
+ * profile — all strengths, limitations, work style, critical rules,
+ * success metrics — without the line-clamp truncation the card has.
  *
- * Warm editorial design — paper card on ivory background.
+ * Interactions:
+ *   - Click card body → open detail modal
+ *   - Click + button → toggle team membership (stops propagation)
+ *   - Hover → light sweep + lift
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { AgentCard } from './AgentCard.js';
-import { AgentCardBack } from './AgentCardBack.js';
-import { colors, radii } from '../styles/tokens.js';
+import { AgentDetailModal } from './AgentDetailModal.js';
+import { colors, radii, shadows } from '../styles/tokens.js';
 import { injectHolographicStyles } from '../styles/holographic.js';
 import type { AgentProfile } from '../hooks/useAgentProfiles.js';
 
@@ -24,18 +29,22 @@ interface Props {
 }
 
 export function FlippableCard({ profile, selected, onToggle, onFlipSound, onSelectSound }: Props) {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [isViewing, setIsViewing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     injectHolographicStyles();
   }, []);
 
-  const handleFlip = useCallback((e: React.MouseEvent) => {
+  const handleOpen = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFlipped(f => !f);
+    setIsViewing(true);
     onFlipSound?.();
   }, [onFlipSound]);
+
+  const handleClose = useCallback(() => {
+    setIsViewing(false);
+  }, []);
 
   const handleSelect = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -44,45 +53,43 @@ export function FlippableCard({ profile, selected, onToggle, onFlipSound, onSele
   }, [onToggle, profile.role, onSelectSound]);
 
   return (
-    <motion.div
-      style={{
-        width: 220,
-        height: 460,
-        perspective: 1000,
-        cursor: 'pointer',
-      }}
-      variants={{
-        hidden: { opacity: 0, y: 20, scale: 0.95 },
-        visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
-      }}
-      whileHover={{ y: -2 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-    >
+    <>
       <motion.div
         style={{
-          width: '100%',
-          height: '100%',
-          position: 'relative',
-          transformStyle: 'preserve-3d',
+          width: 220,
+          height: 460,
+          cursor: 'pointer',
         }}
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+        variants={{
+          hidden: { opacity: 0, y: 20, scale: 0.95 },
+          visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+        }}
+        whileHover={{ y: -2 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        onClick={handleOpen}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsViewing(true); } }}
+        aria-label={`View full profile for ${profile.displayName}`}
       >
-        {/* Front face */}
         <div
           style={{
-            ...faceBase,
-            backfaceVisibility: 'hidden',
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            borderRadius: radii.lg,
+            backgroundColor: colors.bgCard,
+            overflow: 'hidden',
             border: `1px solid ${selected ? colors.text : isHovered ? colors.borderHover : colors.border}`,
             boxShadow: selected
-              ? `0 0 0 1px ${colors.text}, 0 2px 8px rgba(0,0,0,0.06)`
+              ? shadows.selected
               : isHovered
-                ? '0 4px 16px rgba(0,0,0,0.08)'
-                : '0 1px 4px rgba(0,0,0,0.04)',
+                ? shadows.lg
+                : shadows.sm,
+            transition: 'border-color 0.25s cubic-bezier(0.28,0.11,0.32,1), box-shadow 0.35s cubic-bezier(0.28,0.11,0.32,1), transform 0.35s cubic-bezier(0.28,0.11,0.32,1)',
           }}
-          onClick={handleFlip}
         >
           <AgentCard profile={profile} selected={selected} />
 
@@ -121,38 +128,20 @@ export function FlippableCard({ profile, selected, onToggle, onFlipSound, onSele
               backdropFilter: 'blur(4px)',
             }}
             onClick={handleSelect}
+            aria-label={selected ? `Remove ${profile.displayName} from team` : `Add ${profile.displayName} to team`}
             title={selected ? 'Remove from team' : 'Add to team'}
           >
-            {selected ? '\u2713' : '+'}
+            {selected ? '✓' : '+'}
           </button>
         </div>
-
-        {/* Back face */}
-        <div
-          style={{
-            ...faceBase,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            border: `1px solid ${selected ? colors.text : colors.border}`,
-            boxShadow: selected
-              ? `0 0 0 1px ${colors.text}, 0 2px 8px rgba(0,0,0,0.06)`
-              : '0 1px 4px rgba(0,0,0,0.04)',
-          }}
-          onClick={handleFlip}
-        >
-          <AgentCardBack profile={profile} />
-        </div>
       </motion.div>
-    </motion.div>
+
+      <AgentDetailModal
+        profile={isViewing ? profile : null}
+        selected={selected}
+        onClose={handleClose}
+        onToggle={onToggle}
+      />
+    </>
   );
 }
-
-const faceBase: React.CSSProperties = {
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
-  borderRadius: radii.lg,
-  backgroundColor: colors.bgCard,
-  overflow: 'hidden',
-  transition: 'border-color 0.2s ease, box-shadow 0.3s ease',
-};

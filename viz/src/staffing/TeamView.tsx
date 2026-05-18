@@ -317,34 +317,36 @@ export default function TeamView({ onTeamConfirmed, onBack, onSkip }: Props) {
 
   return (
     <div style={styles.container}>
-      {/* Header */}
-      <div style={styles.header}>
-        <div style={styles.headerLeft}>
+      {/* Nav row \u2014 back/skip aligned to viewport edges */}
+      <div style={styles.navRow}>
+        <button
+          onClick={onBack}
+          style={styles.backButton}
+          onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
+          onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
+        >
+          {'\u2190'} Strategy
+        </button>
+        {onSkip && (
           <button
-            onClick={onBack}
-            style={styles.backButton}
-            onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
-            onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
+            onClick={onSkip}
+            disabled={teamSize === 0}
+            style={{
+              ...styles.skipButton,
+              opacity: teamSize === 0 ? 0.35 : 1,
+              cursor: teamSize === 0 ? 'default' : 'pointer',
+            }}
+            onMouseEnter={e => { if (teamSize === 0) return; const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; b.style.borderColor = colors.text; }}
+            onMouseLeave={e => { if (teamSize === 0) return; const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.textMuted; b.style.borderColor = colors.border; }}
           >
-            {'\u2190'} Strategy
+            Skip {'\u2192'}
           </button>
-          <h1 style={styles.title}>Lavern <span style={{ fontStyle: 'italic' }}>Team</span></h1>
-          {onSkip && (
-            <button
-              onClick={onSkip}
-              disabled={teamSize === 0}
-              style={{
-                ...styles.skipButton,
-                opacity: teamSize === 0 ? 0.35 : 1,
-                cursor: teamSize === 0 ? 'default' : 'pointer',
-              }}
-              onMouseEnter={e => { if (teamSize === 0) return; const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; b.style.borderColor = colors.text; }}
-              onMouseLeave={e => { if (teamSize === 0) return; const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.textMuted; b.style.borderColor = colors.border; }}
-            >
-              Skip {'\u2192'}
-            </button>
-          )}
-        </div>
+        )}
+      </div>
+
+      {/* Title + loading hint \u2014 share content-edge */}
+      <div style={styles.titleRow}>
+        <h1 style={styles.title}>Lavern <span style={{ fontWeight: 500 }}>Team</span></h1>
         {recommendationLoading && (
           <span style={styles.loadingHint}>{'\u2022'} loading recommendations...</span>
         )}
@@ -600,17 +602,18 @@ const styles: Record<string, React.CSSProperties> = {
     borderLeft: `3px solid rgba(184, 134, 11, 0.4)`,
     marginBottom: spacing.md,
   },
-  header: {
+  navRow: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: spacing.xl,
   },
-  headerLeft: {
+  titleRow: {
     display: 'flex',
     alignItems: 'baseline',
-    gap: spacing.lg,
-    width: '100%',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    marginBottom: spacing.xs,
   },
   backButton: {
     padding: '6px 14px',
@@ -642,9 +645,9 @@ const styles: Record<string, React.CSSProperties> = {
     transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 300,
-    fontFamily: fonts.serif,
+    fontSize: 'clamp(22px, 5.5vw, 32px)',
+    fontWeight: 400,
+    fontFamily: fonts.sans,
     color: colors.text,
     letterSpacing: -0.5,
     margin: 0,
@@ -668,7 +671,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic',
     flexShrink: 0,
   },
   loadingMessage: {

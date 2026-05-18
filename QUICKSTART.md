@@ -51,15 +51,44 @@ npm run serve:dev
 cd viz && npm run dev
 ```
 
-Open <http://localhost:5173>.
+Open <http://localhost:5173>. You should see Lavern's landing page within a few seconds.
 
-## First engagement
+## ⚠️ Add your Anthropic key to actually process documents
 
-1. From the landing page, click **Start an engagement**.
-2. Upload a contract (your own — or any sample contract you have lying around).
+Demo mode gets you the full UI — landing page, auth, Clawern dashboard, agent profiles, the works — but it cannot run real engagements without an API key.
+
+1. Run `npm run setup` (or copy `.env.example` to `.env` manually — `setup` runs on first launch).
+2. Choose your provider and set the matching key (`ANTHROPIC_API_KEY=sk-ant-...` or `MISTRAL_API_KEY=...`).
+3. Restart Terminal 1 (`npm run serve:dev`).
+
+EU teams: set `LAVERN_PROVIDER=mistral` and `MISTRAL_API_KEY=...` to route every LLM call — orchestrator, agents, debate, verification, briefing analyser, partner-mode chat, agent-builder personality, Clawern processing — through Mistral instead of Anthropic. The Anthropic-streaming paths (briefing interview, partner consult) fall back to a one-shot completion that the route then SSE-emits as a single chunk, so the UI stays identical; no document content reaches `api.anthropic.com` when Mistral is the configured provider.
+
+## Verify the install
+
+```bash
+npx lavern doctor          # Health check: Node version, deps, ports, .env, API key
+npx lavern --help          # Usage banner + option list
+```
+
+`doctor` runs a first-90-seconds preflight: Node version, native sqlite binding, dashboard deps, ports 3000 and 5173, `.env` state, and (informational) whether `ANTHROPIC_API_KEY` is set. If anything is red, fix it before starting the servers.
+
+## First engagement (CLI)
+
+A short, fabricated SaaS Terms of Service ships in `samples/`. With your `ANTHROPIC_API_KEY` set:
+
+```bash
+npx lavern samples/sample-terms-of-service.txt --workflow review
+```
+
+The team picks itself, opens a debate, runs three-layer verification, and lands at a gate before the final deliverable.
+
+## First engagement (dashboard)
+
+1. From the landing page, click **Step In**.
+2. Upload `samples/sample-terms-of-service.txt` (or paste its contents). Bring your own contract if you prefer.
 3. Answer the 3–5 intake questions in the Briefing chat.
 4. Accept the suggested team and workflow, or customize.
-5. Watch the **Working** view — agents analyze, post findings, debate, and resolve disputes in real time.
+5. Watch the **Working** view. Agents analyze, post findings, debate, and resolve disputes in real time.
 6. When a gate fires, approve or reject the team's critical findings.
 7. Read the **Delivery** view: the user-facing document, the legal review package, the scorecard, the full audit trail.
 
@@ -108,7 +137,7 @@ Customize:
 
 ## What's in the box
 
-**67 agents** · **21 MCP tools** · **9 workflows** · **5 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · LEDGAR) · **3 inference providers** (Local Ollama · Anthropic · Mistral EU) · **1,695 tests** across 108 files.
+**67 agents** · **21 MCP tools** · **9 workflows** · **6 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · ContractNLI · LEDGAR) · **3 inference providers** (Local Ollama · Anthropic · Mistral EU) · **1,620 tests** across 105 files.
 
 Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/architecture/](https://lavern.ai/architecture/).
 
@@ -117,7 +146,7 @@ Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/a
 - **`npm install` fails on `better-sqlite3`** → you need a working C/C++ toolchain. macOS: `xcode-select --install`. Linux: `apt install build-essential`. Windows: WSL2 is easier than native.
 - **Ollama daemon not reachable** → setup pings `http://localhost:11434`. Start it with `ollama serve` (or open Ollama.app on macOS), then re-run `npm run setup`.
 - **Dashboard loads but shows "Connection lost"** → the API server didn't start, or stopped. Check the terminal where you ran `npm run dev -- --serve` (or `npm run serve:dev`). The dashboard talks to it over WebSocket.
-- **An engagement won't start with no provider configured** → Lavern boots in demo mode (UI works, processing doesn't) until `.env` is filled in. Re-run `npm run setup` or set `LAVERN_PROVIDER` plus the matching key directly in `.env`.
+- **An engagement won't start with no provider configured** → Lavern boots in demo mode (UI works, processing doesn't) until `.env` is filled in. Re-run `npm run setup` or set `LAVERN_PROVIDER` plus the matching key (`ANTHROPIC_API_KEY` or `MISTRAL_API_KEY`) directly in `.env`.
 - **Agents are slow, or seem to stall** → Lavern auto-retries cloud API calls on transient 429/500s with exponential backoff (1s → 2s → 4s). Watch the terminal logs for retry events. Sustained retries mean your API key is rate-limited. On Local, slow generation usually means the model is CPU-only — check Ollama is using your GPU.
 - **I want to try without installing** → there is no hosted demo right now. Watch the video at [lavern.ai](https://lavern.ai); the install above is 60 seconds.
 

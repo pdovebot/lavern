@@ -6,8 +6,7 @@
  *   1. Build from scratch   → opens the 3-step wizard blank
  *   2. Clone yourself       → paste bio / upload CV → LLM generates a profile
  *                             that lands pre-filled in the wizard
- *   3. Import team          → pick a previously-saved team and jump straight
- *                             into a new engagement with that roster
+ *   3. Clone a firm         → paste a firm homepage → LLM extracts a team
  *
  * The hub replaces the old "wizard-only" entry so the page reads as a
  * set of options, not a forced linear flow.
@@ -15,7 +14,6 @@
 
 import { useState, useCallback } from 'react';
 import { colors, fonts, radii, spacing } from '../../staffing/styles/tokens.js';
-import { useUserProfile } from '../../my-page/hooks/useUserProfile.js';
 import { useCustomAgents } from '../hooks/useCustomAgents.js';
 import { CloneFromProfilePanel } from './CloneFromProfilePanel.js';
 import { CloneFromFirmPanel } from './CloneFromFirmPanel.js';
@@ -24,7 +22,7 @@ import { ImportAgentModal } from './ImportAgentModal.js';
 import { GOBLIN_PROFILE, GOBLIN_AVATAR_URL } from '../data/goblinProfile.js';
 import { JUDE_CLAW_PROFILE } from '../data/judeClawProfile.js';
 import type { CustomAgent } from '../hooks/useCustomAgents.js';
-import type { AgentProfile } from '../../types/agent-profile.js';
+import type { AgentProfile, AgentProvenance } from '../../types/agent-profile.js';
 
 interface CloneData {
   displayName?: string;
@@ -45,14 +43,15 @@ interface Props {
   onCloneComplete: (data: CloneData) => void;
   /** Called with the N firm-cloned profiles the user wants saved to their roster. */
   onFirmCloneComplete: (profiles: AgentProfile[], firmName: string) => void;
+  /** Called when a pre-built profile (Goblin / Jude Claw) is summoned — opens
+   *  the card reveal in the parent view instead of adding silently. */
+  onPreviewAgent?: (profile: AgentProfile, provenance: AgentProvenance) => void;
 }
 
 type HubMode = 'menu' | 'clone' | 'clone-firm';
 
-export function AgentBuilderHub({ onBuildFromScratch, onCloneComplete, onFirmCloneComplete }: Props) {
+export function AgentBuilderHub({ onBuildFromScratch, onCloneComplete, onFirmCloneComplete, onPreviewAgent }: Props) {
   const [mode, setMode] = useState<HubMode>('menu');
-  const { profile } = useUserProfile();
-  const savedTeams = profile.savedTeams;
   const { agents: customAgents, addAgent, removeAgent, setShareToken, clearShareToken } = useCustomAgents();
   const [goblinSummoned, setGoblinSummoned] = useState(false);
   const [sharingAgent, setSharingAgent] = useState<CustomAgent | null>(null);
@@ -65,23 +64,26 @@ export function AgentBuilderHub({ onBuildFromScratch, onCloneComplete, onFirmClo
   }, [removeAgent]);
 
   const handleSummonGoblin = useCallback(() => {
-    addAgent(GOBLIN_PROFILE, { kind: 'goblin' });
     setGoblinSummoned(true);
-    // Reset the "summoned" pulse after the animation
     setTimeout(() => setGoblinSummoned(false), 2000);
-  }, [addAgent]);
+    if (onPreviewAgent) {
+      onPreviewAgent(GOBLIN_PROFILE, { kind: 'goblin' });
+    } else {
+      // Fallback for old call sites without the preview callback wired.
+      addAgent(GOBLIN_PROFILE, { kind: 'goblin' });
+    }
+  }, [addAgent, onPreviewAgent]);
 
   const [judeHired, setJudeHired] = useState(false);
   const handleHireJudeClaw = useCallback(() => {
-    addAgent(JUDE_CLAW_PROFILE, { kind: 'scratch' });
     setJudeHired(true);
     setTimeout(() => setJudeHired(false), 2000);
-  }, [addAgent]);
-
-  const handleImportTeam = useCallback((roles: string[]) => {
-    sessionStorage.setItem('shem-briefing-team', JSON.stringify(roles));
-    window.location.hash = '#/strategy';
-  }, []);
+    if (onPreviewAgent) {
+      onPreviewAgent(JUDE_CLAW_PROFILE, { kind: 'scratch' });
+    } else {
+      addAgent(JUDE_CLAW_PROFILE, { kind: 'scratch' });
+    }
+  }, [addAgent, onPreviewAgent]);
 
   if (mode === 'clone') {
     return (
@@ -119,7 +121,7 @@ export function AgentBuilderHub({ onBuildFromScratch, onCloneComplete, onFirmClo
       <div style={styles.header}>
         <div style={styles.headerTitle}>Start with an agent</div>
         <div style={styles.headerSub}>
-          Build one from scratch, clone from a real person, or bring back a team you've used before.
+          Build one from scratch, clone from a real person, or mint a team from a firm's homepage.
         </div>
       </div>
 
@@ -174,53 +176,6 @@ export function AgentBuilderHub({ onBuildFromScratch, onCloneComplete, onFirmClo
           }
         />
 
-        {/* ── Card 4: Import team ─────────────────────────────── */}
-        <HubCard
-          accent="#6b5a3f"
-          title="Import a team"
-          description={savedTeams.length > 0
-            ? `${savedTeams.length} saved ${savedTeams.length === 1 ? 'team' : 'teams'}. Re-use a roster you've built before.`
-            : 'No saved teams yet. Save a team from Staffing to see it here.'}
-          ctaLabel={savedTeams.length > 0 ? 'Browse teams' : undefined}
-          onClick={savedTeams.length > 0 ? undefined : undefined}
-          disabled={savedTeams.length === 0}
-          icon={
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-          }
-        >
-          {savedTeams.length > 0 && (
-            <div style={styles.teamList}>
-              {savedTeams.slice(0, 5).map(team => (
-                <button
-                  key={team.id}
-                  onClick={() => handleImportTeam(team.roles)}
-                  style={styles.teamRow}
-                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(107, 90, 63, 0.08)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                >
-                  <div style={styles.teamRowLeft}>
-                    <span style={styles.teamName}>{team.name}</span>
-                    <span style={styles.teamMeta}>
-                      {team.teamSize} {team.teamSize === 1 ? 'agent' : 'agents'}
-                      {team.description ? ` \u00B7 ${team.description}` : ''}
-                    </span>
-                  </div>
-                  <span style={styles.teamUse}>Use {'\u2192'}</span>
-                </button>
-              ))}
-              {savedTeams.length > 5 && (
-                <div style={styles.teamOverflow}>
-                  +{savedTeams.length - 5} more in My Page
-                </div>
-              )}
-            </div>
-          )}
-        </HubCard>
       </div>
 
       {/* ── Your roster — list + delete custom agents ──────────────── */}
@@ -587,7 +542,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     color: colors.textMuted,
     padding: '6px 10px',
-    fontStyle: 'italic',
   },
   // ── Your-roster section ──────────────────────────────────────────────
   roster: {
@@ -737,6 +691,5 @@ const styles: Record<string, React.CSSProperties> = {
   importHint: {
     fontSize: 12,
     color: colors.textMuted,
-    fontStyle: 'italic',
   },
 };

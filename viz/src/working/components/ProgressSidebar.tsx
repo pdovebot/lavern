@@ -217,7 +217,7 @@ function AgentChecklist({
       {/* Active with no items yet — show pulsing placeholder */}
       {isActive && agent.items.length === 0 && !currentTool && (
         <div style={styles.taskLine}>
-          <span style={{ ...styles.taskText, fontStyle: 'italic' }}>Starting up...</span>
+          <span style={{ ...styles.taskText }}>Starting up...</span>
         </div>
       )}
     </div>
@@ -672,7 +672,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   itemTextActive: {
     color: colors.textMuted,
-    fontStyle: 'italic' as const,
   },
   itemTextFinding: {
     color: colors.warning,

@@ -238,7 +238,6 @@ const styles: Record<string, React.CSSProperties> = {
   sub: { fontSize: 13, color: 'rgba(245,239,223,0.6)', lineHeight: 1.5 },
   warning: {
     fontSize: 11, color: '#E8845C', marginTop: 4,
-    fontStyle: 'italic',
   },
   chipsWrap: {
     display: 'flex', flexWrap: 'wrap', gap: 8,

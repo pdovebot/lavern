@@ -118,7 +118,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     fontFamily: fonts.sans,
     color: colors.textSecondary,
-    fontStyle: 'italic',
     lineHeight: 1.5,
     margin: `0 0 ${spacing.md}px`,
   },

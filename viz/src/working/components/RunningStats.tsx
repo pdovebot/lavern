@@ -19,6 +19,10 @@ interface RunningStatsProps {
   certaintyPct: number | undefined;
   /** Freeze the elapsed timer (e.g. once the session is delivered). */
   frozen?: boolean;
+  /** When set, show (endTime - sessionStartTime) as a frozen duration instead
+   *  of wall-clock elapsed. Used in replay mode so the timer shows the
+   *  original run length, not days since the session started. */
+  endTime?: string | null;
 }
 
 function formatElapsed(ms: number): string {
@@ -34,6 +38,7 @@ export function RunningStats({
   cost,
   certaintyPct,
   frozen,
+  endTime,
 }: RunningStatsProps) {
   const [elapsed, setElapsed] = useState('0:00');
 
@@ -41,12 +46,20 @@ export function RunningStats({
   useEffect(() => {
     if (!sessionStartTime) return;
     const start = new Date(sessionStartTime).getTime();
+    // Replay / archived view: show the original run duration, frozen.
+    if (endTime) {
+      const end = new Date(endTime).getTime();
+      if (Number.isFinite(end) && end >= start) {
+        setElapsed(formatElapsed(end - start));
+        return;
+      }
+    }
     const update = () => setElapsed(formatElapsed(Date.now() - start));
     update();
     if (frozen) return;
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
-  }, [sessionStartTime, frozen]);
+  }, [sessionStartTime, frozen, endTime]);
 
   return (
     <div style={styles.container}>

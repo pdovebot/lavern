@@ -191,16 +191,15 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '60px 24px 36px',
   },
   loading: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 22,
     color: 'rgba(245,239,223,0.55)',
-    fontStyle: 'italic',
   },
   errorBox: {
     maxWidth: 480, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 16,
   },
   errorTitle: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 36, fontWeight: 500,
   },
   errorMsg: { color: 'rgba(245,239,223,0.7)', fontSize: 14, lineHeight: 1.6 },
@@ -227,7 +226,7 @@ const styles: Record<string, React.CSSProperties> = {
   avatar: { width: '100%', height: '100%', objectFit: 'cover' },
   nameCol: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 },
   name: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 64, fontWeight: 500, lineHeight: 1.0, letterSpacing: -1.2,
     color: '#FAF7F0',
   },
@@ -236,8 +235,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#E8845C', fontWeight: 600, marginTop: 6,
   },
   tagline: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
-    fontStyle: 'italic',
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 24, color: 'rgba(245,239,223,0.8)',
     lineHeight: 1.45,
     maxWidth: 600,
@@ -248,7 +246,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   skill: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 },
   skillValue: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 36, color: '#FAF7F0', lineHeight: 1, fontWeight: 500,
   },
   skillMax: { fontSize: 16, color: 'rgba(245,239,223,0.4)' },
@@ -258,7 +256,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   workStyle: {
     maxWidth: 520, fontSize: 14, lineHeight: 1.65,
-    color: 'rgba(245,239,223,0.65)', fontStyle: 'italic',
+    color: 'rgba(245,239,223,0.65)',
     paddingTop: 8,
   },
   cta: {
@@ -280,7 +278,7 @@ const styles: Record<string, React.CSSProperties> = {
     paddingTop: 48,
   },
   wordmark: {
-    fontFamily: `'Cormorant Garamond', Georgia, serif`,
+    fontFamily: `'Newsreader', Georgia, serif`,
     fontSize: 22, letterSpacing: 4, color: '#FAF7F0', fontWeight: 500,
   },
   footerMeta: { fontSize: 10, letterSpacing: 1.2, color: 'rgba(245,239,223,0.4)' },

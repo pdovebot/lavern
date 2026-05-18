@@ -28,15 +28,16 @@ export const GOBLIN_PROFILE: AgentProfile = {
   seniority: 'counsel',
   costTier: 'opus',
   billingRateUsd: 0,
+  // Overpowered. The goblin is a meme; the meme is, the goblin is the best.
   skills: {
-    precision:     9,
-    creativity:    9,
-    speed:         7,
+    precision:     10,
+    creativity:    10,
+    speed:         10,
     depth:         10,
-    negotiation:   7,
-    communication: 8,
+    negotiation:   10,
+    communication: 10,
     research:      10,
-    risk:          8,
+    risk:          10,
   },
   personality: {
     archetype: 'The Goblin in the Cellar',

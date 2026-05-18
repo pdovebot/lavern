@@ -39,7 +39,6 @@ const styles: Record<string, React.CSSProperties> = {
   empty: {
     fontSize: 14,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: CLAW.textMuted,
     padding: `${spacing.xxl}px`,
     textAlign: 'center' as const,

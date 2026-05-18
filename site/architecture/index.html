@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>How Lavern Works: Architecture of a Driverless Law Firm</title>
-  <meta name="description" content="Technical deep-dive into building a driverless law firm. Multi-agent debate, iterative verification, the lighthouse architecture, institutional memory that compounds.">
+  <title>How Lavern Works: Architecture of an Agentic Law Firm</title>
+  <meta name="description" content="Technical deep-dive into an agentic law firm. Multi-agent debate, iterative verification, the lighthouse architecture, institutional memory that compounds.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -101,7 +101,7 @@
 
     <div class="header">
       <div class="header-mark">LAVERN</div>
-      <h1>Architecture of a<br><em>Driverless Law Firm.</em></h1>
+      <h1>Architecture of an<br><em>Agentic Law Firm.</em></h1>
     </div>
 
     <div class="intro-box">
@@ -805,7 +805,7 @@
       <p>A law firm can't crash. It can't lose data. It can't expose confidential information in a notification. It can't silently stop watching for new documents. These are the basics.</p>
 
       <div class="features">
-        <div class="feat"><div class="feat-title">1,695 Tests</div><div class="feat-desc">108 test files. Unit tests, integration tests, edge case hardening across every layer of the system. Zero security advisories in production dependencies.</div></div>
+        <div class="feat"><div class="feat-title">1,677 Tests</div><div class="feat-desc">109 test files. Edge-case hardening across every layer of the system. Zero security advisories in production dependencies.</div></div>
         <div class="feat"><div class="feat-title">Audit Trail</div><div class="feat-desc">Append-only JSON lines log. Every action recorded with initiator, timestamp, and details. Rotation at 5MB, 3 rotated files. The firm keeps records.</div></div>
         <div class="feat"><div class="feat-title">Daily Backups</div><div class="feat-desc">State, precedents, and profile backed up daily with 30-day retention. Recoverable after any failure. Your institutional memory is protected.</div></div>
         <div class="feat"><div class="feat-title">Prometheus Metrics</div><div class="feat-desc">GET /api/claw/metrics exports documents processed, findings by severity, budget utilization, session counts, precedent activity. Observable from any monitoring stack.</div></div>
@@ -900,7 +900,7 @@
     <hr>
 
     <div class="section" style="margin-bottom:40px">
-      <p>Lavern is an early-stage system building toward a specific vision. Sixty-six agents. Eight workflows. A three-persona lighthouse for autonomous local mode. A firm that runs on a 30-minute heartbeat, learns from every engagement, and keeps your data on your machine unless you decide otherwise.</p>
+      <p>Lavern is an early-stage system building toward a specific vision. Sixty-seven agents. Nine workflows. A three-persona lighthouse for autonomous local mode. A firm that runs on a 30-minute heartbeat, learns from every engagement, and keeps your data on your machine unless you decide otherwise. Open source under Apache 2.0; the source for everything described on this page lives at <a href="https://github.com/AnttiHero/lavern" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(232,132,92,0.3)">github.com/AnttiHero/lavern</a>.</p>
       <p>The analogy is different from anything else in the space, and the architecture follows from that difference. An AI tool waits for you to prompt it. A law firm on retainer works while you sleep — and gets sharper the longer it runs.</p>
       <p style="margin-top:8px">Interested in what this looks like in practice? Read <a href="/writing/" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(232,132,92,0.3)">what we learned building it</a> — the surprises, the failures, and the things that actually worked.</p>
     </div>

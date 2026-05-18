@@ -59,6 +59,7 @@ const ResetPasswordView = lazy(() => import('./auth/ResetPasswordView.js'));
 const QuickStartView = lazy(() => import('./landing/QuickStartView.js'));
 const ClawView = lazy(() => import('./claw/ClawView.js'));
 const ClawLiveView = lazy(() => import('./claw/ClawLiveView.js'));
+const RalphLoopView = lazy(() => import('./ralph/RalphLoopView.js'));
 const DispatchView = lazy(() => import('./dispatch/DispatchView.js'));
 const ArchiveView = lazy(() => import('./archive/ArchiveView.js'));
 const ChallengeView = lazy(() => import('./challenge/ChallengeView.js'));
@@ -66,14 +67,22 @@ const AgentBuilderView = lazy(() => import('./agent-builder/AgentBuilderView.js'
 const PublicAgentShareView = lazy(() => import('./agent-builder/PublicAgentShareView.js'));
 const PublicTeamShareView = lazy(() => import('./agent-builder/PublicTeamShareView.js'));
 const LegalView = lazy(() => import('./legal/LegalView.js'));
-const FoyerView = lazy(() => import('./landing/FoyerView.js'));
 const PartnerView = lazy(() => import('./partner/PartnerView.js'));
 const ShowcaseView = lazy(() => import('./showcase/ShowcaseView.js'));
 
-type AppView = 'foyer' | 'partner' | 'quickstart' | 'landing' | 'lobby' | 'login' | 'reset-password' | 'verify-email' | 'dashboard' | 'intake' | 'briefing' | 'strategy' | 'team' | 'working' | 'delivery' | 'my-page' | 'my-cases' | 'agent-docs' |'claw' | 'claw-live' | 'dispatch' | 'archive' | 'challenge' | 'agent-builder' | 'shared-agent' | 'shared-team' | 'terms' | 'privacy' | 'showcase' | 'demo';
+type AppView = 'foyer' | 'partner' | 'quickstart' | 'landing' | 'lobby' | 'login' | 'reset-password' | 'verify-email' | 'dashboard' | 'intake' | 'briefing' | 'strategy' | 'team' | 'working' | 'delivery' | 'my-page' | 'my-cases' | 'agent-docs' |'claw' | 'claw-live' | 'dispatch' | 'archive' | 'challenge' | 'agent-builder' | 'shared-agent' | 'shared-team' | 'terms' | 'privacy' | 'showcase' | 'demo' | 'ralph';
 
 function getViewFromHash(): AppView {
   const hash = window.location.hash;
+  // The marketing site embeds this SPA at lavern.ai/demo/ via
+  // VITE_BASE_PATH=/demo/ — so when the bundle is served from that
+  // subpath AND no hash route is set, the visitor is here for the
+  // cinematic tour. Surface it as the default view, otherwise the
+  // bare URL lavern.ai/demo/ would render `foyer` (or `landing`)
+  // and the nav-pill click would feel broken.
+  if (typeof window !== 'undefined' && !hash && window.location.pathname.startsWith('/demo/')) {
+    return 'demo';
+  }
   if (hash.startsWith('#/quickstart')) return 'quickstart';
   if (hash.startsWith('#/partner')) return 'partner';
   if (hash.startsWith('#/lobby')) return 'lobby';
@@ -95,6 +104,7 @@ function getViewFromHash(): AppView {
   if (hash.startsWith('#/dispatch')) return 'dispatch';
   if (hash.startsWith('#/claw-live')) return 'claw-live';
   if (hash.startsWith('#/claw')) return 'claw';
+  if (hash.startsWith('#/ralph')) return 'ralph';
   if (hash.startsWith('#/archive')) return 'archive';
   if (hash.startsWith('#/challenge')) return 'challenge';
   if (hash.startsWith('#/agent-builder')) return 'agent-builder';
@@ -154,9 +164,9 @@ function VerifyEmailHandler() {
   }, []);
 
   return (
-    <div style={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0ede8', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0ede8', fontFamily: 'Geist, sans-serif' }}>
       <div style={{ textAlign: 'center', maxWidth: 400, padding: 32 }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, fontWeight: 300, fontStyle: 'italic', marginBottom: 16 }}>
+        <h2 style={{ fontFamily: "'Newsreader', serif", fontSize: 24, fontWeight: 300, marginBottom: 16 }}>
           {status === 'verifying' ? 'Verifying...' : status === 'success' ? 'Verified' : 'Error'}
         </h2>
         <p style={{ fontSize: 14, color: '#6b6560', lineHeight: 1.6 }}>{message}</p>
@@ -1064,6 +1074,21 @@ export function App() {
     );
   }
 
+  // ── Ralph — goal-driven loop. He keeps going until done. ─────────────
+  if (view === 'ralph') {
+    return (
+      <ErrorBoundary>
+        {skipLink}
+        {toast}
+        {offlineBanner}
+        {cursor}
+        <Suspense fallback={<ViewFallback text="Loading Ralph..." />}>
+          <RalphLoopView onBack={() => { window.location.hash = '#/'; }} />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   // ── Dispatch — Voice command interface ────────────────────────────────
   if (view === 'dispatch') {
     return (
@@ -1188,7 +1213,7 @@ export function App() {
     );
   }
 
-  // ── Foyer — the new default landing ─────────────────────────────────
+  // ── QuickStart — the new default landing ───────────────────────────
   return (
     <ErrorBoundary>
       {skipLink}
@@ -1196,14 +1221,11 @@ export function App() {
       {offlineBanner}
       {verifyBanner}
       {cursor}
-      <Suspense fallback={<div style={{ width: '100%', height: '100vh', backgroundColor: '#f0ede8' }} />}>
-        <FoyerView
-          onPartner={() => { window.location.hash = '#/partner'; }}
-          onQuickStart={() => { window.location.hash = '#/quickstart'; }}
-          onMyPage={() => { window.location.hash = '#/my-page'; }}
-          onLogin={() => { window.location.hash = '#/login'; }}
-          onAgentDocs={() => { window.location.hash = '#/agent-docs'; }}
-          onDemo={() => { window.location.hash = '#/demo'; }}
+      <Suspense fallback={<ViewFallback text="Loading..." />}>
+        <QuickStartView
+          onQuickStart={handleQuickStart}
+          onGuidedFlow={() => { window.location.hash = '#/intake'; }}
+          onChallenge={() => { window.location.hash = '#/challenge'; }}
         />
       </Suspense>
     </ErrorBoundary>

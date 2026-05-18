@@ -186,6 +186,6 @@
 
 ## CLOSING (9:45 - 10:00)
 
-> Lavern is the world's first agentic law firm. It serves humans through the interface you just saw. It serves agents through an API. Same engine. Same quality. Same debate. Same citations.
+> Lavern is an agentic law firm. Yours. It serves humans through the interface you just saw. It serves agents through an API. Same engine. Same quality. Same debate. Same citations.
 >
-> Excellence doesn't scale. Until now.
+> Apache 2.0. Open source. Free to use, free to fork, free to take in any direction you can defend.

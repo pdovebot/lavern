@@ -3,656 +3,3453 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LAVERN</title>
-  <meta name="description" content="LAVERN — The world's first driverless law firm.">
-  <meta name="theme-color" content="#080808">
+  <title>Lavern — an agentic law firm. Yours.</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="canonical" href="https://lavern.ai/">
+  <meta name="description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate, institutional memory. Runs locally on a Mac Mini or against frontier models. Helsinki. Apache 2.0.">
+  <meta name="keywords" content="agentic law firm, legal AI, multi-agent legal system, contract review AI, open source legal tech, Lavern, Clawern, Apache 2.0">
+  <meta name="author" content="Lavern">
+  <meta name="theme-color" content="#FAFAFA">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Lavern — an agentic law firm. Yours.">
+  <meta property="og:description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate, institutional memory. Apache 2.0.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lavern.ai/">
+  <meta property="og:site_name" content="Lavern">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="/img/og.png?v=2">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Lavern. An Agentic Law Firm. Free. Open source, Apache 2.0.">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Lavern — an agentic law firm. Yours.">
+  <meta name="twitter:description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate. Apache 2.0.">
+  <meta name="twitter:image" content="/img/og.png?v=2">
+  <meta name="twitter:image:alt" content="Lavern. An Agentic Law Firm. Free. Open source, Apache 2.0.">
+
+  <!-- Structured data — helps Google understand what Lavern is. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://lavern.ai/#org",
+        "name": "Lavern",
+        "url": "https://lavern.ai/",
+        "logo": "https://lavern.ai/favicon.svg",
+        "description": "An open-source agentic law firm. Multi-agent legal system with 67 specialist agents.",
+        "sameAs": [
+          "https://github.com/AnttiHero/lavern"
+        ],
+        "address": [
+          { "@type": "PostalAddress", "addressLocality": "Helsinki", "addressCountry": "FI" }
+        ]
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": "https://lavern.ai/#software",
+        "name": "Lavern",
+        "codeRepository": "https://github.com/AnttiHero/lavern",
+        "programmingLanguage": "TypeScript",
+        "license": "https://www.apache.org/licenses/LICENSE-2.0",
+        "url": "https://lavern.ai/",
+        "description": "Multi-agent legal design system. 67 specialist agents, evidence-backed debate, institutional memory. Runs locally on a Mac Mini or against frontier models.",
+        "author": { "@id": "https://lavern.ai/#org" }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://lavern.ai/#site",
+        "name": "Lavern",
+        "url": "https://lavern.ai/",
+        "publisher": { "@id": "https://lavern.ai/#org" }
+      }
+    ]
+  }
+  </script>
+
+  <script defer data-domain="lavern.ai" src="https://plausible.io/js/script.js"></script>
+
+  <!-- Switzer (Apfel Grotezk stand-in, free for commercial use) + Geist Mono -->
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=switzer@200,300,400,500,600,700,1,2,3,4,5&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
+    /* ═══════════════════════════════════════════════════════════════════
+       TOKENS — Legit DNA: warm cream paper, near-black text, tonal restraint
+       ═══════════════════════════════════════════════════════════════════ */
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    /* Custom cursor — hide native on desktop */
-    @media(pointer:fine){*,*::before,*::after{cursor:none!important}}
     :root{
-      --dark:#080808;--text:#FAF9F6;--muted:rgba(250,249,246,0.4);--dim:rgba(250,249,246,0.12);
-      --accent:#E8845C;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Inter',-apple-system,sans-serif;
-      --ease:cubic-bezier(0.16,1,0.3,1)
+      /* Cream paper palette */
+      --bg:#FAFAFA;
+      --surface:#FAF8F0;
+      --surface-2:#FFFFFF;
+      --text:#141310;
+      --muted:rgba(20,19,16,0.58);
+      --dim:rgba(20,19,16,0.36);
+      --hair:rgba(20,19,16,0.10);
+      --hair-strong:rgba(20,19,16,0.22);
+      /* Quiet warm accent — used sparingly on tags only */
+      --warm:#6B4F3A;
+      --warm-soft:rgba(107,79,58,0.10);
+      /* Type — Switzer body + Newsreader serif moments + Geist Mono */
+      --sans:'Switzer','Apfel Grotezk','Geist',-apple-system,BlinkMacSystemFont,sans-serif;
+      --serif:'Newsreader',Georgia,'Times New Roman',serif;
+      --mono:'Geist Mono',ui-monospace,SFMono-Regular,monospace;
+      --ease:cubic-bezier(0.16,1,0.3,1);
+      --max:1280px;
+      /* ─── Elevation — Apple-class layered drops: contact + bulk + ambient + atmospheric ─── */
+      --shadow-sm:
+        0 1px 1px rgba(20,19,16,0.06),
+        0 3px 6px rgba(20,19,16,0.09),
+        0 10px 22px rgba(20,19,16,0.09);
+      --shadow-md:
+        0 1px 2px rgba(20,19,16,0.07),
+        0 6px 12px rgba(20,19,16,0.11),
+        0 18px 36px rgba(20,19,16,0.17),
+        0 44px 84px rgba(20,19,16,0.13);
+      --shadow-lg:
+        0 1px 2px rgba(20,19,16,0.07),
+        0 8px 16px rgba(20,19,16,0.13),
+        0 28px 54px rgba(20,19,16,0.20),
+        0 68px 124px rgba(20,19,16,0.24),
+        0 130px 220px rgba(20,19,16,0.17);
+      --shadow-xl:
+        0 1px 2px rgba(20,19,16,0.09),
+        0 8px 18px rgba(20,19,16,0.15),
+        0 34px 68px rgba(20,19,16,0.24),
+        0 86px 160px rgba(20,19,16,0.30),
+        0 170px 280px rgba(20,19,16,0.22);
+      /* 2xl — reserved for the hero iMac and other show-stopping centerpieces */
+      --shadow-2xl:
+        0 1px 2px rgba(20,19,16,0.11),
+        0 10px 22px rgba(20,19,16,0.18),
+        0 42px 84px rgba(20,19,16,0.28),
+        0 110px 200px rgba(20,19,16,0.36),
+        0 220px 340px rgba(20,19,16,0.24);
+      /* Pill-specific — Apple-class contact shadow + dramatic floor */
+      --shadow-pill:
+        0 1px 2px rgba(20,19,16,0.09),
+        0 4px 8px rgba(20,19,16,0.11),
+        0 14px 28px rgba(20,19,16,0.17),
+        0 30px 58px rgba(20,19,16,0.15);
+      --shadow-pill-hover:
+        0 1px 2px rgba(20,19,16,0.11),
+        0 6px 12px rgba(20,19,16,0.15),
+        0 22px 42px rgba(20,19,16,0.24),
+        0 50px 88px rgba(20,19,16,0.24);
+      /* Apple chamfer — 1px top-edge highlight, mimics the light catching a bevelled edge */
+      --ring-top:inset 0 1px 0 rgba(255,255,255,0.55);
+      --ring-top-strong:inset 0 1px 0 rgba(255,255,255,0.75);
+      /* Warm specular glow — for accents & hovered focal points */
+      --glow-warm:0 0 70px rgba(232,132,92,0.20);
+      /* ─── Corner radii (Apple-class generosity) ─── */
+      --r-sm:10px;
+      --r-md:18px;
+      --r-lg:28px;
+      --r-xl:36px;
+      --r-pill:100px;
     }
     html{scroll-behavior:smooth}
     body{
-      font-family:var(--sans);background:var(--dark);color:var(--text);
-      -webkit-font-smoothing:antialiased;overflow-x:hidden
+      font-family:var(--sans);background:var(--bg);color:var(--text);
+      -webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.55;
+      font-feature-settings:"ss01","ss02";font-weight:400;
+      /* Suppress iOS rubber-band overscroll at the very top — that
+         elastic bounce briefly exposes the area above the fixed nav
+         and reads as a "gap" before the page springs back. */
+      overscroll-behavior-y:none;
     }
+    ::selection{background:var(--text);color:var(--bg)}
+    a{color:inherit;text-decoration:none}
 
-    /* Film grain */
+    /* ═══════════════════════════════════════════════════════════════════
+       PAPER GRAIN — letterpress stipple on cream, multiply-blended
+       ═══════════════════════════════════════════════════════════════════ */
     @keyframes grain{
       0%,100%{transform:translate(0,0)}
-      10%{transform:translate(-5%,-10%)}
-      20%{transform:translate(-15%,5%)}
-      30%{transform:translate(7%,-25%)}
-      40%{transform:translate(-5%,25%)}
-      50%{transform:translate(-15%,10%)}
-      60%{transform:translate(15%,0)}
-      70%{transform:translate(0,15%)}
-      80%{transform:translate(3%,-35%)}
-      90%{transform:translate(-10%,10%)}
+      10%{transform:translate(-2%,-4%)} 20%{transform:translate(-7%,3%)}
+      30%{transform:translate(4%,-10%)} 40%{transform:translate(-3%,10%)}
+      50%{transform:translate(-7%,5%)}  60%{transform:translate(7%,0)}
+      70%{transform:translate(0,7%)}    80%{transform:translate(2%,-14%)}
+      90%{transform:translate(-5%,5%)}
     }
     body::after{
-      content:'';position:fixed;inset:-50%;z-index:9999;pointer-events:none;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size:256px 256px;
-      opacity:0.35;
-      animation:grain 8s steps(10) infinite;
-      mix-blend-mode:overlay
+      content:'';position:fixed;inset:-50%;z-index:9998;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:240px 240px;
+      opacity:0.06;
+      mix-blend-mode:multiply;
+      animation:grain 9s steps(10) infinite
     }
     @media(prefers-reduced-motion:reduce){body::after{animation:none}}
 
-    /* Word-by-word reveal */
-    [data-words] .w{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity 0.6s var(--ease),transform 0.6s var(--ease)}
-    [data-words].revealed .w{opacity:1;transform:translateY(0)}
+    /* Hero mist removed — the only atmospheric fog is now battle-mist at
+       the lower part of the viewport. Keep stub so HTML <div> is harmless. */
+    .hero-mist{display:none}
+    .hero-mist span{
+      position:absolute;border-radius:50%;
+      filter:blur(30px);will-change:transform
+    }
+    /* 1 — large warm shadow stain, upper left (aged paper edge) — CRANKED */
+    .hero-mist span:nth-child(1){
+      width:75vw;height:75vw;top:-22vw;left:-18vw;
+      background:radial-gradient(circle,
+        rgba(107,79,58,0.65) 0%,
+        rgba(107,79,58,0.36) 22%,
+        rgba(107,79,58,0.16) 45%,
+        rgba(107,79,58,0.04) 65%,
+        rgba(107,79,58,0) 78%);
+      mix-blend-mode:multiply;
+      animation:mist1 32s ease-in-out infinite alternate
+    }
+    /* 2 — bright cream highlight, mid-right (beam of light) — CRANKED */
+    .hero-mist span:nth-child(2){
+      width:60vw;height:60vw;top:6vw;right:-18vw;
+      background:radial-gradient(circle,
+        rgba(255,255,255,1) 0%,
+        rgba(255,255,255,0.7) 22%,
+        rgba(255,255,255,0.35) 45%,
+        rgba(255,255,255,0.1) 65%,
+        rgba(255,255,255,0) 78%);
+      mix-blend-mode:screen;
+      animation:mist2 42s ease-in-out infinite alternate
+    }
+    /* 3 — warm tea stain, lower center (foxing) — CRANKED */
+    .hero-mist span:nth-child(3){
+      width:65vw;height:65vw;bottom:-26vw;left:22vw;
+      background:radial-gradient(circle,
+        rgba(184,134,11,0.50) 0%,
+        rgba(184,134,11,0.26) 22%,
+        rgba(184,134,11,0.10) 45%,
+        rgba(184,134,11,0.02) 65%,
+        rgba(184,134,11,0) 78%);
+      mix-blend-mode:multiply;
+      animation:mist3 48s ease-in-out infinite alternate
+    }
+    @keyframes mist1{
+      0%{transform:translate(0,0) scale(1)}
+      100%{transform:translate(10vw,6vw) scale(1.14)}
+    }
+    @keyframes mist2{
+      0%{transform:translate(0,0) scale(1)}
+      100%{transform:translate(-8vw,10vw) scale(.9)}
+    }
+    @keyframes mist3{
+      0%{transform:translate(0,0) scale(1)}
+      100%{transform:translate(-12vw,-8vw) scale(1.1)}
+    }
+    @media(prefers-reduced-motion:reduce){
+      .hero-mist span{animation:none}
+    }
+    /* Make sure hero content sits above mist */
+    .hero > *:not(.hero-mist){position:relative;z-index:1}
 
-    /* Reveals */
-    .r{opacity:0;transform:translateY(50px);transition:opacity 1.2s var(--ease),transform 1.2s var(--ease)}
-    .r.v{opacity:1;transform:translateY(0)}
-    .r1{transition-delay:.15s}.r2{transition-delay:.3s}.r3{transition-delay:.45s}
-    @media(prefers-reduced-motion:reduce){.r{opacity:1;transform:none;transition:none}}
+    /* ═══════════════════════════════════════════════════════════════════
+       SCROLL FOG — depth-of-field blur at top & bottom of viewport.
+       Subtle backdrop-blur on the outer edges; crisp focus zone in the
+       middle. Content scrolls in/out of softness like a real camera DOF.
+       (Apple/Linear/Vercel use this. Not battle fog. Subtle.)
+       ═══════════════════════════════════════════════════════════════════ */
+    .scroll-fog{
+      position:fixed;left:0;right:0;pointer-events:none;z-index:9997;
+      backdrop-filter:blur(4px);
+      -webkit-backdrop-filter:blur(4px);
+      transition:opacity .55s var(--ease)
+    }
+    /* The mist clears when the footer enters the viewport (JS toggles this
+       class via IntersectionObserver). Footer links read crisp; the rest
+       of the page keeps its soft DOF edge. */
+    .scroll-fog.cleared{opacity:0}
+    /* Top scroll-fog removed — the nav already handles the top edge with
+       its own backdrop-blur, so duplicating fog up there muddied the air
+       without adding any DOF effect. Bottom-only now. */
+    .scroll-fog.bottom{
+      bottom:0;height:14vh;
+      mask-image:linear-gradient(to top,
+        #000 0%,
+        rgba(0,0,0,0.85) 35%,
+        rgba(0,0,0,0.45) 65%,
+        transparent 100%);
+      -webkit-mask-image:linear-gradient(to top,
+        #000 0%,
+        rgba(0,0,0,0.85) 35%,
+        rgba(0,0,0,0.45) 65%,
+        transparent 100%);
+      background:linear-gradient(to top,
+        rgba(250,250,250,0.30) 0%,
+        rgba(250,250,250,0.08) 60%,
+        transparent 100%)
+    }
+    /* Safari/older fallback — without backdrop-filter, the gentle bg tint
+       alone still softens the edges visually. */
+    @supports not (backdrop-filter:blur(1px)){
+      .scroll-fog.top{background:linear-gradient(to bottom,
+        rgba(250,250,250,0.85) 0%,
+        rgba(250,250,250,0.35) 60%,
+        transparent 100%)}
+      .scroll-fog.bottom{background:linear-gradient(to top,
+        rgba(250,250,250,0.85) 0%,
+        rgba(250,250,250,0.35) 60%,
+        transparent 100%)}
+    }
+    /* Mobile: keep the smog blur, fix the seam. The eye picks up the top
+       edge of the fog as a horizontal line whenever the alpha change per
+       vertical pixel rises above ~1%. The fix is purely geometric:
+       1. Stretch the fog to 45vh so the same fade is distributed over a
+          much longer distance — each pixel-row's alpha-delta drops below
+          the perceptual threshold.
+       2. Use 8 mask stops with eased (quadratic-ish) interpolation so the
+          gradient has no kink that could read as a discrete band.
+       3. Keep blur at 2px — strong enough to feel, weak enough that any
+          residual transition at the very top is imperceptible.
+       The `.cleared` class still hides the fog when the footer scrolls
+       into view, so the bottom of the page reads crisp. */
+    @media(max-width:760px){
+      .scroll-fog.bottom{
+        height:45vh;
+        backdrop-filter:blur(2px);
+        -webkit-backdrop-filter:blur(2px);
+        mask-image:linear-gradient(to top,
+          #000 0%,
+          rgba(0,0,0,0.96) 12%,
+          rgba(0,0,0,0.86) 25%,
+          rgba(0,0,0,0.70) 38%,
+          rgba(0,0,0,0.50) 52%,
+          rgba(0,0,0,0.30) 68%,
+          rgba(0,0,0,0.14) 82%,
+          rgba(0,0,0,0.05) 92%,
+          transparent 100%);
+        -webkit-mask-image:linear-gradient(to top,
+          #000 0%,
+          rgba(0,0,0,0.96) 12%,
+          rgba(0,0,0,0.86) 25%,
+          rgba(0,0,0,0.70) 38%,
+          rgba(0,0,0,0.50) 52%,
+          rgba(0,0,0,0.30) 68%,
+          rgba(0,0,0,0.14) 82%,
+          rgba(0,0,0,0.05) 92%,
+          transparent 100%);
+        background:linear-gradient(to top,
+          rgba(250,250,250,0.20) 0%,
+          rgba(250,250,250,0.14) 30%,
+          rgba(250,250,250,0.07) 60%,
+          rgba(250,250,250,0.02) 85%,
+          transparent 100%)
+      }
+    }
 
-    /* ═══════════════════════════════════════
-       1. LOGO — top-left, just the mark
-       ═══════════════════════════════════════ */
-    .logo{
-      position:fixed;top:32px;left:40px;z-index:100;
-      font-family:var(--serif);font-size:18px;font-weight:300;
-      color:var(--text);text-decoration:none;letter-spacing:8px;
+    /* ═══════════════════════════════════════════════════════════════════
+       LAVERN CURSOR — matches viz/src/components/CustomCursor.tsx
+       Dot tracks instantly; blurred trail lags. Difference-blended so it
+       auto-inverts on cream paper AND on the dark GitHub button.
+       ═══════════════════════════════════════════════════════════════════ */
+    @media(pointer:fine){
+      html,body,*{cursor:none !important}
+    }
+    .cursor-dot,.cursor-trail{
+      position:fixed;top:0;left:0;pointer-events:none;
+      border-radius:50%;opacity:0;
       mix-blend-mode:difference
     }
-    .login{
-      position:fixed;top:36px;right:40px;z-index:100;
-      font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;
-      color:var(--text);text-decoration:none;letter-spacing:0;
-      mix-blend-mode:difference;opacity:.45;
-      transition:opacity .4s var(--ease)
+    .cursor-dot{
+      width:8px;height:8px;
+      background:#FFFFFF;
+      z-index:99999;
+      transition:background-color .35s ease,border .35s ease
     }
-    .login:hover{opacity:1}
+    .cursor-dot.hover{
+      background:transparent;
+      border:1.5px solid rgba(255,255,255,0.6)
+    }
+    .cursor-trail{
+      width:32px;height:32px;
+      background:rgba(255,255,255,0.12);
+      filter:blur(8px);
+      z-index:99998
+    }
+    @media(pointer:coarse){
+      .cursor-dot,.cursor-trail{display:none}
+    }
 
-    /* ═══════════════════════════════════════
-       2. HERO
-       ═══════════════════════════════════════ */
+    /* Scroll reveals */
+    .r{opacity:0;transform:translateY(20px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+    .r.v{opacity:1;transform:translateY(0)}
+    .r1{transition-delay:.08s}.r2{transition-delay:.16s}.r3{transition-delay:.24s}.r4{transition-delay:.32s}
+
+    /* ═══════════════════════════════════════════════════════════════════
+       SCROLL-BUILT ANIMATIONS — content assembles as you scroll
+       ═══════════════════════════════════════════════════════════════════ */
+
+    /* ─── WORD-BY-WORD REVEAL — awwwards-style headlines that read in ─── */
+    .word-reveal{display:block}
+    .word-reveal .word{
+      display:inline-block;opacity:0;
+      transform:translateY(35%) skewY(4deg);
+      transform-origin:left bottom;
+      transition:opacity .85s var(--ease),transform .85s var(--ease);
+      will-change:transform,opacity
+    }
+    .word-reveal.v .word{opacity:1;transform:translateY(0) skewY(0)}
+    /* Container that holds an inline-block word — generous padding so
+       italic slants and descenders are never clipped at the edges. */
+    .word-reveal .word-mask{
+      display:inline-block;overflow:visible;vertical-align:baseline;
+      padding:0.08em 0.12em 0.2em 0
+    }
+
+    /* Make headlines that lost the clip-path wipe still elegant on the
+       feature card layer when no JS runs (graceful degradation). */
+    @media(prefers-reduced-motion:reduce){
+      .word-reveal .word{opacity:1;transform:none;transition:none}
+    }
+
+    /* Feature CAPTION children — number / title / desc stagger in
+       (was static before). The mockup itself already cascades; now the
+       text below the mockup builds too. */
+    .feature-caption .feature-num,
+    .feature-caption .feature-title,
+    .feature-caption .feature-desc{
+      opacity:0;transform:translateY(18px);
+      transition:opacity .8s var(--ease),transform .8s var(--ease)
+    }
+    .feature.v .feature-caption .feature-num{
+      opacity:1;transform:translateY(0);transition-delay:.25s
+    }
+    .feature.v .feature-caption .feature-title{
+      opacity:1;transform:translateY(0);transition-delay:.35s
+    }
+    .feature.v .feature-caption .feature-desc{
+      opacity:1;transform:translateY(0);transition-delay:.50s
+    }
+
+    /* Footer fade-in */
+    footer{
+      opacity:0;transform:translateY(16px);
+      transition:opacity .8s var(--ease),transform .8s var(--ease)
+    }
+    footer.v{opacity:1;transform:translateY(0)}
+
+    /* Section eyebrow pill — pop in */
+    .section-tag{
+      opacity:0;transform:scale(.9) translateY(8px);
+      transition:opacity .6s var(--ease),transform .6s var(--ease)
+    }
+    .section-tag.v,.v > .section-tag,.v .section-tag{
+      opacity:1;transform:scale(1) translateY(0)
+    }
+
+    /* Feature mockup — INNER BUILD when card enters view. Explicit
+       cascade so the user clearly SEES each piece arrive. */
+    .feature .feature-body > *{
+      opacity:0;transform:translateY(40px) scale(.85);
+      transition:opacity 1s var(--ease),transform 1s var(--ease)
+    }
+    .feature.built .feature-body > *{opacity:1;transform:translateY(0) scale(1)}
+    .feature.built .feature-body > *:nth-child(1){transition-delay:.25s}
+    .feature.built .feature-body > *:nth-child(2){transition-delay:.50s}
+    .feature.built .feature-body > *:nth-child(3){transition-delay:.75s}
+    .feature.built .feature-body > *:nth-child(4){transition-delay:1.00s}
+    .feature.built .feature-body > *:nth-child(5){transition-delay:1.25s}
+    .feature.built .feature-body > *:nth-child(6){transition-delay:1.50s}
+    .feature.built .feature-body > *:nth-child(7){transition-delay:1.75s}
+
+    /* Chat bubbles slide horizontally — "you" from right, "them" from left */
+    .feature .feature-body > .m-bubble.you{
+      transform:translateX(60px) scale(.9);transform-origin:right center
+    }
+    .feature .feature-body > .m-bubble.them{
+      transform:translateX(-60px) scale(.9);transform-origin:left center
+    }
+    .feature.built .feature-body > .m-bubble.you,
+    .feature.built .feature-body > .m-bubble.them{
+      transform:translateX(0) scale(1)
+    }
+
+    /* Counter — stable digit widths during tween */
+    .count-up{font-variant-numeric:tabular-nums;display:inline-block}
+
+    /* Hero stats — values + labels both crossfade as the row rotates
+       through different stat sets every ~6 seconds. */
+    .hero-meta-num,.hero-meta-label{
+      transition:opacity .35s var(--ease),transform .45s var(--ease);
+      will-change:opacity,transform
+    }
+    .hero-meta-item.swapping .hero-meta-num,
+    .hero-meta-item.swapping .hero-meta-label{
+      opacity:0;transform:translateY(-6px)
+    }
+    @media(prefers-reduced-motion:reduce){
+      .hero-meta-num,.hero-meta-label{transition:none}
+    }
+
+    /* ─── Signature animations per mockup (explicit & dramatic) ─── */
+
+    /* Verification: progress bar fills 0 → target on build */
+    .m-bar > span{
+      width:0;
+      transition:width 1.8s cubic-bezier(0.65,0,0.35,1) .9s
+    }
+    .feature.built .m-bar > span{width:var(--fill,70%)}
+
+    /* Avatars: pop in with overshoot scale */
+    @keyframes avatarPop{
+      0%{transform:scale(0);opacity:0}
+      60%{transform:scale(1.15);opacity:1}
+      100%{transform:scale(1);opacity:1}
+    }
+    .feature .m-avatar,
+    .feature .m-avatar-img{transform:scale(0);opacity:0}
+    .feature.built .m-avatar,
+    .feature.built .m-avatar-img{animation:avatarPop .8s var(--ease) forwards}
+
+    /* Verification dots: each pops individually with cumulative delay */
+    @keyframes dotPop{
+      0%{transform:scale(0);opacity:0}
+      55%{transform:scale(1.35);opacity:1}
+      100%{transform:scale(1);opacity:1}
+    }
+    .feature .feature-body .m-dot{transform:scale(0);opacity:0}
+    .feature.built .feature-body .m-dot{animation:dotPop .5s var(--ease) forwards}
+    .feature.built .feature-body .m-dot:nth-of-type(1){animation-delay:.5s}
+    .feature.built .feature-body .m-dot:nth-of-type(2){animation-delay:.6s}
+    .feature.built .feature-body .m-dot:nth-of-type(3){animation-delay:.7s}
+    .feature.built .feature-body .m-dot:nth-of-type(4){animation-delay:.8s}
+    .feature.built .feature-body .m-dot:nth-of-type(5){animation-delay:.9s}
+    .feature.built .feature-body .m-dot:nth-of-type(6){animation-delay:1.0s}
+    .feature.built .feature-body .m-dot:nth-of-type(7){animation-delay:1.1s}
+    .feature.built .feature-body .m-dot:nth-of-type(8){animation-delay:1.2s}
+    .feature.built .feature-body .m-dot:nth-of-type(9){animation-delay:1.3s}
+    .feature.built .feature-body .m-dot:nth-of-type(10){animation-delay:1.4s}
+
+    /* Voice — much more dramatic waveform pulse */
+    @keyframes wavePulse{
+      0%,100%{transform:scaleY(1)}
+      50%{transform:scaleY(.15)}
+    }
+    .feature.built .wave-svg rect{
+      animation:wavePulse 1.1s ease-in-out infinite;
+      transform-origin:center;transform-box:fill-box
+    }
+    .feature.built .wave-svg rect:nth-child(2n){animation-delay:.10s}
+    .feature.built .wave-svg rect:nth-child(3n){animation-delay:.22s}
+    .feature.built .wave-svg rect:nth-child(4n){animation-delay:.34s}
+    .feature.built .wave-svg rect:nth-child(5n){animation-delay:.46s}
+    .feature.built .wave-svg rect:nth-child(7n){animation-delay:.58s}
+
+    /* Clawern — bigger green status pulse */
+    @keyframes statusBlink{
+      0%,80%,100%{box-shadow:0 0 0 0 rgba(58,125,68,0)}
+      40%{box-shadow:0 0 0 7px rgba(58,125,68,0.18)}
+    }
+    .feature.built .m-dot.ok{animation:statusBlink 2.4s ease-in-out infinite}
+
+    /* ═══════════════════════════════════════════════════════════════════
+       MOVEMENT — life in every card. Each animation is subtle, but they
+       compound into a sustained sense of motion across the grid.
+       ═══════════════════════════════════════════════════════════════════ */
+
+    /* — Cursor blink — a steady |‎  at the end of typed text */
+    @keyframes caretBlink{
+      0%,49%{opacity:1}50%,100%{opacity:0}
+    }
+    .m-caret{
+      display:inline-block;width:1px;height:1em;
+      background:var(--text);vertical-align:-2px;margin-left:2px;
+      animation:caretBlink 1.05s steps(1) infinite
+    }
+
+    /* — Avatar bob — tiny up/down 2px float, suggests a "speaking" head.
+       Every DiceBear avatar in every card bobs continuously, staggered
+       across n-th positions so they don't all bob in unison. The bob
+       chains after the initial pop-in. */
+    @keyframes avatarBob{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-2.5px)}
+    }
+    .feature.built .m-avatar-img{
+      animation:avatarPop .8s var(--ease) forwards,
+                avatarBob 3.4s ease-in-out 1.1s infinite
+    }
+    .feature.built .feature-body .m-avatar-img:nth-of-type(2n){animation-delay:0s, 1.7s}
+    .feature.built .feature-body .m-avatar-img:nth-of-type(3n){animation-delay:0s, 2.2s}
+    .feature.built .feature-body .m-avatar-img:nth-of-type(4n){animation-delay:0s, 2.8s}
+    /* Explicit class hooks (debate cards, voice mic) — still work for elements
+       that aren't .m-avatar-img */
+    .feature.built .m-bobber{animation:avatarBob 2.4s ease-in-out infinite}
+
+    /* — Orbit spin — for "+" affordance + processing spinners */
+    @keyframes orbitSpin{
+      to{transform:rotate(360deg)}
+    }
+    .m-spin{
+      display:inline-flex;width:14px;height:14px;
+      border:1.5px solid var(--hair-strong);
+      border-top-color:var(--text);
+      border-radius:50%;
+      animation:orbitSpin 1.1s linear infinite;
+      flex:none
+    }
+    .feature.built .m-plus-rotate{animation:orbitSpin 12s linear infinite;display:inline-block}
+
+    /* — Bar fill loop — a progress bar that fills 0→100% on a loop */
+    @keyframes barFillLoop{
+      0%{width:0%;opacity:1}
+      80%{width:100%;opacity:1}
+      90%{width:100%;opacity:.3}
+      100%{width:0%;opacity:0}
+    }
+    .feature.built .m-bar .m-bar-loop{
+      animation:barFillLoop 3.6s cubic-bezier(.4,.0,.2,1) infinite
+    }
+
+    /* — Arrow swap — vertical ↕ flips emphasis between top/bottom */
+    @keyframes arrowSwap{
+      0%,40%{transform:translateY(-2px) scale(1.0);opacity:1}
+      50%,90%{transform:translateY(2px) scale(1.0);opacity:1}
+      100%{transform:translateY(-2px) scale(1.0);opacity:1}
+    }
+    .feature.built .m-arrow-swap{animation:arrowSwap 2.6s ease-in-out infinite;display:inline-block}
+
+    /* — Status tag pulse — the small green "on" / "delivered" tags ripple
+       through, drawing the eye through the team / clawern lists */
+    @keyframes tagPulse{
+      0%,100%{filter:brightness(1)}
+      50%{filter:brightness(1.18)}
+    }
+    .feature.built .m-tag.ok{animation:tagPulse 2.6s ease-in-out infinite}
+    .feature.built .m-row:nth-of-type(1) .m-tag.ok{animation-delay:0s}
+    .feature.built .m-row:nth-of-type(2) .m-tag.ok{animation-delay:.4s}
+    .feature.built .m-row:nth-of-type(3) .m-tag.ok{animation-delay:.8s}
+    .feature.built .m-row:nth-of-type(4) .m-tag.ok{animation-delay:1.2s}
+
+    /* — Bubble cascade — chat bubbles slide in one-by-one when card builds */
+    .feature .m-bubble{opacity:0;transform:translateY(8px)}
+    .feature.built .m-bubble{
+      animation:bubbleIn .55s var(--ease) forwards
+    }
+    @keyframes bubbleIn{
+      0%{opacity:0;transform:translateY(8px)}
+      100%{opacity:1;transform:translateY(0)}
+    }
+    .feature.built .feature-body > .m-row:nth-of-type(1) .m-bubble,
+    .feature.built .feature-body > .m-bubble:nth-of-type(1){animation-delay:.30s}
+    .feature.built .feature-body > .m-row:nth-of-type(2) .m-bubble,
+    .feature.built .feature-body > .m-bubble:nth-of-type(2){animation-delay:.55s}
+    .feature.built .feature-body > .m-row:nth-of-type(3) .m-bubble,
+    .feature.built .feature-body > .m-bubble:nth-of-type(3){animation-delay:.80s}
+    .feature.built .feature-body > .m-row:nth-of-type(4) .m-bubble,
+    .feature.built .feature-body > .m-bubble:nth-of-type(4){animation-delay:1.05s}
+
+    /* — Card highlight ping — debate's findings briefly brighten in turn */
+    @keyframes cardPing{
+      0%,100%{box-shadow:var(--shadow-sm);border-color:var(--hair)}
+      50%{box-shadow:var(--shadow-md);border-color:var(--hair-strong)}
+    }
+    .feature.built .m-card-ping{animation:cardPing 4s ease-in-out infinite}
+    .feature.built .m-card-ping:nth-of-type(2){animation-delay:2s}
+
+    /* — Tap-shimmer — for the "Instruct →" button pop */
+    @keyframes tapShimmer{
+      0%,100%{transform:scale(1);box-shadow:0 2px 4px rgba(20,19,16,0.15)}
+      50%{transform:scale(1.03);box-shadow:0 4px 12px rgba(20,19,16,0.28)}
+    }
+    .feature.built .m-cta{animation:tapShimmer 2.4s ease-in-out infinite}
+
+    /* — Wave breath — the wave-svg ALSO subtly translates and the whole
+       card gets a "voice is here" feel */
+    @keyframes voiceMicPulse{
+      0%,100%{box-shadow:0 0 0 0 rgba(20,19,16,0.18)}
+      60%{box-shadow:0 0 0 14px rgba(20,19,16,0)}
+    }
+    .feature.built .voice-avatar{animation:avatarBob 2.4s ease-in-out infinite, voiceMicPulse 2.4s ease-in-out infinite}
+
+    @media(prefers-reduced-motion:reduce){
+      .feature.built .wave-svg rect,
+      .feature.built .m-dot.ok,
+      .feature.built .voice-avatar,
+      .feature.built .m-bobber,
+      .feature.built .m-plus-rotate,
+      .feature.built .m-bar .m-bar-loop,
+      .feature.built .m-arrow-swap,
+      .feature.built .m-tag.ok,
+      .feature.built .m-bubble,
+      .feature.built .m-card-ping,
+      .feature.built .m-cta,
+      .feature.built .m-soul-line,
+      .feature.built .m-doc-large-title,
+      .feature.built .m-doc-large-body p,
+      .feature.built .m-doc-large-body li,
+      .feature.built .m-doc-large-footer,
+      .feature.built .m-doc-stamp,
+      .feature .m-type-instruct,
+      .feature.briefing-card .m-bubble,
+      .feature.briefing-card .m-typing,
+      .m-caret,
+      .m-spin{animation:none}
+      .feature.built .m-soul-line,
+      .feature.built .m-doc-large-title,
+      .feature.built .m-doc-large-body p,
+      .feature.built .m-doc-large-body li,
+      .feature.built .m-doc-large-footer,
+      .feature .m-type-instruct,
+      .feature .m-soul-line,
+      .feature.briefing-card .m-bubble{
+        opacity:1;transform:none;clip-path:none
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       TYPEWRITER — text reveals itself left-to-right with stepped ticks,
+       mimicking a keyboard typing the content out. clip-path inset is
+       used so it works on multi-line text and respects line wrap.
+       Step count is tuned per element to roughly match its character
+       length so the "tick" feels right.
+       ═══════════════════════════════════════════════════════════════════ */
+    @keyframes typeReveal{
+      from{clip-path:inset(0 100% 0 0)}
+      to{clip-path:inset(0 -2% 0 0)}
+    }
+
+    /* Card 1 — the instruct request types itself in (≈122 chars) */
+    .feature .m-type-instruct{clip-path:inset(0 100% 0 0)}
+    .feature.built .m-type-instruct{
+      animation:typeReveal 2.4s steps(70) .4s forwards
+    }
+
+    /* Card 4 Soul — each principle types in sequence (overrides the prior
+       slide-in stagger). After the type completes, lines 2 & 3 drift on a
+       subtle opacity loop so the block keeps breathing. */
+    @keyframes soulDrift{
+      0%,100%{opacity:1}
+      50%{opacity:.82}
+    }
+    .feature .m-soul-line{
+      clip-path:inset(0 100% 0 0);opacity:1;transform:none
+    }
+    .feature.built .m-soul-line:nth-of-type(1){
+      animation:typeReveal 1.1s steps(28) .5s forwards
+    }
+    .feature.built .m-soul-line:nth-of-type(2){
+      animation:typeReveal 1.7s steps(48) 1.8s forwards,
+                soulDrift 5.5s ease-in-out 3.7s infinite
+    }
+    .feature.built .m-soul-line:nth-of-type(3){
+      animation:typeReveal 1.4s steps(42) 3.7s forwards,
+                soulDrift 5.5s ease-in-out 5.4s infinite
+    }
+
+    /* Card 8 Briefing — chat bubbles type in like a real conversation,
+       alternating between the interviewer and the user. Overrides the
+       universal bubbleIn fade cascade on this card only. */
+    .feature.briefing-card .m-bubble{
+      opacity:1;transform:none;clip-path:inset(0 100% 0 0)
+    }
+    /* Children of .feature-body are all <div>s (m-row, m-bubble, m-bubble, m-bubble, m-typing),
+       so :nth-of-type counts the div position, not the class. The selectors below use the
+       actual div index for each turn of the chat. */
+    .feature.briefing-card.built .feature-body > .m-row:nth-of-type(1) .m-bubble{
+      animation:typeReveal 1.5s steps(40) .5s forwards
+    }
+    .feature.briefing-card.built .feature-body > .m-bubble:nth-of-type(2){
+      animation:typeReveal 1.0s steps(28) 2.3s forwards
+    }
+    .feature.briefing-card.built .feature-body > .m-row:nth-of-type(3) .m-bubble{
+      animation:typeReveal 1.7s steps(46) 3.6s forwards
+    }
+    .feature.briefing-card.built .feature-body > .m-bubble:nth-of-type(4){
+      animation:typeReveal .8s steps(17) 5.6s forwards
+    }
+    /* The typing indicator at the end shows AFTER the last reply lands */
+    .feature.briefing-card .m-typing{opacity:0}
+    .feature.briefing-card.built .m-typing{
+      animation:lineWriteIn .4s ease-out 6.6s forwards
+    }
+
+    /* FAQ — same treatment */
+    .faq-item{
+      opacity:0;transform:translateY(8px);
+      transition:opacity .7s var(--ease),transform .7s var(--ease)
+    }
+    .faq-item.v{opacity:1;transform:translateY(0)}
+    /* Reveal observer adds .v to .faq-list (parent); propagate visibility
+       to each item via descendant selector so children become visible too. */
+    .faq-list.v .faq-item{opacity:1;transform:translateY(0)}
+    .faq-list.v .faq-item:nth-child(1){transition-delay:.04s}
+    .faq-list.v .faq-item:nth-child(2){transition-delay:.10s}
+    .faq-list.v .faq-item:nth-child(3){transition-delay:.16s}
+    .faq-list.v .faq-item:nth-child(4){transition-delay:.22s}
+    .faq-list.v .faq-item:nth-child(5){transition-delay:.28s}
+    .faq-list.v .faq-item:nth-child(6){transition-delay:.34s}
+    .faq-list.v .faq-item:nth-child(7){transition-delay:.40s}
+    .faq-list.v .faq-item:nth-child(8){transition-delay:.46s}
+
+    /* Hero meta — staggered count-up appearance */
+    .hero-meta-item{
+      opacity:0;transform:translateY(12px);
+      transition:opacity .8s var(--ease),transform .8s var(--ease)
+    }
+    .hero-meta.v .hero-meta-item:nth-child(1){opacity:1;transform:translateY(0);transition-delay:.1s}
+    .hero-meta.v .hero-meta-item:nth-child(2){opacity:1;transform:translateY(0);transition-delay:.22s}
+    .hero-meta.v .hero-meta-item:nth-child(3){opacity:1;transform:translateY(0);transition-delay:.34s}
+    .hero-meta.v .hero-meta-item:nth-child(4){opacity:1;transform:translateY(0);transition-delay:.46s}
+
+    @media(prefers-reduced-motion:reduce){
+      .r,.section-title,.hero h1,.closing h2,
+      .feature .feature-body > *,
+      .faq-item,.hero-meta-item{
+        opacity:1;transform:none;clip-path:none;transition:none
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       NAV — borrowed from Legit: identify-as prompt, restrained
+       ═══════════════════════════════════════════════════════════════════ */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:10000;
+      /* z-index above body::after grain (9998) so the nav is always
+         the topmost layer — no risk of page content bleeding through. */
+      display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+      padding:22px 32px;
+      margin:0;
+      background:rgba(250,250,250,0.78);
+      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--hair);
+      /* Respect the iOS notch safe area so the bar sits below it on
+         iPhones with viewport-fit=cover pages (we don't currently set
+         that meta, but the env() falls back to 0 when there's no inset,
+         so this is a no-op on Android and on viewport-fit=auto). */
+      padding-top:max(22px, env(safe-area-inset-top))
+    }
+    /* Brand sits at the left edge of column 1; nav-links at the right
+       edge of column 3. The middle column (nav-meta) is auto-sized and
+       therefore truly viewport-centred. */
+    .nav > .brand{justify-self:start}
+    .nav > .nav-links{justify-self:end}
+    .brand{
+      font-family:var(--sans);font-size:18px;font-weight:500;
+      letter-spacing:-0.5px;color:var(--text)
+    }
+    .nav-meta{
+      font-family:var(--mono);font-size:10px;
+      letter-spacing:1.5px;text-transform:uppercase;
+      color:var(--muted);display:flex;gap:18px;align-items:center
+    }
+    .nav-meta span.dot{
+      display:inline-block;width:5px;height:5px;border-radius:50%;
+      background:var(--text);margin-right:8px;vertical-align:1px
+    }
+    .nav-links{display:flex;gap:8px;align-items:center}
+    .nav-link{
+      font-family:var(--sans);font-size:13px;font-weight:500;
+      color:var(--text);padding:8px 14px;border-radius:6px;
+      transition:background .25s var(--ease)
+    }
+    .nav-link:hover{background:rgba(20,19,16,0.06)}
+    .nav-link.primary{
+      background:var(--text);color:var(--bg);
+      display:inline-flex;align-items:center;gap:8px;
+      box-shadow:var(--shadow-pill);
+      transition:background .25s var(--ease),box-shadow .35s var(--ease),transform .35s var(--ease)
+    }
+    .nav-link.primary:hover{background:#000;box-shadow:var(--shadow-pill-hover),var(--ring-top-strong);transform:translateY(-2px)}
+    .nav-link.featured{
+      background:var(--surface-2);
+      border:1px solid var(--hair-strong);
+      box-shadow:var(--shadow-pill);
+      display:inline-flex;align-items:center;gap:6px;
+      transition:background .25s var(--ease),border-color .25s var(--ease),box-shadow .35s var(--ease),transform .35s var(--ease)
+    }
+    .nav-link.featured:hover{
+      background:#fff;border-color:var(--text);
+      box-shadow:var(--shadow-pill-hover);transform:translateY(-1px)
+    }
+    .nav-link.featured .arrow{display:inline-block;font-size:11px;transition:transform .25s var(--ease)}
+    .nav-link.featured:hover .arrow{transform:translate(2px,-2px)}
+    .nav-link svg{width:13px;height:13px}
+
+    @media(max-width:760px){
+      .nav{
+        padding:12px 16px;
+        padding-top:max(12px, env(safe-area-inset-top));
+        /* Mobile-only treatment: keep the frosted-glass look (translucent
+           bg + backdrop blur) but kill the hard seam that previously read
+           as a "gap" above the bar as iOS Safari's URL bar collapses:
+           1. No 1px border-bottom — it renders as a sub-pixel seam.
+           2. Soft box-shadow instead, for the "lift" line, with no hard
+              edge to misalign as the URL-bar slides. */
+        border-bottom:none;
+        box-shadow:0 1px 0 rgba(20,19,16,0.04), 0 4px 12px rgba(20,19,16,0.05);
+        /* Flex layout on mobile so the three pills take only the space
+           they need — the 1fr|auto|1fr grid would otherwise constrain
+           the nav-links column to half the viewport. */
+        display:flex;justify-content:space-between;gap:8px;
+      }
+      .nav-meta{display:none}
+      .nav-links{gap:6px}
+      .nav-link{padding:8px 10px;font-size:12px}
+      .nav-link.featured{padding:7px 11px}
+      /* GitHub label collapses to icon-only on mobile — saves room for
+         Architecture + Demo to keep their full word labels. */
+      .nav-link.primary{padding:8px 11px;gap:0;font-size:0}
+      .nav-link.primary svg{width:15px;height:15px;margin:0}
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       HERO — type-first, no photo, paper restraint, CENTERED
+       ═══════════════════════════════════════════════════════════════════ */
     .hero{
-      min-height:100vh;min-height:100dvh;position:relative;overflow:hidden;
-      display:flex;align-items:center;justify-content:center;text-align:center
+      min-height:100vh;min-height:100dvh;position:relative;
+      padding:clamp(140px,18vh,240px) 32px 0;
+      display:flex;flex-direction:column;justify-content:flex-start;align-items:center;
+      max-width:var(--max);margin:0 auto;text-align:center
     }
-    .hero-img{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-      animation:drift 25s ease-in-out infinite alternate
+    /* iMac shot embedded directly in the hero — first impression includes
+       the product visual. Tight margin so it peeks above the fold. */
+    .hero-imac{
+      position:relative;width:100%;max-width:1000px;margin:28px auto 0;
+      border-radius:var(--r-xl);overflow:hidden;
+      box-shadow:var(--shadow-2xl), var(--ring-top-strong);
+      opacity:var(--so,1);
+      transform:scale(var(--ss,.92));
+      transition:box-shadow .6s var(--ease),transform .6s var(--ease)
     }
-    @keyframes drift{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.06) translate(-1%,1%)}}
-    .hero::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:35%;z-index:1;
-      background:linear-gradient(to top,transparent,var(--dark));pointer-events:none
+    .hero-imac img{display:block;width:100%;height:auto}
+    /* Demo video — locked to the iMac screen area of imac-hero.jpg.
+       Pixel-tuned to the photograph (1600×931): screen runs roughly from
+       y=30 (top bezel) to y=600 (chin), x=320 to x=1280. Hidden behind
+       the play button until the user clicks. */
+    .hero-imac-screen{
+      position:absolute;
+      top:8.5%;left:22%;
+      width:56%;height:58%;
+      overflow:hidden;
+      background:#0a0908;
+      opacity:0;pointer-events:none;
+      transition:opacity .45s var(--ease)
     }
-    .hero::after{
-      content:'';position:absolute;bottom:0;left:0;right:0;height:50%;z-index:1;
-      background:linear-gradient(to bottom,transparent 0%,var(--dark) 85%);pointer-events:none
+    .hero-imac-screen video{
+      width:100%;height:100%;
+      object-fit:cover;display:block;
+      background:#0a0908
     }
-    .hero-fog-left{
-      position:absolute;top:0;left:0;bottom:0;width:25%;z-index:1;
-      background:linear-gradient(to right,rgba(8,8,8,0.7),transparent);pointer-events:none
+    .hero-imac.playing .hero-imac-screen{
+      opacity:1;pointer-events:auto
     }
-    .hero-fog-right{
-      position:absolute;top:0;right:0;bottom:0;width:25%;z-index:1;
-      background:linear-gradient(to left,rgba(8,8,8,0.7),transparent);pointer-events:none
+
+    /* Play overlay — centred on the iMac's screen area (not the whole frame).
+       Vertical centre of the screen = 3.2% + 64.5%/2 ≈ 35.5%. */
+    .hero-imac-play{
+      position:absolute;
+      top:48%;left:50%;
+      transform:translate(-50%,-50%);
+      display:flex;flex-direction:column;align-items:center;gap:14px;
+      background:none;border:none;cursor:pointer;
+      color:rgba(250,248,240,1);
+      font-family:var(--sans);padding:18px;
+      filter:
+        drop-shadow(0 6px 16px rgba(0,0,0,0.5))
+        drop-shadow(0 20px 50px rgba(0,0,0,0.32))
+        drop-shadow(0 0 32px rgba(232,132,92,0.45));
+      transition:opacity .4s var(--ease),transform .4s var(--ease)
     }
-    .hero-content{position:relative;z-index:2;padding:24px;max-width:900px}
+    .hero-imac-play:hover{transform:translate(-50%,-50%) scale(1.06)}
+    /* Continuous attention pulse around the SVG circle — combined with
+       a warm specular glow that breathes alongside the pulse. */
+    .hero-imac-play-circle{
+      display:inline-flex;border-radius:50%;
+      animation:heroPlayPulse 2.4s ease-in-out infinite
+    }
+    @keyframes heroPlayPulse{
+      0%,100%{box-shadow:0 0 0 0 rgba(250,248,240,0), 0 0 48px rgba(232,132,92,0.30)}
+      55%{box-shadow:0 0 0 14px rgba(250,248,240,0.10), 0 0 72px rgba(232,132,92,0.45)}
+    }
+    .hero-imac-play svg{width:104px;height:104px;display:block}
+    .hero-imac-play-meta{
+      font-family:var(--mono);font-size:9px;font-weight:500;
+      letter-spacing:1.8px;text-transform:uppercase;
+      opacity:.62
+    }
+    .hero-imac.playing .hero-imac-play{opacity:0;pointer-events:none}
+    @media(max-width:760px){
+      .hero-imac-play svg{width:80px;height:80px}
+      .hero-imac-play{gap:10px}
+      .hero-imac-play-meta{font-size:8px}
+    }
+    .hero-imac-cap{
+      margin-top:28px;text-align:center;
+      display:flex;justify-content:center;align-items:center;gap:18px;
+      font-family:var(--mono);font-size:11px;font-weight:500;
+      letter-spacing:2.4px;text-transform:uppercase;color:var(--muted);
+      flex-wrap:wrap
+    }
+    .hero-imac-cap .rule{
+      display:inline-block;width:48px;height:1px;
+      background:var(--hair-strong);flex:none
+    }
+    .hero-imac-cap em{
+      font-style:normal;color:var(--text);font-weight:500
+    }
+    @media(max-width:640px){
+      .hero-imac-cap{font-size:10px;gap:12px;letter-spacing:2px}
+      .hero-imac-cap .rule{width:28px}
+    }
+    @media(max-width:480px){
+      .hero-imac-cap{font-size:9.5px;letter-spacing:1.6px;gap:10px}
+      .hero-imac-cap .rule{display:none}
+      /* Force "Not in a browser tab" onto its own line so "TAB" never orphans */
+      .hero-imac-cap > span:not(.rule) > span{display:block;margin-top:4px}
+    }
     .hero h1{
-      font-family:var(--serif);font-size:clamp(56px,11vw,140px);
-      font-weight:300;line-height:.95;letter-spacing:-2px;margin-bottom:48px;
-      text-shadow:0 4px 80px rgba(0,0,0,.6)
+      font-family:var(--serif);
+      font-size:clamp(44px,5.6vw,92px);
+      font-weight:400;line-height:1.05;letter-spacing:-0.01em;
+      color:var(--text);margin:0 auto 44px;max-width:980px
     }
-    .hero h1 em{font-style:italic;display:block}
+    /* Global: emphasis comes from weight + colour, not slant. */
+    em, i{font-style:normal}
+    .hero h1 em{
+      font-weight:400;color:var(--text)
+    }
+    .hero-deck{
+      font-family:var(--sans);font-size:clamp(16px,1.5vw,20px);
+      font-weight:400;color:var(--muted);
+      max-width:580px;line-height:1.5;margin:0 auto 32px
+    }
+    .hero-deck strong{color:var(--text);font-weight:600}
 
-    /* Apply button — dark, rounded pill */
-    .btn-invite{
+    /* Hero CTAs */
+    .cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center}
+    .btn{
       display:inline-flex;align-items:center;gap:10px;
-      font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
-      text-decoration:none;color:var(--text);
-      background:#000;
-      padding:20px 56px;border-radius:100px;border:1px solid rgba(255,255,255,0.06);
-      cursor:pointer;transition:all .5s var(--ease);
-      box-shadow:0 4px 30px rgba(0,0,0,0.4)
+      font-family:var(--sans);font-size:14px;font-weight:500;
+      padding:15px 26px;border-radius:var(--r-pill);cursor:pointer;
+      transition:transform .35s var(--ease),box-shadow .35s var(--ease),background-color .25s var(--ease);
+      border:1px solid transparent;letter-spacing:-0.005em
     }
-    .btn-invite:hover{
-      background:#181818;border-color:rgba(255,255,255,0.15);
+    .btn-primary{
+      background:var(--text);color:var(--bg);
+      box-shadow:var(--shadow-pill)
+    }
+    .btn-primary:hover{
+      background:#000;transform:translateY(-2px);
+      box-shadow:var(--shadow-pill-hover)
+    }
+    .btn svg{width:15px;height:15px}
+
+    /* Install one-liner pill */
+    .install{
+      display:inline-flex;align-items:center;gap:14px;
+      font-family:var(--mono);font-size:13px;
+      background:var(--surface-2);border:1px solid var(--hair-strong);
+      padding:13px 22px;border-radius:var(--r-pill);color:var(--text);cursor:pointer;
+      transition:transform .35s var(--ease),box-shadow .35s var(--ease),background-color .25s var(--ease),border-color .25s var(--ease);
+      max-width:100%;box-shadow:var(--shadow-pill)
+    }
+    .install:hover{
+      background:#fff;border-color:var(--text);
       transform:translateY(-2px);
-      box-shadow:0 8px 40px rgba(0,0,0,0.5)
+      box-shadow:var(--shadow-pill-hover)
     }
-    .btn-demo{
-      display:inline-block;margin-top:20px;
-      font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;
-      color:var(--muted);text-decoration:none;letter-spacing:0;
-      transition:color .4s var(--ease)
+    .install-prompt{color:var(--dim);user-select:none}
+    .install-cmd{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .install-copy{
+      font-family:var(--sans);font-size:11px;font-weight:500;
+      color:var(--muted);padding-left:12px;border-left:1px solid var(--hair);
+      transition:color .25s var(--ease)
     }
-    .btn-demo:hover{color:var(--text)}
+    .install:hover .install-copy{color:var(--text)}
+    .install.copied .install-copy{color:var(--warm)}
 
-    .hero-scroll{
-      position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:3;
-      display:flex;flex-direction:column;align-items:center;gap:10px
+    .hero-meta{
+      margin:36px auto 0;padding-top:24px;border-top:1px solid var(--hair);
+      display:grid;grid-template-columns:repeat(4,1fr);gap:24px;
+      max-width:780px;width:100%;text-align:left
     }
-    .hero-scroll span{font-size:9px;font-weight:500;letter-spacing:5px;text-transform:uppercase;color:var(--dim)}
-    .pulse-line{
-      width:1px;height:36px;background:linear-gradient(to bottom,var(--dim),transparent);
-      animation:pulse 2.5s ease-in-out infinite
+    .hero-meta-item{
+      display:flex;flex-direction:column;gap:4px
     }
-    @keyframes pulse{0%,100%{opacity:.2;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.3)}}
+    .hero-meta-num{
+      font-family:var(--sans);font-size:22px;font-weight:500;
+      letter-spacing:-0.02em;color:var(--text)
+    }
+    .hero-meta-label{
+      font-family:var(--mono);font-size:10px;
+      letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)
+    }
+    @media(max-width:640px){
+      .hero{padding:120px 22px 60px}
+      .hero-meta{grid-template-columns:repeat(2,1fr)}
+    }
+    /* ─── Tight mobile (<=480px) — fix overflow, polish elegance ─── */
+    @media(max-width:480px){
+      /* Install pill — sized to fit a phone viewport */
+      .install{
+        width:100%;
+        padding:12px 18px;
+        font-size:11.5px;
+        gap:10px;
+        justify-content:center
+      }
+      .install-prompt{display:none}
+      .install-copy{font-size:10px;padding-left:10px}
+      /* CTA stack — both items full-width when row wraps to column */
+      .cta-row{gap:12px}
+      .cta-row > *{width:100%;justify-content:center}
+      .btn-primary{justify-content:center}
+      /* Nav — drop the featured Architecture pill (accessible via footer);
+         keep Demo pill — it's a primary CTA on mobile too. */
+      .nav-link.featured{display:none}
+      #navDemo{display:inline-flex;padding:8px 12px;font-size:12px}
+      .nav{padding:12px 18px}
+      /* Stats hero — single-column reads more luxurious than 2×2 on a phone */
+      .hero-meta{grid-template-columns:1fr;gap:14px;max-width:280px;padding-top:32px;margin-top:48px}
+      .hero-meta-item{flex-direction:row;justify-content:space-between;align-items:baseline;gap:14px}
+      .hero-meta-num{font-size:24px}
+      .hero-meta-label{font-size:11px}
+      /* Hero — slight breathing-room tweaks */
+      .hero{padding:96px 22px 56px}
+      .hero h1{
+        /* Smaller min-size + slightly tighter spacing so the desktop
+           composition ("An agentic law firm." / "Yours.") survives on
+           narrow viewports as two lines instead of wrapping to three.
+           At 375px viewport this resolves to ~32-34px. */
+        font-size:clamp(30px,8.4vw,42px);
+        letter-spacing:-0.02em;
+        line-height:1.08;
+        margin-bottom:32px;
+      }
+      .hero-deck{margin-bottom:28px}
+    }
 
-    /* ═══════════════════════════════════════
-       3. STATEMENT — text over image, stronger contrast
-       ═══════════════════════════════════════ */
-    .statement{
-      min-height:80vh;position:relative;overflow:hidden;
-      display:flex;align-items:center;justify-content:center;text-align:center
+    /* ═══════════════════════════════════════════════════════════════════
+       SECTION SCAFFOLDING
+       ═══════════════════════════════════════════════════════════════════ */
+    section{padding:clamp(80px,10vw,140px) 32px;position:relative}
+    .container{max-width:var(--max);margin:0 auto}
+    .container-narrow{max-width:840px;margin:0 auto}
+
+    .section-tag{
+      display:inline-flex;align-items:center;gap:8px;
+      font-family:var(--mono);font-size:10px;font-weight:500;
+      letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+      padding:8px 14px;border:1px solid var(--hair-strong);border-radius:100px;
+      margin-bottom:56px;background:var(--surface-2);
+      box-shadow:var(--shadow-pill)
     }
-    .statement-img{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-      filter:brightness(0.45)
+    .section-tag .num{color:var(--text);font-weight:500}
+    .section-title{
+      font-family:var(--serif);font-size:clamp(36px,5.6vw,84px);
+      font-weight:400;line-height:1.02;letter-spacing:-0.015em;
+      margin:0 auto 24px;max-width:18ch;
+      text-wrap:balance
     }
-    .statement::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:50%;z-index:1;
-      background:linear-gradient(to top,transparent,var(--dark));pointer-events:none
+    .section-title em{font-style:normal;font-weight:400;color:var(--text)}
+    .section-deck{
+      font-family:var(--sans);font-size:clamp(16px,1.6vw,20px);
+      font-weight:400;color:var(--muted);max-width:580px;line-height:1.55;
+      margin:0 auto
     }
-    .statement::after{
-      content:'';position:absolute;bottom:0;left:0;right:0;height:50%;z-index:1;
-      background:linear-gradient(to bottom,transparent,var(--dark));pointer-events:none
+    /* Quote variant — pull-quote testimonial under a section title */
+    .section-quote{
+      font-family:var(--serif);font-size:clamp(20px,2.1vw,28px);
+      font-weight:400;line-height:1.4;color:var(--text);
+      max-width:620px;letter-spacing:-0.005em;
+      text-wrap:balance
     }
-    /* Dark vignette overlay for readability */
-    .statement-overlay{
-      position:absolute;inset:0;z-index:1;
-      background:radial-gradient(ellipse at center,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.6) 100%);
+    .section-quote em{color:var(--text);font-style:normal;font-weight:600}
+    .quote-attr{
+      display:block;margin-left:0;margin-top:18px;
+      font-family:var(--mono);font-size:11px;font-weight:500;
+      letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);
+      vertical-align:baseline
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       BILLBOARD — brand moment, full-bleed photograph
+       ═══════════════════════════════════════════════════════════════════ */
+    .billboard{
+      padding:clamp(80px,10vw,140px) 24px;
+      position:relative
+    }
+    .billboard-frame{
+      position:relative;max-width:1180px;margin:0 auto;
+      border-radius:var(--r-xl);overflow:hidden;
+      box-shadow:var(--shadow-xl), var(--ring-top);
+      opacity:var(--so,1);
+      transform:scale(var(--ss,.92));
+      transition:box-shadow .6s var(--ease)
+    }
+    .billboard-frame img{
+      display:block;width:100%;height:auto
+    }
+    .billboard-cap{
+      margin-top:32px;text-align:center;
+      font-family:var(--sans);font-style:normal;font-weight:400;
+      font-size:clamp(18px,1.8vw,22px);color:var(--muted);
+      max-width:520px;margin-left:auto;margin-right:auto;line-height:1.5
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════════════
+       FEATURE GRID — 10 boxes with light-paper mockups
+       ═══════════════════════════════════════════════════════════════════ */
+    .features-head{margin:0 auto clamp(56px,8vw,90px);max-width:840px;text-align:center}
+    .features-grid{
+      display:grid;grid-template-columns:repeat(2,1fr);
+      gap:28px;max-width:var(--max);margin:0 auto
+    }
+    @media(max-width:860px){.features-grid{grid-template-columns:1fr;gap:20px}}
+
+    /* ─── Mobile (<=640px) — feature cards become a horizontal swipe deck.
+       Each card takes 84% of viewport width so the next one peeks from
+       the right edge — that peek is the affordance that says "swipe me".
+       Scroll-snap keeps each card centered after a flick. ─── */
+    @media(max-width:640px){
+      #features{padding:60px 0 80px}
+      .features-head{padding:0 24px}
+      .features-grid{
+        display:flex;flex-direction:row;
+        overflow-x:auto;overflow-y:visible;
+        scroll-snap-type:x mandatory;
+        scroll-padding:0 8%;
+        gap:14px;
+        padding:14px 8% 28px;
+        margin:0;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+        -ms-overflow-style:none
+      }
+      .features-grid::-webkit-scrollbar{display:none}
+      .feature{
+        flex:0 0 84%;min-width:84%;
+        scroll-snap-align:center;
+        /* Neutralise scroll-choreography variables — cards are always
+           visible in carousel mode, no fade-in/out as the page scrolls. */
+        opacity:1 !important;
+        transform:none !important
+      }
+      .feature:hover{transform:none !important}
+    }
+
+    /* ─── Hide the Stack section entirely on mobile. The 3D perspective
+       parallax doesn't translate without hover, and the slab-overlay UX
+       gets confused with a single-column layout. The principles it
+       presents are already covered in the feature cards. ─── */
+    @media(max-width:640px){
+      #tldr{display:none}
+    }
+
+    /* ─── Chip rows inside mockup cards on narrow phones (≤480px).
+       The mockup is fixed at aspect-ratio 5/4, so the body has a
+       hard vertical budget on a 315px-wide carousel slide (~173px
+       inner). We need each chip to fit on a SINGLE line so that two
+       chips + the ↕ arrow stack vertically without clipping.
+       Shrinking avatar, badge, text, and gaps gets the worst-case
+       row ("Indemnification cap is uncapped.") under the available
+       width without wrapping. The chip ends up two lines tall:
+         · row 1: [avatar] [BADGE] [single-line finding]
+         · row 2: italic-feeling quote citation
+       Total ≈ 60-70px per chip. Two chips + arrow ≈ 160px. Fits.
+       ─── */
+    /* Specificity bumped with `.feature-mockup` prefix so these rules
+       win against the default `.m-card{...}` rule that's defined later
+       in the file (~line 1400). Plus `[style]` on the text span beats
+       the inline style="...font-size:11.5px..." attribute the
+       finding-row markup carries. */
+    @media(max-width:480px){
+      .feature-mockup .m-card{padding:9px 11px;gap:5px}
+      .feature-mockup .m-card .m-row{gap:6px}
+      .feature-mockup .m-card .m-avatar-img.sm{width:18px;height:18px}
+      .feature-mockup .m-card .m-tag{font-size:8px;padding:1px 5px;letter-spacing:.3px}
+      .feature-mockup .m-card .m-row > span[style]:last-child{font-size:10.5px !important;line-height:1.3 !important}
+      .feature-mockup .m-quote{font-size:10px;line-height:1.4}
+      .feature-mockup .feature-body{padding:30px 16px}
+
+      /* ─── Delivery card (#07) doc — shrink so all three findings +
+         header + title + footer fit cleanly in the 173px mockup body.
+         Otherwise the bottom cuts mid-sentence ("…tolling provision
+         missing;") which reads as a layout bug, not a designed crop. ─── */
+      .feature-mockup .m-doc-large{padding:10px 12px 9px;gap:5px}
+      .feature-mockup .m-doc-large-title{font-size:13px;padding-bottom:3px}
+      .feature-mockup .m-doc-large-tag{font-size:7.5px;padding:2px 6px}
+      .feature-mockup .m-doc-large-meta{font-size:7.5px}
+      .feature-mockup .m-doc-large-body{font-size:10px;line-height:1.45}
+      .feature-mockup .m-doc-large-body p{margin-bottom:5px}
+      .feature-mockup .m-doc-large-body ul{gap:3px}
+      .feature-mockup .m-doc-large-body li{font-size:9.5px;padding-left:10px}
+      .feature-mockup .m-doc-large-body li::before{top:5px;width:3px;height:3px}
+      .feature-mockup .m-doc-large-footer{font-size:7.5px;padding-top:4px}
+
+      /* ─── Briefing card (#08) bubbles — bump the available width
+         and shrink the font so the longest reply
+         ("What's your risk appetite. Strict or pragmatic?") wraps
+         to a tidy 2-line bubble that sits comfortably inside the
+         265px-wide mockup body, with the avatar to the left and a
+         visible right margin. Without this the line breaks awkwardly
+         (Safari sometimes splits 'appetite' across the right edge,
+         which reads as a clipping bug). ─── */
+      .feature-mockup .m-bubble{
+        font-size:11px;
+        line-height:1.4;
+        padding:7px 11px;
+        max-width:92%;
+      }
+      /* Pin the briefing m-typing indicator so it doesn't run off
+         the mockup bottom — keeps the "agent is composing" affordance
+         visible at the natural reading rhythm. */
+      .feature-mockup .m-typing{padding:7px 11px}
+    }
+    /* ↑ Close of @media(max-width:480px). Without this `}`, every
+       rule that follows — .feature, .feature-mockup, .mac-chrome,
+       .m-card, the whole mockup styling system — was trapped inside
+       the narrow-mobile media query and never applied on viewports
+       wider than 480px. The site looked broken on every desktop
+       resolution. Do not delete this brace. */
+
+    .feature{
+      background:var(--surface-2);
+      border:1px solid var(--hair);
+      border-radius:var(--r-lg);overflow:hidden;
+      display:flex;flex-direction:column;
+      box-shadow:var(--shadow-md), var(--ring-top);
+      /* Scroll-choreographed: --sy and --so are written by the rAF
+         scroll handler. Cards fade in as they enter, peak when centered,
+         fade out as they leave. */
+      opacity:var(--so, 1);
+      transform:scale(var(--ss, .9)) translateY(var(--sy, 30px));
+      transition:border-color .45s var(--ease),box-shadow .55s var(--ease)
+    }
+    .feature:hover{
+      border-color:var(--hair-strong);
+      box-shadow:var(--shadow-lg), var(--ring-top), var(--glow-warm);
+      --sy:-6px
+    }
+    .feature-mockup{
+      position:relative;aspect-ratio:5/4;
+      /* Soft cream radial spotlight — Legora-class light wash */
+      background:
+        radial-gradient(ellipse 100% 80% at 50% 35%,
+          rgba(255,253,245,1) 0%,
+          rgba(252,250,242,0.7) 40%,
+          rgba(244,242,234,0.4) 70%,
+          rgba(250,250,250,0) 100%),
+        linear-gradient(160deg, #F8F6EE 0%, #F1EFE5 100%);
+      border-bottom:1px solid var(--hair);
+      overflow:hidden;display:flex;flex-direction:column;
+      padding-top:36px; /* clears the Mac chrome bar */
+      isolation:isolate
+    }
+    /* ─── Mac chrome — proper macOS window top bar ─── */
+    .mac-chrome{
+      position:absolute;top:0;left:0;right:0;height:36px;
+      display:flex;align-items:center;gap:8px;padding:0 14px;
+      background:linear-gradient(180deg,
+        rgba(255,253,245,0.78) 0%,
+        rgba(240,236,224,0.55) 100%);
+      border-bottom:1px solid rgba(20,19,16,0.07);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      z-index:3
+    }
+    .mac-chrome i{
+      width:11px;height:11px;border-radius:50%;
+      box-shadow:
+        inset 0 -1px 0 rgba(0,0,0,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.30),
+        0 0 0 0.5px rgba(0,0,0,0.06)
+    }
+    .mac-chrome i.r{background:linear-gradient(180deg,#FF6157 0%,#DE3F39 100%)}
+    .mac-chrome i.y{background:linear-gradient(180deg,#FEBE2E 0%,#DEA226 100%)}
+    .mac-chrome i.g{background:linear-gradient(180deg,#28C940 0%,#1AA631 100%)}
+    .mac-chrome .stage-title{
+      margin-left:auto;margin-right:auto;
+      font-family:var(--mono);font-size:10.5px;
+      color:var(--dim);letter-spacing:.4px;
+      transform:translateX(-22px); /* offset for the dots on the left */
+      display:inline-flex;align-items:center;gap:7px
+    }
+    /* Live indicator — small green pulsing dot inside the chrome title */
+    .mac-chrome .live-dot{
+      width:6px;height:6px;border-radius:50%;
+      background:#3a7d44;flex:none;position:relative
+    }
+    .mac-chrome .live-dot::after{
+      content:'';position:absolute;inset:-3px;border-radius:50%;
+      border:1.5px solid #3a7d44;opacity:0;
+      animation:liveBlink 2.4s ease-out infinite
+    }
+    @keyframes liveBlink{
+      0%{transform:scale(.6);opacity:.7}
+      80%,100%{transform:scale(1.9);opacity:0}
+    }
+    @media(prefers-reduced-motion:reduce){.mac-chrome .live-dot::after{animation:none}}
+    /* Subtle inner highlight for premium card glass feel */
+    .feature-mockup::after{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background:radial-gradient(ellipse 60% 50% at 50% 10%,
+        rgba(255,255,255,0.55) 0%,
+        rgba(255,255,255,0.18) 30%,
+        transparent 60%);
+      mix-blend-mode:soft-light;z-index:0
+    }
+    .feature-body{
+      position:relative;z-index:1;
+      flex:1;padding:36px 32px;display:flex;flex-direction:column;
+      justify-content:center;align-items:stretch;
+      gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted);
+      overflow:hidden
+    }
+    .feature-caption{
+      padding:26px 28px 30px;display:flex;flex-direction:column;gap:10px
+    }
+    .feature-num{
+      font-family:var(--mono);font-size:10px;font-weight:500;
+      letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)
+    }
+    /* Lighter number — was 600 black, looked too heavy. Now matches the
+       surrounding mono caps weight (500) and uses --text without bold. */
+    .feature-num span{color:var(--text);font-weight:500}
+    .feature-title{
+      font-family:var(--sans);font-size:24px;font-weight:500;
+      line-height:1.15;letter-spacing:-0.02em;color:var(--text)
+    }
+    .feature-title em{font-style:normal;font-weight:500;color:var(--text)}
+    .feature-desc{
+      font-family:var(--sans);font-size:14px;color:var(--muted);
+      line-height:1.6;max-width:50ch
+    }
+
+    /* Mockup atoms — light theme */
+    .m-row{display:flex;align-items:center;gap:10px}
+    .m-dot{width:7px;height:7px;border-radius:50%;background:var(--text);flex:none}
+    .m-dot.dim{background:var(--dim)}
+    .m-dot.ok{background:#3a7d44}
+    .m-dot.warn{background:#B8860B}
+    .m-bar{height:5px;border-radius:3px;background:rgba(20,19,16,0.08);overflow:hidden}
+    .m-bar span{display:block;height:100%;background:var(--text)}
+    .m-bubble{
+      padding:10px 15px;border-radius:18px;
+      font-family:var(--sans);font-size:12px;font-weight:400;
+      line-height:1.5;letter-spacing:-0.005em;
+      max-width:78%;color:var(--text);position:relative
+    }
+    .m-bubble.you{
+      background:linear-gradient(180deg,#1e1c18 0%,#141310 100%);
+      color:var(--bg);
+      align-self:flex-end;border-bottom-right-radius:6px;
+      box-shadow:0 2px 6px rgba(20,19,16,0.15),0 1px 2px rgba(20,19,16,0.08)
+    }
+    .m-bubble.them{
+      background:#fff;border:1px solid var(--hair-strong);
+      align-self:flex-start;border-bottom-left-radius:6px;
+      box-shadow:0 2px 6px rgba(20,19,16,0.06),0 1px 2px rgba(20,19,16,0.03)
+    }
+    /* Typing indicator — three pulsing dots, looped continuously */
+    .m-typing{
+      display:inline-flex;gap:4px;padding:11px 16px;
+      background:#fff;border:1px solid var(--hair-strong);
+      border-radius:18px;border-bottom-left-radius:6px;
+      align-self:flex-start;
+      box-shadow:0 2px 6px rgba(20,19,16,0.06)
+    }
+    .m-typing i{
+      width:5px;height:5px;border-radius:50%;background:var(--muted);
+      animation:typingPulse 1.4s ease-in-out infinite
+    }
+    .m-typing i:nth-child(2){animation-delay:.18s}
+    .m-typing i:nth-child(3){animation-delay:.36s}
+    @keyframes typingPulse{
+      0%,80%,100%{opacity:.3;transform:translateY(0)}
+      40%{opacity:1;transform:translateY(-2px)}
+    }
+    @media(prefers-reduced-motion:reduce){.m-typing i{animation:none}}
+    .m-tag{
+      display:inline-block;font-family:var(--mono);font-size:9px;
+      padding:2px 7px;border-radius:3px;letter-spacing:.5px;
+      background:var(--warm-soft);color:var(--warm);
+      text-transform:uppercase;font-weight:500
+    }
+    .m-tag.ok{background:rgba(58,125,68,0.10);color:#3a7d44}
+    .m-tag.warn{background:rgba(184,134,11,0.10);color:#8a6608}
+    .m-tag.danger{background:rgba(155,40,30,0.10);color:#9b281e}
+    .m-tag.neutral{background:rgba(20,19,16,0.06);color:var(--text)}
+    .m-card{
+      background:#fff;border:1px solid var(--hair);
+      border-radius:var(--r-md);padding:11px 14px;display:flex;flex-direction:column;gap:6px;
+      box-shadow:var(--shadow-sm)
+    }
+    .m-avatar{
+      width:26px;height:26px;border-radius:50%;flex:none;
+      background:#EFEDE5;border:1px solid var(--hair-strong);
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--sans);font-style:normal;font-size:12px;
+      font-weight:500;color:var(--text)
+    }
+    /* DiceBear avatar image — drop-in replacement for .m-avatar letter circle */
+    .m-avatar-img{
+      width:30px;height:30px;border-radius:50%;flex:none;
+      background:#EFEDE5;border:1px solid var(--hair-strong);
+      object-fit:cover;display:block
+    }
+    .m-avatar-img.sm{width:22px;height:22px}
+
+    /* Single Lavern deliverable — full editorial document mockup for the
+       Delivery card. Writes itself in line-by-line when the card builds. */
+    .m-doc-large{
+      background:#fff;border:1px solid var(--hair);border-radius:10px;
+      padding:14px 16px 12px;box-shadow:var(--shadow-md);
+      display:flex;flex-direction:column;gap:8px;width:100%;
+      font-family:var(--sans)
+    }
+    .m-doc-large-header{
+      display:flex;justify-content:space-between;align-items:center;gap:8px
+    }
+    .m-doc-large-tag{
+      font-family:var(--mono);font-size:8px;font-weight:600;
+      letter-spacing:1.6px;text-transform:uppercase;
+      background:var(--text);color:var(--bg);
+      padding:3px 8px;border-radius:3px
+    }
+    .m-doc-large-meta{
+      font-family:var(--mono);font-size:8.5px;font-weight:500;
+      letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)
+    }
+    .m-doc-large-title{
+      font-family:var(--sans);font-size:15px;font-weight:600;
+      letter-spacing:-0.012em;color:var(--text);line-height:1.2;
+      padding-bottom:4px;border-bottom:1px solid var(--hair)
+    }
+    .m-doc-large-body{
+      font-family:var(--sans);font-size:11px;line-height:1.5;color:var(--muted)
+    }
+    .m-doc-large-body p{margin-bottom:7px}
+    .m-doc-large-body ul{
+      list-style:none;display:flex;flex-direction:column;gap:5px
+    }
+    .m-doc-large-body li{
+      position:relative;padding-left:11px;font-size:10.5px
+    }
+    .m-doc-large-body li::before{
+      content:'';position:absolute;left:2px;top:6px;
+      width:4px;height:4px;border-radius:50%;background:var(--text)
+    }
+    .m-doc-large-body li strong{color:var(--text);font-weight:600}
+    .m-doc-large-footer{
+      display:flex;align-items:center;gap:8px;
+      font-family:var(--mono);font-size:8.5px;font-weight:500;
+      letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);
+      padding-top:6px;border-top:1px solid var(--hair)
+    }
+    .m-doc-stamp{
+      display:inline-block;width:8px;height:8px;border-radius:50%;
+      background:var(--text);flex:none
+    }
+    /* Each body line writes itself in sequentially after the card builds. */
+    .feature .m-doc-large-body p,
+    .feature .m-doc-large-body li,
+    .feature .m-doc-large-title,
+    .feature .m-doc-large-footer{
+      opacity:0;transform:translateY(4px)
+    }
+    .feature.built .m-doc-large-title{
+      animation:lineWriteIn .5s ease-out .4s forwards
+    }
+    .feature.built .m-doc-large-body p{
+      animation:lineWriteIn .5s ease-out .8s forwards
+    }
+    .feature.built .m-doc-large-body li:nth-of-type(1){
+      animation:lineWriteIn .5s ease-out 1.2s forwards
+    }
+    .feature.built .m-doc-large-body li:nth-of-type(2){
+      animation:lineWriteIn .5s ease-out 1.55s forwards
+    }
+    .feature.built .m-doc-large-body li:nth-of-type(3){
+      animation:lineWriteIn .5s ease-out 1.9s forwards
+    }
+    .feature.built .m-doc-large-footer{
+      animation:lineWriteIn .5s ease-out 2.3s forwards
+    }
+    @keyframes lineWriteIn{
+      to{opacity:1;transform:translateY(0)}
+    }
+    .feature.built .m-doc-stamp{
+      animation:statusBlink 2.4s ease-in-out 2.8s infinite
+    }
+
+    /* Soul card — each principle types itself in on a different beat */
+    .feature .m-soul-line{opacity:0;transform:translateX(-6px)}
+    .feature.built .m-soul-line{
+      animation:soulLineIn .55s ease-out forwards
+    }
+    .feature.built .m-soul-line:nth-of-type(1){animation-delay:.5s}
+    .feature.built .m-soul-line:nth-of-type(2){animation-delay:1.0s}
+    .feature.built .m-soul-line:nth-of-type(3){animation-delay:1.5s}
+    @keyframes soulLineIn{
+      to{opacity:1;transform:translateX(0)}
+    }
+
+    /* Knowledge card — sources cascade in one row at a time */
+    .feature.built .feature-body .m-row{opacity:1}
+    /* (rows are flex parents so we don't reset their opacity globally,
+       but specifically inside the Knowledge body we want a stagger) */
+
+    .m-quote{
+      font-family:var(--sans);font-style:normal;font-weight:400;
+      font-size:13px;line-height:1.45;color:var(--text)
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       THE STACK — interactive deck of cards (Apple-grade)
+       Real slab photographs as the drawn card faces. 3D mouse parallax
+       on the stack. Auto-cycling demo when idle. Cinematic weighted
+       physics on the card-from-deck animation. Ambient warm glow that
+       breathes behind the whole composition.
+       ═══════════════════════════════════════════════════════════════════ */
+    .codex-head{margin:0 auto clamp(56px,7vw,96px);max-width:840px;text-align:center}
+    .codex-deck-line{
+      font-family:var(--sans);font-size:clamp(16px,1.5vw,20px);
+      font-weight:400;color:var(--muted);
+      max-width:560px;line-height:1.55;margin:24px auto 0
+    }
+
+    .codex-stage{
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:64px;
+      max-width:1320px;
+      margin:0 auto;
+      padding:0 32px;
+      align-items:center;
+      position:relative;
+      /* Scroll-choreographed — same vocabulary as .feature and .hero-imac.
+         JS rAF handler writes --so, --ss, --sy so the whole Stack scales
+         in/out and floats as it approaches the viewport centre. */
+      opacity:var(--so, 1);
+      transform:scale(var(--ss, .9)) translateY(var(--sy, 30px));
+      transition:opacity .55s var(--ease)
+    }
+    @media(max-width:1080px){
+      .codex-stage{grid-template-columns:240px 1fr;gap:40px}
+    }
+    @media(max-width:860px){
+      .codex-stage{grid-template-columns:1fr;gap:40px;padding:0 20px}
+    }
+
+    /* — DECK — seven cards stacked vertically, Apple-class elevation */
+    .codex-deck{display:flex;flex-direction:column;gap:10px;position:relative}
+    .codex-deck-card{
+      position:relative;display:flex;align-items:center;gap:14px;
+      width:100%;padding:16px 22px;
+      background:var(--surface-2);border:1px solid var(--hair);
+      border-radius:16px;cursor:pointer;text-align:left;
+      font-family:var(--sans);color:var(--text);
+      box-shadow:
+        0 1px 2px rgba(20,19,16,0.04),
+        0 2px 6px rgba(20,19,16,0.06),
+        0 6px 18px rgba(20,19,16,0.05);
+      transition:
+        transform .5s cubic-bezier(0.2,0.9,0.3,1.15),
+        box-shadow .45s var(--ease),
+        background .3s var(--ease),
+        border-color .3s var(--ease),
+        color .3s var(--ease);
+      transform-origin:left center;
+      overflow:hidden
+    }
+    /* Top edge highlight — gives the card real "edge" depth */
+    .codex-deck-card::before{
+      content:'';position:absolute;top:0;left:8px;right:8px;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.85) 50%,transparent);
       pointer-events:none
     }
-    .statement-text{
-      position:relative;z-index:2;font-family:var(--serif);
-      font-size:clamp(40px,8vw,100px);font-weight:300;line-height:1.05;
-      max-width:800px;padding:24px;
-      text-shadow:0 2px 40px rgba(0,0,0,.8),0 8px 80px rgba(0,0,0,.5)
+    .codex-deck-card:hover{
+      transform:translateX(10px) translateY(-2px) rotateZ(-0.3deg);
+      border-color:var(--hair-strong);
+      box-shadow:
+        0 3px 6px rgba(20,19,16,0.08),
+        0 10px 24px rgba(20,19,16,0.12),
+        0 24px 48px rgba(20,19,16,0.10)
     }
-    .statement-text em{
-      font-style:italic;
-      background:linear-gradient(135deg,var(--accent),#E0B888);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-      filter:drop-shadow(0 2px 24px rgba(212,144,96,.35))
+    /* Card .label gets a tiny horizontal slide on hover so the text feels live */
+    .codex-deck-card .label{transition:transform .35s var(--ease)}
+    .codex-deck-card:hover .label{transform:translateX(2px)}
+    .codex-deck-card.active .label{transform:translateX(0)}
+    .codex-deck-card.active{
+      background:var(--text);color:var(--bg);
+      border-color:var(--text);
+      transform:translateX(18px) translateY(-3px) scale(1.025);
+      box-shadow:
+        0 6px 12px rgba(20,19,16,0.18),
+        0 18px 36px rgba(20,19,16,0.22),
+        0 36px 72px rgba(20,19,16,0.16);
+      /* Subtle continuous breath on the active deck card too */
+      animation:deckCardBreath 3.6s ease-in-out infinite
+    }
+    @keyframes deckCardBreath{
+      0%,100%{box-shadow:
+        0 6px 12px rgba(20,19,16,0.18),
+        0 18px 36px rgba(20,19,16,0.22),
+        0 36px 72px rgba(20,19,16,0.16),
+        0 0 0 0 rgba(20,19,16,0.18)}
+      50%{box-shadow:
+        0 6px 12px rgba(20,19,16,0.18),
+        0 22px 44px rgba(20,19,16,0.26),
+        0 44px 88px rgba(20,19,16,0.18),
+        0 0 0 8px rgba(20,19,16,0)}
+    }
+    /* Click pop — a quick 1.04 scale spike then settle */
+    .codex-deck-card.clicked{
+      animation:deckCardPop .35s var(--ease)
+    }
+    @keyframes deckCardPop{
+      0%   {transform:translateX(18px) translateY(-3px) scale(1.025)}
+      40%  {transform:translateX(22px) translateY(-5px) scale(1.05)}
+      100% {transform:translateX(18px) translateY(-3px) scale(1.025)}
+    }
+    /* Active card — a thin glowing accent on the right edge,
+       like a deck-card edition stamp */
+    .codex-deck-card.active::after{
+      content:'';position:absolute;right:-1px;top:22%;bottom:22%;
+      width:3px;background:var(--bg);border-radius:2px;
+      box-shadow:0 0 14px rgba(250,248,240,0.5)
+    }
+    .codex-deck-card .num{
+      font-family:var(--mono);font-size:10px;font-weight:500;
+      letter-spacing:1.8px;color:var(--muted);
+      flex:none;width:24px;transition:color .25s var(--ease)
+    }
+    .codex-deck-card.active .num{color:rgba(250,248,240,0.7)}
+    .codex-deck-card .label{
+      font-family:var(--sans);font-size:16px;font-weight:500;
+      letter-spacing:-0.012em;line-height:1.1
     }
 
-    /* ═══════════════════════════════════════
-       4. ART ROW with pull quote
-       ═══════════════════════════════════════ */
-    /* Unified fog system for all images */
-    .fog{position:relative;overflow:hidden}
-    .fog::before{
-      content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-      box-shadow:inset 0 0 120px 60px var(--dark)
+    /* Deck "auto-cycle" progress strip — sits below the deck, hairline,
+       fills 0→100% over the auto-cycle interval to telegraph that the
+       carousel is alive */
+    .codex-deck-progress{
+      margin-top:14px;height:2px;width:100%;
+      background:var(--hair);border-radius:1px;overflow:hidden;
+      opacity:0;transition:opacity .35s var(--ease)
+    }
+    .codex-stage.auto-cycling .codex-deck-progress{opacity:1}
+    .codex-deck-progress-bar{
+      display:block;height:100%;width:0;background:var(--text);
+      border-radius:1px;transform-origin:left
+    }
+    .codex-stage.auto-cycling .codex-deck-progress-bar{
+      animation:deckProgress 4.6s linear infinite
+    }
+    @keyframes deckProgress{
+      0%{width:0}
+      96%{width:100%}
+      100%{width:100%;opacity:0}
     }
 
-    .art-card{
-      padding:0 24px;max-width:1200px;margin:0 auto
+    /* — STACK WRAP — 3D perspective container with ambient warm halo */
+    .codex-stack-wrap{
+      position:relative;width:100%;
+      aspect-ratio:1500/1000;
+      perspective:1600px;
+      perspective-origin:50% 38%;
+      isolation:isolate
     }
-    .art-card-inner{
-      border-radius:28px;overflow:hidden;position:relative;
-      box-shadow:0 60px 120px rgba(0,0,0,.6),0 0 60px rgba(196,93,62,.04)
+    /* Ambient warm halo behind everything — continuously breathing */
+    .codex-stack-wrap::before{
+      content:'';position:absolute;inset:-12%;
+      background:radial-gradient(
+        ellipse 65% 50% at 50% 58%,
+        rgba(255,232,195,0.45) 0%,
+        rgba(255,220,170,0.22) 38%,
+        rgba(250,248,240,0) 78%);
+      filter:blur(48px);
+      z-index:-1;pointer-events:none;
+      animation:stackHalo 7.5s ease-in-out infinite alternate
     }
-    .art-card-inner img{width:100%;display:block;height:auto}
+    @keyframes stackHalo{
+      0%,100%{opacity:.7;transform:scale(1)}
+      50%{opacity:1;transform:scale(1.06)}
+    }
+    .codex-stack-img{
+      width:100%;height:auto;display:block;
+      transform-style:preserve-3d;
+      transform:rotateY(0) rotateX(0);
+      transition:
+        transform .9s cubic-bezier(0.2,0.8,0.3,1),
+        filter .45s var(--ease),
+        opacity .45s var(--ease);
+      will-change:transform;
+      animation:stackIdleBreath 9s ease-in-out infinite alternate
+    }
+    @keyframes stackIdleBreath{
+      0%,100%{filter:brightness(1) saturate(1)}
+      50%{filter:brightness(1.04) saturate(1.06)}
+    }
+    /* Pause the idle breath while the user is parallaxing or a slab is drawn */
+    .codex-stack-wrap.parallax .codex-stack-img,
+    .codex-stack-wrap.has-active .codex-stack-img{animation:none}
+    /* Tracking mouse — JS writes inline rotateY/X for parallax */
+    .codex-stack-wrap.parallax .codex-stack-img{
+      transition:transform .12s linear, filter .45s var(--ease)
+    }
+    /* When a slab is drawn, dim the underlying stack so the card pops */
+    .codex-stack-wrap.has-active .codex-stack-img{
+      filter:brightness(.88) saturate(.88);
+      opacity:.78
+    }
+    /* Floor reflection beneath the stack — grounds the 3D-perspective stack
+       on the page. Subtle by design so it sits behind the warm halo. */
+    .codex-stack-wrap::after{
+      content:'';position:absolute;left:14%;right:14%;bottom:-18px;height:54px;
+      background:radial-gradient(ellipse at 50% 0%,
+        rgba(20,19,16,0.32) 0%,
+        rgba(20,19,16,0.16) 30%,
+        rgba(20,19,16,0.06) 55%,
+        rgba(20,19,16,0) 78%);
+      filter:blur(10px);
+      pointer-events:none;z-index:-1;
+      opacity:.78
+    }
 
-    .art-quote-row{
-      display:grid;grid-template-columns:1fr 1fr;gap:0;
-      max-width:1200px;margin:0 auto;padding:0 24px;
-      min-height:520px;position:relative
-    }
-    /* Fog over the image side only — left/top/bottom edges dissolve into dark */
-    .art-quote-row::before{
-      content:'';position:absolute;top:0;bottom:0;left:0;width:50%;z-index:2;pointer-events:none;
-      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-      mask-image:
-        linear-gradient(to top, black 0%, transparent 40%),
-        linear-gradient(to bottom, black 0%, transparent 40%),
-        linear-gradient(to right, black 0%, transparent 30%);
-      -webkit-mask-image:
-        linear-gradient(to top, black 0%, transparent 40%),
-        linear-gradient(to bottom, black 0%, transparent 40%),
-        linear-gradient(to right, black 0%, transparent 30%);
-      mask-composite:add;-webkit-mask-composite:source-over;
-      background:
-        linear-gradient(to top, var(--dark) 0%, transparent 40%),
-        linear-gradient(to bottom, var(--dark) 0%, transparent 40%),
-        linear-gradient(to right, var(--dark) 0%, transparent 30%)
-    }
-    /* Soft blend — stays within image column, never touches quote text */
-    .art-quote-row::after{
-      content:'';position:absolute;top:0;bottom:0;left:35%;width:15%;z-index:2;pointer-events:none;
-      background:linear-gradient(to right, transparent 0%, var(--dark) 100%)
-    }
-    .art-quote-img{
-      border-radius:24px;overflow:hidden;position:relative;
-      box-shadow:0 40px 80px rgba(0,0,0,.5)
-    }
-    .art-quote-img img{width:100%;height:100%;object-fit:cover;display:block}
-
-    .art-quote-text{
+    /* — SLAB — uses the actual photographed slab as background, then
+       overlays the principle's content on top. Weighted physics on
+       the draw: starts tucked, tilted, blurred. Lands flat with a
+       soft heavy shadow that suggests real mass. */
+    .codex-slab{
+      position:absolute;
+      top:50%;left:50%;
+      width:80%;
+      aspect-ratio:1.6/1;
+      background-image:url('img/stack-slab-a.png');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      /* Initial state: tucked deep inside the stack */
+      transform:
+        translate(-50%,-12%)
+        scale(.36)
+        rotateZ(-15deg)
+        rotateX(38deg);
+      opacity:0;pointer-events:none;
+      transition:
+        transform 1.0s cubic-bezier(0.32,0.94,0.28,1.05),
+        opacity .65s var(--ease),
+        filter .65s var(--ease),
+        box-shadow .65s var(--ease);
+      filter:brightness(.72) blur(2px);
+      transform-style:preserve-3d;
+      border-radius:22px;
+      z-index:1;
       display:flex;flex-direction:column;justify-content:center;
-      padding:40px 48px 40px 64px;
-      will-change:transform
+      align-items:flex-start;
+      padding:8% 10% 9% 10%;
+      gap:14px
     }
-    .art-quote-text .pull-quote{
-      transition:transform 0.1s linear;will-change:transform;
-      transform:translateY(40px)
+    /* Alternate slab photo on every other card for visual variety */
+    .codex-slab[data-i="1"],
+    .codex-slab[data-i="3"],
+    .codex-slab[data-i="5"]{
+      background-image:url('img/stack-slab-b.png')
     }
-    .pull-quote{
-      font-family:var(--serif);font-style:italic;font-weight:300;
-      font-size:clamp(24px,3.5vw,42px);line-height:1.35;
-      color:var(--text)
+    /* Subtle white wash UNDER the text content so it stays legible
+       against the translucent slab photo */
+    .codex-slab::before{
+      content:'';position:absolute;inset:3.5% 4.5%;border-radius:18px;
+      background:linear-gradient(180deg,
+        rgba(252,250,244,0.62) 0%,
+        rgba(252,250,244,0.82) 40%,
+        rgba(252,250,244,0.88) 100%);
+      backdrop-filter:blur(5px) saturate(1.06);
+      -webkit-backdrop-filter:blur(5px) saturate(1.06);
+      z-index:0;pointer-events:none
     }
-    .pull-quote-attr{
-      font-family:var(--sans);font-size:11px;font-weight:500;
-      letter-spacing:3px;text-transform:uppercase;color:var(--muted)
+    /* Shimmer-wipe — a diagonal highlight sweeps across the slab once,
+       as the card draws out. Apple-page glint. */
+    .codex-slab .codex-slab-glint{
+      position:absolute;inset:3.5% 4.5%;border-radius:18px;
+      background:linear-gradient(105deg,
+        transparent 38%,
+        rgba(255,255,255,0.55) 50%,
+        transparent 62%);
+      background-size:300% 100%;
+      background-position:-150% 0;
+      opacity:0;pointer-events:none;z-index:3;
+      mix-blend-mode:overlay
     }
-    .quote-attr{
-      display:block;margin-top:16px;
-      font-family:var(--sans);font-size:11px;font-weight:400;
+    .codex-slab.active .codex-slab-glint{
+      animation:slabGlint 1.4s var(--ease) .55s forwards
+    }
+    @keyframes slabGlint{
+      0%   {background-position:-150% 0;opacity:0}
+      10%  {opacity:1}
+      90%  {opacity:1}
+      100% {background-position:150% 0;opacity:0}
+    }
+    .codex-slab > *{position:relative;z-index:1}
+
+    /* Tucked-in start position varies by index — each slab is hiding in the
+       y-region of the stack photo where its real slab actually lives. Card 0
+       (Architecture, bottom of stack) starts lower; card 6 (Open Source,
+       top of stack) starts higher. They all DRAW OUT to the same forward
+       position so the focal point is consistent. */
+    .codex-slab[data-i="0"]{transform:translate(-50%,38%)   scale(.36) rotateZ(-14deg) rotateX(38deg)}
+    .codex-slab[data-i="1"]{transform:translate(-50%,26%)   scale(.36) rotateZ(-12deg) rotateX(35deg)}
+    .codex-slab[data-i="2"]{transform:translate(-50%,14%)   scale(.36) rotateZ(-15deg) rotateX(34deg)}
+    .codex-slab[data-i="3"]{transform:translate(-50%,2%)    scale(.36) rotateZ(-13deg) rotateX(33deg)}
+    .codex-slab[data-i="4"]{transform:translate(-50%,-10%)  scale(.36) rotateZ(-16deg) rotateX(32deg)}
+    .codex-slab[data-i="5"]{transform:translate(-50%,-22%)  scale(.36) rotateZ(-14deg) rotateX(31deg)}
+    .codex-slab[data-i="6"]{transform:translate(-50%,-34%)  scale(.36) rotateZ(-15deg) rotateX(30deg)}
+
+    .codex-slab.active{
+      transform:
+        translate(-50%,-52%)
+        scale(1)
+        rotateZ(-2.5deg)
+        rotateX(0);
+      opacity:1;pointer-events:auto;
+      filter:brightness(1) blur(0);
+      z-index:10;
+      box-shadow:
+        0 4px 8px rgba(20,19,16,0.10),
+        0 28px 64px rgba(20,19,16,0.24),
+        0 72px 160px rgba(20,19,16,0.18),
+        0 0 140px rgba(255,210,150,0.42);
+      /* Subtle continuous "alive" breathing layers on top of the draw transition */
+      animation:slabAlive 5.2s ease-in-out 1.1s infinite alternate
+    }
+    @keyframes slabAlive{
+      0%{transform:translate(-50%,-52%) scale(1) rotateZ(-2.5deg) rotateX(0)}
+      100%{transform:translate(-50%,-54%) scale(1.006) rotateZ(-2.2deg) rotateX(0.4deg)}
+    }
+    /* Per-slab rotation variety on active — slab N gets its own resting tilt
+       (and its own alive-breath keyframes derived from it). */
+    .codex-slab[data-i="0"].active{animation:slabAlive0 5.2s ease-in-out 1.1s infinite alternate;transform:translate(-50%,-52%) scale(1) rotateZ(-2.5deg)}
+    .codex-slab[data-i="1"].active{animation:slabAlive1 5.4s ease-in-out 1.1s infinite alternate;transform:translate(-50%,-52%) scale(1) rotateZ(2deg)}
+    .codex-slab[data-i="2"].active{animation:slabAlive2 5.0s ease-in-out 1.1s infinite alternate;transform:translate(-50%,-52%) scale(1) rotateZ(-1.5deg)}
+    .codex-slab[data-i="3"].active{animation:slabAlive3 5.6s ease-in-out 1.1s infinite alternate;transform:translate(-50%,-52%) scale(1) rotateZ(3deg)}
+    .codex-slab[data-i="4"].active{animation:slabAlive4 4.9s ease-in-out 1.1s infinite alternate;transform:translate(-50%,-52%) scale(1) rotateZ(-3deg)}
+    .codex-slab[data-i="5"].active{animation:slabAlive5 5.3s ease-in-out 1.1s infinite alternate;transform:translate(-50%,-52%) scale(1) rotateZ(1.5deg)}
+    .codex-slab[data-i="6"].active{animation:slabAlive6 5.1s ease-in-out 1.1s infinite alternate;transform:translate(-50%,-52%) scale(1) rotateZ(-2deg)}
+    @keyframes slabAlive0{0%{transform:translate(-50%,-52%) scale(1) rotateZ(-2.5deg) rotateX(0)}100%{transform:translate(-50%,-54%) scale(1.006) rotateZ(-2.1deg) rotateX(0.4deg)}}
+    @keyframes slabAlive1{0%{transform:translate(-50%,-52%) scale(1) rotateZ(2deg) rotateX(0)}   100%{transform:translate(-50%,-54%) scale(1.006) rotateZ(2.4deg) rotateX(0.5deg)}}
+    @keyframes slabAlive2{0%{transform:translate(-50%,-52%) scale(1) rotateZ(-1.5deg) rotateX(0)}100%{transform:translate(-50%,-54%) scale(1.006) rotateZ(-1.1deg) rotateX(0.4deg)}}
+    @keyframes slabAlive3{0%{transform:translate(-50%,-52%) scale(1) rotateZ(3deg) rotateX(0)}   100%{transform:translate(-50%,-54%) scale(1.006) rotateZ(3.4deg) rotateX(0.6deg)}}
+    @keyframes slabAlive4{0%{transform:translate(-50%,-52%) scale(1) rotateZ(-3deg) rotateX(0)}  100%{transform:translate(-50%,-54%) scale(1.006) rotateZ(-2.6deg) rotateX(0.4deg)}}
+    @keyframes slabAlive5{0%{transform:translate(-50%,-52%) scale(1) rotateZ(1.5deg) rotateX(0)} 100%{transform:translate(-50%,-54%) scale(1.006) rotateZ(1.9deg) rotateX(0.5deg)}}
+    @keyframes slabAlive6{0%{transform:translate(-50%,-52%) scale(1) rotateZ(-2deg) rotateX(0)}  100%{transform:translate(-50%,-54%) scale(1.006) rotateZ(-1.6deg) rotateX(0.4deg)}}
+
+    /* Slab content fade-in after the card lands (~0.4s into the draw) */
+    .codex-slab > .codex-slab-num,
+    .codex-slab > .codex-slab-title,
+    .codex-slab > .codex-slab-body,
+    .codex-slab > .codex-slab-tag{
+      opacity:0;transform:translateY(10px);
+      transition:opacity .55s var(--ease), transform .55s var(--ease)
+    }
+    .codex-slab.active > .codex-slab-num   {transition-delay:.42s;opacity:1;transform:translateY(0)}
+    .codex-slab.active > .codex-slab-title {transition-delay:.55s;opacity:1;transform:translateY(0)}
+    .codex-slab.active > .codex-slab-body  {transition-delay:.70s;opacity:1;transform:translateY(0)}
+    .codex-slab.active > .codex-slab-tag   {transition-delay:.85s;opacity:1;transform:translateY(0)}
+
+    .codex-slab-num{
+      font-family:var(--mono);font-size:10px;font-weight:500;
+      letter-spacing:1.8px;text-transform:uppercase;color:var(--muted)
+    }
+    .codex-slab-title{
+      font-family:var(--sans);
+      font-size:clamp(22px,2.4vw,32px);font-weight:500;
+      line-height:1.08;letter-spacing:-0.025em;color:var(--text);
+      max-width:22ch
+    }
+    .codex-slab-body{
+      font-family:var(--sans);font-size:clamp(13px,1.2vw,16px);
+      font-weight:400;line-height:1.5;color:var(--muted);
+      max-width:42ch
+    }
+    .codex-slab-tag{
+      display:inline-flex;align-items:center;
+      font-family:var(--mono);font-size:10px;font-weight:500;
+      letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);
+      padding-top:8px;border-top:1px solid var(--hair-strong);
+      max-width:fit-content
+    }
+    /* Position indicator pinned to the slab's top-right corner */
+    .codex-slab-pos{
+      position:absolute;top:7%;right:8%;
+      font-family:var(--mono);font-size:9px;font-weight:600;
+      letter-spacing:2px;color:var(--muted);
+      padding:4px 10px;border:1px solid var(--hair-strong);
+      border-radius:100px;background:rgba(252,250,244,0.55);
+      backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+      z-index:2
+    }
+    .codex-slab-pos strong{color:var(--text);font-weight:600}
+
+    @media(max-width:860px){
+      .codex-slab{width:88%}
+      .codex-slab-title{font-size:18px}
+      .codex-slab-body{font-size:12px}
+      .codex-slab-tag{font-size:9px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      .codex-slab,.codex-deck-card,.codex-stack-img,
+      .codex-stack-wrap::before,
+      .codex-stage.auto-cycling .codex-deck-progress-bar,
+      .codex-slab.active,.codex-deck-card.active,
+      .codex-slab.active .codex-slab-glint{
+        transition:opacity .2s,background .2s,color .2s,border-color .2s;
+        animation:none
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       STATS — big numbers section (Legora ROI block reskin)
+       Three colossal counters with mono labels and one-line captions.
+       Numbers tween up from 0 with easeOutCubic when scrolled into view.
+       ═══════════════════════════════════════════════════════════════════ */
+    .stats-section{
+      padding:clamp(80px,12vw,160px) 32px;
+      border-top:1px solid var(--hair);
+      border-bottom:1px solid var(--hair);
+      position:relative
+    }
+    .stats-head{margin:0 auto clamp(64px,8vw,100px);max-width:840px;text-align:center}
+    .stats-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:64px;max-width:var(--max);margin:0 auto;align-items:start
+    }
+    .stat-cell{
+      display:flex;flex-direction:column;gap:24px;
+      padding-top:32px;border-top:1px solid var(--hair)
+    }
+    .stat-label{
+      font-family:var(--mono);font-size:11px;font-weight:500;
       letter-spacing:2px;text-transform:uppercase;color:var(--muted)
     }
-    .solo-quote{
-      max-width:800px;margin:0 auto;padding:80px 24px;text-align:center
+    .stat-num{
+      font-family:var(--sans);
+      font-size:clamp(80px,11vw,180px);
+      font-weight:500;line-height:.9;letter-spacing:-0.045em;
+      color:var(--text);font-variant-numeric:tabular-nums;
+      display:flex;align-items:baseline
+    }
+    .stat-num .suffix{
+      font-weight:400;color:var(--muted);
+      font-size:0.55em;margin-left:0.06em;letter-spacing:-0.02em
+    }
+    .stat-caption{
+      font-family:var(--sans);font-size:15px;font-weight:400;
+      line-height:1.55;color:var(--muted);max-width:32ch
+    }
+    @media(max-width:860px){
+      .stats-grid{grid-template-columns:1fr;gap:40px}
     }
 
-    /* ═══════════════════════════════════════
-       5. VIDEO SECTION — embedded, framed
-       ═══════════════════════════════════════ */
-    .video-section{padding:clamp(80px,14vw,200px) 24px}
-    .video-label{
-      text-align:center;font-family:var(--serif);
-      font-size:clamp(36px,6vw,72px);font-weight:300;line-height:1.1;
-      margin-bottom:clamp(48px,8vw,96px)
+    /* ═══════════════════════════════════════════════════════════════════
+       FAQ
+       ═══════════════════════════════════════════════════════════════════ */
+    .faq-head{margin:0 auto 64px;max-width:840px;text-align:center}
+    .faq-list{max-width:840px;display:flex;flex-direction:column;border-top:1px solid var(--hair)}
+    .faq-item{border-bottom:1px solid var(--hair)}
+    .faq-q{
+      width:100%;text-align:left;background:none;border:none;
+      padding:24px 0;cursor:pointer;
+      display:flex;justify-content:space-between;align-items:flex-start;gap:24px;
+      font-family:var(--sans);font-size:clamp(18px,2vw,24px);
+      font-weight:500;line-height:1.3;color:var(--text);
+      letter-spacing:-0.02em;transition:color .25s var(--ease)
     }
-    .video-glow{
-      position:relative;max-width:1000px;margin:0 auto;isolation:isolate
+    .faq-q:hover{color:var(--warm)}
+    /* Hover candy on the + only: it fills to a black circle with a cream
+       glyph. Reads as "tap me" without disturbing the row. */
+    .faq-q:hover .faq-toggle{
+      background-color:var(--text);color:var(--bg);
+      border-radius:50%
     }
-    .video-glow::before{
-      content:'';position:absolute;
-      top:50%;left:50%;transform:translate(-50%,-50%);
-      width:320%;height:350%;
-      background:radial-gradient(ellipse at center,
-        rgba(232,132,92,0.9) 0%,
-        rgba(232,132,92,0.5) 15%,
-        rgba(200,110,80,0.25) 30%,
-        rgba(150,80,50,0.1) 50%,
-        transparent 65%);
-      filter:blur(120px);
-      pointer-events:none;z-index:-1
+    .faq-q em{font-style:normal;font-weight:500;color:var(--text)}
+    .faq-toggle{
+      flex:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+      font-family:var(--mono);font-size:18px;color:var(--text);border-radius:50%;
+      transition:transform .35s var(--ease),background-color .25s var(--ease),color .25s var(--ease);
+      margin-top:2px
     }
-    .video-wrap{
-      max-width:1000px;margin:0 auto;
-      background:#0a0a0a;border-radius:20px;overflow:hidden;
-      border:1px solid rgba(255,255,255,.06);
-      box-shadow:
-        0 100px 200px rgba(0,0,0,.8),
-        0 50px 100px rgba(0,0,0,.5),
-        0 0 120px rgba(232,132,92,.04),
-        0 0 0 1px rgba(255,255,255,.03) inset;
-      mask-image:none;
-      -webkit-mask-image:none
+    .faq-item.open .faq-toggle{transform:rotate(45deg)}
+    .faq-a{
+      max-height:0;overflow:hidden;
+      transition:max-height .45s var(--ease),padding .45s var(--ease)
     }
-    .video-chrome{
-      display:flex;align-items:center;gap:7px;padding:14px 20px;
-      background:#0d0d0d;border-bottom:1px solid rgba(255,255,255,.05)
+    .faq-item.open .faq-a{max-height:640px;padding:0 0 28px}
+    .faq-a p{
+      font-family:var(--sans);font-size:15px;line-height:1.7;
+      color:var(--muted);margin-bottom:12px;max-width:64ch
     }
-    .dot{width:10px;height:10px;border-radius:50%}
-    .dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
-    .video-chrome-url{flex:1;text-align:center;font-size:11px;color:rgba(255,255,255,.18);font-weight:500}
-    .video-container{
-      position:relative;width:100%;padding-bottom:56.25%;
-      background:#000
+    .faq-a p strong{color:var(--text);font-weight:600}
+    .faq-a a{color:var(--text);border-bottom:1px solid var(--hair-strong);font-weight:500}
+
+    /* ═══════════════════════════════════════════════════════════════════
+       CLOSING + footer
+       ═══════════════════════════════════════════════════════════════════ */
+    .closing{padding:clamp(100px,14vw,180px) 32px clamp(80px,12vw,140px);text-align:center}
+    .closing .container-narrow{max-width:1160px}
+    .closing .closing-h2{
+      font-family:var(--serif);font-size:clamp(32px,4.2vw,60px);
+      font-weight:400;line-height:1.15;letter-spacing:-0.005em;
+      margin:0 auto 28px;max-width:none;padding:0 56px;
+      text-align:center
     }
-    .video-container iframe{
-      position:absolute;top:0;left:0;width:100%;height:100%;border:none
+    .closing .closing-h2 em{font-style:normal;font-weight:400;color:var(--text)}
+    .closing .cta-row{
+      max-width:760px;margin:0 auto
     }
-    /* Placeholder state before video loads or if no video yet */
-    .video-placeholder{
-      position:absolute;inset:0;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:20px;background:#0a0a0a;cursor:pointer
+    /* The install pill inside the closing cta-row may want to grow due
+       to max-width:100% — force it to natural width here */
+    .closing .cta-row > *{flex:0 0 auto}
+    .closing-deck{
+      font-family:var(--sans);font-size:clamp(17px,1.8vw,22px);
+      font-weight:400;color:var(--muted);
+      max-width:560px;margin:0 auto 40px;line-height:1.55;
+      text-align:center
     }
-    .video-play{
-      width:80px;height:80px;border-radius:50%;
-      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-      display:flex;align-items:center;justify-content:center;
-      transition:all .4s var(--ease)
+    .closing-deck em{font-style:normal;font-weight:600;color:var(--text)}
+    .deepdive-link{
+      display:inline-flex;align-items:center;gap:8px;margin-top:48px;
+      font-family:var(--mono);font-size:11px;font-weight:500;
+      letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);
+      padding-bottom:4px;border-bottom:1px solid var(--hair-strong);
+      transition:color .25s var(--ease),border-color .25s var(--ease)
     }
-    .video-placeholder:hover .video-play{
-      background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);
-      transform:scale(1.08)
-    }
-    .video-play-arrow{
-      width:0;height:0;border-style:solid;
-      border-width:12px 0 12px 22px;
-      border-color:transparent transparent transparent rgba(255,255,255,0.5);
-      margin-left:4px
-    }
-    .video-soon{
-      font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;
-      color:rgba(255,255,255,0.2)
+    /* Belt-and-braces: in case any descendant of .closing falls back to
+       left-align, force-centre the immediate children */
+    .closing > .container-narrow > *{text-align:center}
+    .deepdive-link:hover{color:var(--text);border-color:var(--text)}
+    .deepdive-link .arrow{display:inline-block;transition:transform .25s var(--ease)}
+    .deepdive-link:hover .arrow{transform:translate(2px,-2px)}
+    .closing-ps{
+      font-family:var(--sans);font-style:normal;font-weight:300;
+      font-size:14px;color:var(--muted);
+      max-width:520px;margin:56px auto 0;line-height:1.55;
+      letter-spacing:-0.005em
     }
 
-    /* ═══════════════════════════════════════
-       6. CTA
-       ═══════════════════════════════════════ */
-    .cta{
-      min-height:90vh;position:relative;overflow:hidden;
-      display:flex;align-items:center;justify-content:center;text-align:center
+    footer{
+      border-top:1px solid var(--hair);padding:48px 32px
     }
-    .cta-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-    .cta::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:50%;z-index:1;
-      background:linear-gradient(to top,transparent,var(--dark));pointer-events:none
+    .footer-grid{
+      max-width:var(--max);margin:0 auto;
+      display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center
     }
-    .cta::after{
-      content:'';position:absolute;bottom:0;left:0;right:0;height:50%;z-index:1;
-      background:linear-gradient(to bottom,transparent,var(--dark));pointer-events:none
+    .footer-mark{
+      font-family:var(--sans);font-size:18px;font-weight:500;
+      letter-spacing:-0.5px;color:var(--text)
     }
-    .cta-content{position:relative;z-index:2;padding:24px}
-    .cta-title{
-      font-family:var(--serif);font-size:clamp(48px,9vw,120px);
-      font-weight:300;line-height:.95;margin-bottom:40px;
-      text-shadow:0 4px 60px rgba(0,0,0,.5)
+    .footer-links{
+      display:flex;justify-content:flex-end;gap:24px;flex-wrap:wrap;
+      font-family:var(--mono);font-size:11px;font-weight:500;
+      letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)
     }
-    .cta-title em{font-style:italic}
-
-    /* Mist — soft fog rising from the bottom of the page */
-    .smoke{
-      position:fixed;bottom:0;left:0;right:0;height:40vh;pointer-events:none;z-index:9998;
-      background:linear-gradient(to top,
-        var(--dark) 0%,
-        rgba(8,8,8,0.85) 20%,
-        rgba(8,8,8,0.5) 45%,
-        rgba(8,8,8,0.15) 70%,
-        transparent 100%
-      )
+    .footer-links a{transition:color .25s var(--ease)}
+    .footer-links a:hover{color:var(--text)}
+    .footer-kindred{
+      max-width:var(--max);margin:28px auto 0;
+      padding-top:22px;border-top:1px solid var(--hair);
+      display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+      font-family:var(--mono);font-size:10px;font-weight:500;
+      letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)
     }
-
-    /* Footer */
-    .footer{
-      padding:48px 24px 32px;border-top:1px solid rgba(255,255,255,.04);
-      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;
-      max-width:1200px;margin:0 auto
+    .footer-kindred .label{color:var(--dim)}
+    .footer-kindred .sep{color:var(--dim)}
+    .footer-kindred a{
+      color:var(--muted);transition:color .25s var(--ease)
     }
-    .footer-left{display:flex;align-items:center;gap:24px}
-    .footer-mark{font-family:var(--serif);font-size:16px;font-weight:300;letter-spacing:8px;color:var(--text)}
-    .footer-link{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s}
-    .footer-link:hover{color:var(--text)}
-    .footer-right{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
-
-    /* Spacers */
-    .sp{height:clamp(80px,12vw,160px)}
-    .sp-lg{height:clamp(120px,16vw,240px)}
-
-    /* Responsive */
-    @media(max-width:1024px){
-      .art-quote-row{grid-template-columns:1fr;min-height:auto}
-      .art-quote-text{padding:40px 24px}
-      /* Disable side fog when stacked — use simple vertical fade instead */
-      .art-quote-row::before{
-        width:100%;
-        mask-image:
-          linear-gradient(to top, black 0%, transparent 30%),
-          linear-gradient(to bottom, black 0%, transparent 30%);
-        -webkit-mask-image:
-          linear-gradient(to top, black 0%, transparent 30%),
-          linear-gradient(to bottom, black 0%, transparent 30%);
-        background:
-          linear-gradient(to top, var(--dark) 0%, transparent 30%),
-          linear-gradient(to bottom, var(--dark) 0%, transparent 30%)
-      }
-      .art-quote-row::after{display:none}
-    }
-    @media(max-width:768px){
-      /* ── Mobile: hero + footer only, single screen, no scroll ── */
-      .statement,.art-quote-row,.video-section,.cta,.sp,.sp-lg,.hero-scroll{display:none !important}
-      html,body{overflow:hidden;height:100vh;height:100dvh}
-      .login{display:none}
-      .logo{top:20px;left:20px;font-size:15px;letter-spacing:6px}
-      .hero h1{letter-spacing:-1px;margin-bottom:36px}
-      /* Disable ALL image animation/transform on mobile */
-      .hero-img{animation:none !important;transform:none !important}
-      /* Fix iOS Safari viewport resize — lock hero height, +1px kills sub-pixel seam */
-      .hero{min-height:calc(100vh + 1px);min-height:calc(100dvh + 1px);max-height:calc(100vh + 1px);max-height:calc(100dvh + 1px);overflow:hidden}
-      .hero-img{position:absolute;top:0;left:0;width:100%;height:calc(100vh + 1px);height:calc(100dvh + 1px);object-fit:cover}
-      .btn-invite{padding:16px 44px;font-size:10px}
-      .btn-invite:hover{transform:none}
-      .hero::after{height:40%}
-      .smoke{height:35vh}
-      /* Footer — single clean row, no border */
-      .footer{padding:16px 20px;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:transparent;border-top:none;flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:0;max-width:none;margin:0}
-      .footer-left{flex-direction:row;align-items:center;gap:0}
-      .footer-mark{font-size:13px;letter-spacing:6px}
-      .footer-right{font-size:9px;letter-spacing:2px}
-      .footer-right a{color:var(--muted);text-decoration:none}
-      /* Hide footer links — architecture link is in top-right via .arch-link */
-      .footer-link{display:none}
-    }
-    @media(max-width:420px){
-      .logo{top:16px;left:16px;font-size:13px;letter-spacing:5px}
-      .hero-content{padding:16px}
-      .hero h1{font-size:clamp(40px,12vw,56px)}
-      .btn-invite{padding:14px 36px;font-size:9px;letter-spacing:2px}
+    .footer-kindred a:hover{color:var(--text)}
+    @media(max-width:640px){
+      .footer-grid{grid-template-columns:1fr;gap:18px}
+      .footer-links{justify-content:flex-start;gap:16px}
+      .footer-kindred{gap:12px}
     }
 
-    /* The Architecture — desktop: hidden (it's in the footer). Mobile: top-right fixed. */
-    .arch-link{display:none}
-    @media(max-width:768px){
-      .arch-link{display:block;position:fixed;top:22px;right:20px;z-index:100;font-family:var(--sans);font-size:10px;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:var(--text);text-decoration:none;mix-blend-mode:difference;opacity:.45}
+    /* skip-to-content — visible only on keyboard focus */
+    .skip-link{
+      position:absolute;left:16px;top:-44px;z-index:1000;
+      background:var(--text);color:var(--bg);
+      padding:10px 16px;border-radius:6px;
+      font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+      text-decoration:none;
+      transition:top .2s ease
     }
-    .skip-link{position:absolute;top:-100px;left:0;background:var(--accent);color:#fff;padding:12px 24px;z-index:10001;font-size:14px;text-decoration:none}
-    .skip-link:focus{top:0}
-    a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+    .skip-link:focus{top:16px;outline:2px solid var(--accent);outline-offset:2px}
+
+    /* ═══════════════════════════════════════════════════════════════════
+       GOBLIN MODE — easter egg. Click the 👹 in the footer.
+       Inverts the editorial aesthetic into a deliberate goblin palette:
+       goblin-green page, Comic Sans on the big headings, subtle tilt,
+       custom 👹 cursor, mist and grain hidden. Persists in localStorage.
+       ═══════════════════════════════════════════════════════════════════ */
+    .goblin-toggle{
+      background:none;border:0;font-size:14px;cursor:pointer;
+      opacity:.28;transition:opacity .25s var(--ease),transform .35s var(--ease);
+      padding:4px 6px;line-height:1;border-radius:6px;
+      vertical-align:baseline
+    }
+    @media(max-width:640px){
+      /* Easter egg — bigger emoji + comfier tap target on a phone */
+      .goblin-toggle{font-size:18px;padding:8px 10px;opacity:.4}
+    }
+    .goblin-toggle:hover{opacity:1;transform:rotate(-14deg) scale(1.5)}
+    .goblin-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;opacity:1}
+    .goblin-tag{display:none}
+
+    html.goblin{
+      --bg:#B8E25E;
+      --surface:#D6F08F;
+      --surface-2:#A4D348;
+      --warm:#FFF6A8;
+      --text:#1a2a00;
+      --muted:#3d5a00;
+      --dim:#6b8a30;
+      --hair:rgba(20,40,0,0.20);
+      --hair-strong:rgba(20,40,0,0.40)
+    }
+    /* Goblin cursor: reuse the existing .cursor-dot div (already tracks
+       the pointer via JS) and skin it as a 👹. The trail is hidden;
+       the system cursor stays hidden via the base `html,body,* { cursor:none !important }`. */
+    html.goblin .cursor-trail,
+    html.goblin .paper-grain{display:none}
+    html.goblin .cursor-dot{
+      width:auto;height:auto;
+      background:transparent !important;
+      border:0 !important;
+      border-radius:0;
+      mix-blend-mode:normal;
+      font-size:22px;line-height:1;
+      transition:transform .2s ease;
+      /* JS centers the 8 px dot via -4 px offset; nudge for the larger emoji */
+      transform:translate(-8px,-10px)
+    }
+    html.goblin .cursor-dot::before{content:'👹';display:block}
+    html.goblin .cursor-dot.hover{
+      transform:translate(-8px,-10px) rotate(-15deg) scale(1.3)
+    }
+    html.goblin .hero-mist{opacity:.4;filter:hue-rotate(80deg)}
+    html.goblin .hero h1,
+    html.goblin .section-title,
+    html.goblin .closing-h2,
+    html.goblin .faq-q,
+    html.goblin .billboard-h2{
+      font-family:'Comic Sans MS','Chalkboard SE',cursive!important;
+      letter-spacing:0!important
+    }
+    html.goblin main{transform:rotate(-0.35deg);transform-origin:50% 0}
+    /* The subtle tilt reads as a playful flourish on desktop, but on a
+       phone it pivots from top-centre and causes a visible zoom/shift
+       when goblin mode toggles. Keep the font + colour flip on mobile,
+       skip the rotation. */
+    @media(max-width:640px){
+      html.goblin main{transform:none}
+    }
+    html.goblin .goblin-toggle{opacity:1;transform:rotate(-20deg) scale(1.4)}
+    html.goblin .goblin-tag{
+      display:block;position:fixed;top:14px;left:50%;
+      transform:translateX(-50%);z-index:200;
+      background:#1a2a00;color:#B8E25E;
+      font-family:'Comic Sans MS','Chalkboard SE',cursive;
+      font-size:11px;letter-spacing:2px;text-transform:uppercase;
+      padding:6px 14px;border-radius:100px;
+      pointer-events:none;
+      animation:goblinBob 1.6s ease-in-out infinite
+    }
+    @keyframes goblinBob{
+      0%,100%{transform:translateX(-50%) translateY(0) rotate(-2deg)}
+      50%{transform:translateX(-50%) translateY(-3px) rotate(2deg)}
+    }
+
   </style>
 </head>
 <body>
-  <script defer data-domain="lavern.ai" src="https://plausible.io/js/script.js"></script>
-  <a href="#main" class="skip-link">Skip to content</a>
 
-  <!-- 1. Logo only — top left, nothing else -->
-  <a href="#" class="logo">LAVERN</a>
-  <a href="#" class="login">Log In</a>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="goblin-tag" aria-hidden="true">Goblin Mode</div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       NAV
+       ═══════════════════════════════════════════════════════════════════ -->
+  <nav class="nav" aria-label="Primary">
+    <a href="/" class="brand" aria-label="Lavern home">Lavern</a>
+    <div class="nav-meta"><span><span class="dot"></span>v0.15.0 · Apache 2.0</span></div>
+    <div class="nav-links">
+      <a class='nav-link featured' href='/architecture/'>Architecture <span class="arrow">↗</span></a>
+      <a class="nav-link featured" href="/demo/" id="navDemo">Demo</a>
+      <a class="nav-link primary" href="https://github.com/AnttiHero/lavern" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3Z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </nav>
 
   <main id="main">
 
-    <!-- ═══════ HERO ═══════ -->
-    <section class="hero">
-      <img src="img/hero.jpg" alt="" role="presentation" class="hero-img" loading="eager">
-      <div class="hero-fog-left"></div>
-      <div class="hero-fog-right"></div>
-      <div class="hero-content">
-        <h1 class="r">Excellence<br>doesn't scale.<br><em>Until now.</em></h1>
-        <a href="https://app.lavern.ai/#/demo" class="btn-invite r r1">Talk is cheap</a>
+  <!-- ═══════════════════════════════════════════════════════════════════
+       HERO
+       ═══════════════════════════════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <div class="hero-mist" aria-hidden="true"><span></span><span></span><span></span></div>
+    <h1 class="word-reveal" id="heroHeadline"
+        data-goblin="A scrappy law goblin.<br><span>Yours.</span>">
+      An agentic law firm.<br>
+      <em>Yours.</em>
+    </h1>
+    <p class="hero-deck r r2 v" style="text-wrap:balance">
+      <strong>Sixty-seven</strong> specialist agents.
+      <strong>Free</strong> for you to use and build.
+      <strong style="white-space:nowrap">Open source.</strong>
+      Built by a <strong style="white-space:nowrap">law firm founder.</strong>
+    </p>
+    <div class="cta-row r r3 v">
+      <a class="btn btn-primary" href="https://github.com/AnttiHero/lavern" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3Z"/></svg>
+        View source on GitHub
+      </a>
+      <button class="install" id="install" type="button" aria-label="Copy install command">
+        <span class="install-prompt">$</span>
+        <span class="install-cmd">curl -fsSL lavern.ai/install.sh | sh</span>
+        <span class="install-copy" id="installCopy">Copy</span>
+      </button>
+    </div>
+    <!-- iMac shot doubles as the demo video player. click play to start. -->
+    <div class="hero-imac" id="heroImac">
+      <img src="img/imac-hero.jpg" alt="Lavern running on an iMac. Click to play the demo." loading="eager" decoding="async">
+      <!-- Video sits behind a play overlay; locked to the iMac screen area
+           within imac-hero.jpg. Hidden until the user clicks play. -->
+      <div class="hero-imac-screen">
+        <video id="heroVideo" playsinline preload="metadata">
+          <source src="demo.mp4" type="video/mp4">
+        </video>
       </div>
-    </section>
+      <button class="hero-imac-play" id="heroPlay" type="button" aria-label="Play the Lavern demo video">
+        <span class="hero-imac-play-circle">
+          <svg viewBox="0 0 88 88" aria-hidden="true">
+            <circle cx="44" cy="44" r="42.5" fill="none" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M36 28 L62 44 L36 60 Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="hero-imac-play-meta">≈ 27 sec</span>
+      </button>
+    </div>
+    <p class="hero-imac-cap"><span class="rule" aria-hidden="true"></span><span>Lavern on your desk &middot; <span>Not in a browser tab</span></span><span class="rule" aria-hidden="true"></span></p>
 
-    <div class="sp-lg"></div>
+    <div class="hero-meta r r4 v">
+      <div class="hero-meta-item"><div class="hero-meta-num count-up" data-target="67">0</div><div class="hero-meta-label">Agents</div></div>
+      <div class="hero-meta-item"><div class="hero-meta-num count-up" data-target="10" data-suffix="×">0×</div><div class="hero-meta-label">Verification passes</div></div>
+      <div class="hero-meta-item"><div class="hero-meta-num count-up" data-target="100" data-suffix="%">0%</div><div class="hero-meta-label">Open source</div></div>
+      <div class="hero-meta-item"><div class="hero-meta-num">Local</div><div class="hero-meta-label">On-device option</div></div>
+    </div>
+  </section>
 
-    <!-- ═══════ STATEMENT — darkened image for text visibility ═══════ -->
-    <section class="statement">
-      <img src="img/statement.jpg" alt="" role="presentation" class="statement-img" loading="lazy">
-      <div class="statement-overlay"></div>
-      <p class="statement-text r">Law firms sell hours.<br>We sell <em>answers.</em></p>
-    </section>
+  </div>
 
-    <!-- ═══════ Art + pull quote ═══════ -->
-    <div class="sp-lg"></div>
-    <div class="art-quote-row">
-      <div class="art-quote-img r">
-        <img src="img/detail.jpg" alt="" role="presentation" loading="lazy">
+  <!-- ═══════════════════════════════════════════════════════════════════
+       FEATURES. 10 boxes
+       ═══════════════════════════════════════════════════════════════════ -->
+  <section id="features">
+    <div class="container">
+      <div class="features-head r">
+        <span class="section-tag">The system</span>
+        <h2 class="section-title word-reveal" data-goblin="The <span>guts</span> of Lavern.">The architecture <em>of&nbsp;Lavern.</em></h2>
+        <p class="section-deck section-quote"><span>“It is like a legal tech tool, mixed with some <em>NBA 2K</em> and <em>Pokémon</em>.”</span> <span class="quote-attr">— General Counsel</span></p>
       </div>
-      <div class="art-quote-text r r1">
-        <p class="pull-quote" data-words>"This might be the strangest legal tech tool I have ever seen." — GC</p>
+
+      <div class="features-grid">
+
+        <!-- 01 Legal AI tool. the basic Lavern functionality -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:10px">
+              <div class="m-card" style="background:var(--surface-2);gap:8px">
+                <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)">What brings you in today?</div>
+                <div class="m-type-instruct" style="font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.4">Review this <strong>two-year non-compete</strong> across <strong>twelve states</strong>. Buy-side. Find anything we should push back on.<span class="m-caret"></span></div>
+                <div class="m-row" style="justify-content:flex-end;gap:8px;padding-top:4px">
+                  <span class="m-tag neutral">+ Attach</span>
+                  <span class="m-tag m-cta" style="background:var(--text);color:var(--bg)">Instruct →</span>
+                </div>
+              </div>
+              <div class="m-row" style="font-family:var(--mono);font-size:10px;color:var(--muted);justify-content:center"><span class="m-dot ok"></span><span>Your firm is on it</span></div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>01</span> · The Tool</div>
+            <h3 class="feature-title">Legal work, <em>on demand.</em></h3>
+            <p class="feature-desc">Type the request. Review, draft, redline, summarise, restructure. Lavern's team picks up the work. The instruct line is the front door.</p>
+          </div>
+        </article>
+
+        <!-- 02 Agentic team. DiceBear Notionists avatars -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:8px">
+              <div class="m-row"><img class="m-avatar-img" src="https://api.dicebear.com/9.x/notionists/svg?seed=eleanor&backgroundColor=f4f2ec,e8e4d8,d8d2c4" alt="" loading="lazy"><div style="flex:1"><div style="color:var(--text);font-family:var(--sans);font-size:11.5px;font-weight:500">Eleanor Vance · Senior Partner</div><div style="font-size:10.5px">M&amp;A · 30y · debate-ready</div></div><span class="m-tag ok">on</span></div>
+              <div class="m-row"><img class="m-avatar-img" src="https://api.dicebear.com/9.x/notionists/svg?seed=marcus&backgroundColor=f4f2ec,e8e4d8,d8d2c4" alt="" loading="lazy"><div style="flex:1"><div style="color:var(--text);font-family:var(--sans);font-size:11.5px;font-weight:500">Marcus Ito · Associate</div><div style="font-size:10.5px">Contracts · adversarial</div></div><span class="m-tag ok">on</span></div>
+              <div class="m-row"><img class="m-avatar-img" src="https://api.dicebear.com/9.x/notionists/svg?seed=sana&backgroundColor=f4f2ec,e8e4d8,d8d2c4" alt="" loading="lazy"><div style="flex:1"><div style="color:var(--text);font-family:var(--sans);font-size:11.5px;font-weight:500">Sana Reyes · Specialist</div><div style="font-size:10.5px">Delaware corporate</div></div><span class="m-tag ok">on</span></div>
+              <div class="m-row"><div class="m-avatar" style="opacity:.5">+</div><div style="flex:1;font-size:10.5px;color:var(--dim)">64 more available</div></div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>02</span> · Team</div>
+            <h3 class="feature-title">An agentic <em>team.</em></h3>
+            <p class="feature-desc">Sixty-seven specialists with skill ratings, personalities, and faces. M&amp;A partner, adversarial associate, jurisdictional specialist. Or build your own.</p>
+          </div>
+        </article>
+
+        <!-- 03 Debate. with DiceBear avatars on the contesting voices -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:8px">
+              <div class="m-card m-card-ping">
+                <div class="m-row" style="gap:8px"><img class="m-avatar-img sm m-bobber" src="https://api.dicebear.com/9.x/notionists/svg?seed=eleanor&backgroundColor=f4f2ec" alt="" loading="lazy"><span class="m-tag danger">red</span><span style="color:var(--text);font-family:var(--sans);font-size:11.5px;font-weight:500;flex:1">Indemnification cap is uncapped.</span></div>
+                <div class="m-quote" style="font-size:11px;color:var(--muted)">“…the Indemnifying Party shall be liable for all losses…” §8.2</div>
+              </div>
+              <div style="text-align:center;color:var(--text);font-size:14px;line-height:1;opacity:.5"><span class="m-arrow-swap">↕</span></div>
+              <div class="m-card m-card-ping">
+                <div class="m-row" style="gap:8px"><img class="m-avatar-img sm m-bobber" src="https://api.dicebear.com/9.x/notionists/svg?seed=marcus&backgroundColor=f4f2ec" alt="" loading="lazy"><span class="m-tag warn">challenge</span><span style="color:var(--text);font-family:var(--sans);font-size:11.5px;font-weight:500;flex:1">§13.1 carves out. See “Notwithstanding”.</span></div>
+                <div class="m-quote" style="font-size:11px;color:var(--muted)">Marcus Ito · counter-evidence cited</div>
+              </div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>03</span> · Debate</div>
+            <h3 class="feature-title">Agents that <em>argue.</em></h3>
+            <p class="feature-desc">Every finding cites evidence. Every challenge cites counter-evidence. The orchestrator weighs both and resolves. The audit trail is a side effect.</p>
+          </div>
+        </article>
+
+        <!-- 04 The Soul -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:6px;color:var(--muted);font-family:var(--sans);font-style:normal;font-size:13px;line-height:1.55">
+              <div style="color:var(--text);font-family:var(--mono);font-style:normal;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:500;opacity:.7">// FIRM PERSONALITY</div>
+              <div class="m-soul-line">No legalese. Plain language.</div>
+              <div class="m-soul-line">Look at everything from the client's perspective.</div>
+              <div class="m-soul-line">Explain every decision in business terms.<span class="m-caret"></span></div>
+              <div style="color:var(--dim);font-family:var(--mono);font-style:normal;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;margin-top:4px">. injected into every engagement</div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>04</span> · Soul</div>
+            <h3 class="feature-title">A firm with a <em>voice.</em></h3>
+            <p class="feature-desc">Write the principles. They flow into the orchestrator's system prompt for every engagement. The firm sounds like the firm. Not like a model.</p>
+          </div>
+        </article>
+
+        <!-- 05 Knowledge. open, bring-your-own -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:7px">
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">Your firm precedents</span><span style="color:var(--dim)">243 docs</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">Past contracts</span><span style="color:var(--dim)">1,840 docs</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">CUAD · MAUD · LEDGAR</span><span style="color:var(--dim)">5 datasets</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--text)"><span class="m-dot ok"></span><span style="flex:1;font-weight:500">Your client memos</span><span style="color:var(--dim)">412 docs</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--dim);padding-top:4px;border-top:1px solid var(--hair)"><span class="m-plus-rotate" style="font-size:14px;line-height:1;color:var(--text)">+</span><span style="flex:1">Drop a folder. It indexes.</span></div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>05</span> · Knowledge</div>
+            <h3 class="feature-title">Open <em>shelf.</em></h3>
+            <p class="feature-desc">Five public legal datasets out of the box. Plus your firm's precedents, contracts, memos, anything. Drop a folder, it indexes, the agents cite it.</p>
+          </div>
+        </article>
+
+        <!-- 06 Verification -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:14px;justify-content:center">
+              <div class="m-row" style="gap:9px">
+                <span class="m-dot ok"></span><span class="m-dot ok"></span><span class="m-dot ok"></span>
+                <span class="m-dot ok"></span><span class="m-dot ok"></span><span class="m-dot ok"></span>
+                <span class="m-dot ok"></span><span class="m-dot warn"></span><span class="m-dot dim"></span><span class="m-dot dim"></span>
+              </div>
+              <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.5px">pass 7 of 10 · structure · evidence · preservation · placeholders · …</div>
+              <div class="m-bar"><span class="m-bar-loop" style="--fill:70%"></span></div>
+              <div class="m-quote" style="font-size:13px;color:var(--text)">critique → revise → resubmit</div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>06</span> · Verification</div>
+            <h3 class="feature-title">A ten-pass <em>loop.</em></h3>
+            <p class="feature-desc">A loop that checks, critiques, and iterates produces a deliverable. A single pass produces a draft. Lavern is a loop. That's the difference.</p>
+          </div>
+        </article>
+
+        <!-- 07 Delivery. one beautifully-typeset Lavern document -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:0;justify-content:center;align-items:stretch">
+              <div class="m-doc-large">
+                <div class="m-doc-large-header">
+                  <span class="m-doc-large-tag">Executive memo</span>
+                  <span class="m-doc-large-meta">Lavern · 12 May 2026</span>
+                </div>
+                <div class="m-doc-large-title">Two-year non-compete review</div>
+                <div class="m-doc-large-body">
+                  <p>Twelve states. Buy-side. Three risks ranked by severity.</p>
+                  <ul>
+                    <li>Texas: California-style void provision <strong>does not apply</strong>.</li>
+                    <li>Massachusetts: §24L garden-leave gap is <strong>actionable</strong>.</li>
+                    <li>Florida: tolling provision <strong>missing</strong>; recommend redline.</li>
+                  </ul>
+                </div>
+                <div class="m-doc-large-footer">
+                  <span class="m-doc-stamp"></span><span>3 of 14 findings · cited at §1.2, §3.4, §5.1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>07</span> · Delivery</div>
+            <h3 class="feature-title">An actual <em>deliverable.</em></h3>
+            <p class="feature-desc">Lavern produces real documents. Executive memos, redlines, board emails. Typeset, cited, ready to send. Not a chat transcript. A deliverable.</p>
+          </div>
+        </article>
+
+        <!-- 08 Briefing. Law is a context game -->
+        <article class="feature briefing-card">
+          <div class="feature-mockup"><div class="feature-body" style="gap:10px">
+              <div class="m-row" style="align-items:flex-start;gap:8px"><img class="m-avatar-img sm" src="https://api.dicebear.com/9.x/notionists/svg?seed=intake&backgroundColor=f4f2ec" alt="" loading="lazy"><div class="m-bubble them" style="flex:1">What kind of document are we looking at?</div></div>
+              <div class="m-bubble you">M&amp;A NDA. Delaware. $50M deal.</div>
+              <div class="m-row" style="align-items:flex-start;gap:8px"><img class="m-avatar-img sm" src="https://api.dicebear.com/9.x/notionists/svg?seed=intake&backgroundColor=f4f2ec" alt="" loading="lazy"><div class="m-bubble them" style="flex:1">What's your risk appetite. Strict or pragmatic?</div></div>
+              <div class="m-bubble you">Strict. Buy-side.</div>
+              <div class="m-typing" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>08</span> · Briefing</div>
+            <h3 class="feature-title">Law is a <em>context game.</em></h3>
+            <p class="feature-desc">An adaptive interview builds the context every agent will need. Jurisdiction, deal size, risk appetite, intent. The model is not the bottleneck. Context is.</p>
+          </div>
+        </article>
+
+        <!-- 09 Voice. talk to the partner -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:16px;justify-content:center;align-items:center">
+              <svg class="wave-svg" viewBox="0 0 200 40" style="width:90%;max-width:320px;height:40px" aria-hidden="true">
+                <g fill="var(--text)">
+                  <rect x="2" y="17" width="2" height="6"/><rect x="8" y="14" width="2" height="12"/>
+                  <rect x="14" y="10" width="2" height="20"/><rect x="20" y="6" width="2" height="28"/>
+                  <rect x="26" y="11" width="2" height="18"/><rect x="32" y="15" width="2" height="10"/>
+                  <rect x="38" y="9" width="2" height="22"/><rect x="44" y="13" width="2" height="14"/>
+                  <rect x="50" y="7" width="2" height="26"/><rect x="56" y="12" width="2" height="16"/>
+                  <rect x="62" y="16" width="2" height="8"/><rect x="68" y="10" width="2" height="20"/>
+                  <rect x="74" y="14" width="2" height="12"/><rect x="80" y="8" width="2" height="24"/>
+                  <rect x="86" y="11" width="2" height="18"/><rect x="92" y="15" width="2" height="10"/>
+                  <rect x="98" y="9" width="2" height="22"/><rect x="104" y="13" width="2" height="14"/>
+                  <rect x="110" y="6" width="2" height="28"/><rect x="116" y="12" width="2" height="16"/>
+                  <rect x="122" y="16" width="2" height="8"/><rect x="128" y="11" width="2" height="18"/>
+                  <rect x="134" y="14" width="2" height="12"/><rect x="140" y="8" width="2" height="24"/>
+                  <rect x="146" y="13" width="2" height="14"/><rect x="152" y="15" width="2" height="10"/>
+                  <rect x="158" y="10" width="2" height="20"/><rect x="164" y="14" width="2" height="12"/>
+                  <rect x="170" y="17" width="2" height="6"/><rect x="176" y="13" width="2" height="14"/>
+                  <rect x="182" y="16" width="2" height="8"/><rect x="188" y="18" width="2" height="4"/>
+                </g>
+              </svg>
+              <div class="m-row" style="align-items:flex-start;gap:8px;max-width:92%"><img class="m-avatar-img sm voice-avatar" src="https://api.dicebear.com/9.x/notionists/svg?seed=eleanor&backgroundColor=f4f2ec" alt="" loading="lazy"><div class="m-bubble them" style="flex:1;font-style:normal;font-size:13px">“Eleanor, what's the strongest counter we have on §8.2?”</div></div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>09</span> · Voice</div>
+            <h3 class="feature-title">Talk to the <em>partner.</em></h3>
+            <p class="feature-desc">Ask questions, interrupt the work, reopen the conversation post-delivery. Voice in three places. The partner you're talking to is the one you picked.</p>
+          </div>
+        </article>
+
+        <!-- 10 Clawern. autonomous, local AI models -->
+        <article class="feature">
+          <div class="feature-mockup"><div class="feature-body" style="gap:8px">
+              <div class="m-row"><img class="m-avatar-img sm" src="https://api.dicebear.com/9.x/notionists/svg?seed=eleanor&backgroundColor=f4f2ec" alt="" loading="lazy"><img class="m-avatar-img sm" src="https://api.dicebear.com/9.x/notionists/svg?seed=marcus&backgroundColor=f4f2ec" alt="" loading="lazy" style="margin-left:-8px"><span style="flex:1;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase">Team on retainer</span><span class="m-tag" style="background:var(--text);color:var(--bg)">local</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:10.5px;color:var(--text)"><span class="m-tag ok">watching</span><span>~/Documents/Contracts</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span class="m-dot ok"></span><span style="flex:1">SaaS-MSA-Acme.pdf</span><span class="m-tag ok">delivered</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span class="m-dot warn"></span><span style="flex:1">Vendor-DPA-v3.docx</span><span class="m-tag warn">3 flags</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span class="m-spin"></span><span style="flex:1">M&amp;A-LOI-redline.pdf</span><span class="m-tag neutral">processing</span></div>
+              <div class="m-row" style="font-family:var(--mono);font-size:10px;color:var(--dim);padding-top:6px;border-top:1px solid var(--hair)"><span style="flex:1">on-device · nothing leaves the laptop</span><span>$0.00</span></div>
+            </div>
+          </div>
+          <div class="feature-caption">
+            <div class="feature-num"><span>10</span> · Clawern</div>
+            <h3 class="feature-title">Autonomous, <em>on local.</em></h3>
+            <p class="feature-desc">Point Clawern at a folder. It watches, drafts findings, delivers a bundle. Runs on your machine with local models. No document leaves the laptop.</p>
+          </div>
+        </article>
+
       </div>
     </div>
-    <div class="sp-lg"></div>
+  </section>
 
-    <!-- ═══════ VIDEO — framed like Vesence ═══════ -->
-    <section class="video-section">
-      <h2 class="video-label r">It is a law firm.<br>Just that the offices are in a Mac Mini.</h2>
-      <div class="video-glow">
-        <div class="video-wrap fog r r1">
-          <div class="video-chrome">
-            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
-            <div class="video-chrome-url">lavern.ai</div>
+  <!-- ═══════════════════════════════════════════════════════════════════
+       TL;DR. The Codex
+       Editorial three-column layout: spine, entries, building.
+       ═══════════════════════════════════════════════════════════════════ -->
+  <section id="tldr">
+    <div class="container">
+      <div class="codex-head r">
+        <span class="section-tag">The Stack</span>
+        <h2 class="section-title word-reveal" data-goblin="The <span>Mess.</span>">The <em>Stack.</em></h2>
+        <p class="codex-deck-line">Not a product. A suite of ideas you point your AI at. Watch it make better.</p>
+      </div>
+
+      <div class="codex-stage" id="codexStage">
+
+        <!-- Deck of numbered cards on the left. click to draw the slab -->
+        <nav class="codex-deck" aria-label="The Stack. Lavern principles">
+          <button class="codex-deck-card" data-i="0" type="button"><span class="num">01</span><span class="label">Architecture</span></button>
+          <button class="codex-deck-card" data-i="1" type="button"><span class="num">02</span><span class="label">Evidence</span></button>
+          <button class="codex-deck-card" data-i="2" type="button"><span class="num">03</span><span class="label">Loops</span></button>
+          <button class="codex-deck-card" data-i="3" type="button"><span class="num">04</span><span class="label">Context</span></button>
+          <button class="codex-deck-card" data-i="4" type="button"><span class="num">05</span><span class="label">Providers</span></button>
+          <button class="codex-deck-card" data-i="5" type="button"><span class="num">06</span><span class="label">Clawern</span></button>
+          <button class="codex-deck-card" data-i="6" type="button"><span class="num">07</span><span class="label">Open source</span></button>
+          <div class="codex-deck-progress" aria-hidden="true"><span class="codex-deck-progress-bar"></span></div>
+        </nav>
+
+        <!-- Stack visual with slabs that slide out when a card is clicked -->
+        <div class="codex-stack-wrap">
+          <img src="img/stack.jpg"
+               alt="The Lavern stack. Mac Mini with seven luminous translucent slabs."
+               class="codex-stack-img"
+               loading="lazy" decoding="async" />
+
+          <div class="codex-slab" data-i="0">
+            <span class="codex-slab-num">01 / Architecture</span>
+            <h4 class="codex-slab-title">A multi-agent legal system, not a chatbot.</h4>
+            <p class="codex-slab-body">Architecture borrowed from law firms. Partners, associates, debate rooms, institutional memory. Sixty-seven specialist agents organised to do the work the way a firm does it.</p>
+            <span class="codex-slab-tag">src/agents/ · 67 specialists</span>
           </div>
-          <div class="video-container">
-            <img src="/architecture/img/working.png" alt="Lavern dashboard: live agents analysing a document with a real-time checklist and findings streaming in." style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" loading="lazy">
+          <div class="codex-slab" data-i="1">
+            <span class="codex-slab-num">02 / Evidence</span>
+            <h4 class="codex-slab-title">Every finding cites text.</h4>
+            <p class="codex-slab-body">Every challenge cites counter-text. The orchestrator weighs both and resolves. The audit trail isn't bolted on after. It's a side effect of how the system thinks.</p>
+            <span class="codex-slab-tag">src/mcp/tools/ · 21 modules</span>
+          </div>
+          <div class="codex-slab" data-i="2">
+            <span class="codex-slab-num">03 / Loops</span>
+            <h4 class="codex-slab-title">Defined by its feedback loops.</h4>
+            <p class="codex-slab-body">Briefing loops. Debate loops. A ten-pass verification loop before anything reaches the user. Workflows aren't chains. They're spirals that tighten until the work survives.</p>
+            <span class="codex-slab-tag">src/workflows/ · 1,700+ tests</span>
+          </div>
+          <div class="codex-slab" data-i="3">
+            <span class="codex-slab-num">04 / Context</span>
+            <h4 class="codex-slab-title">Context is the bottleneck.</h4>
+            <p class="codex-slab-body">The model is not. An intake that asks questions outperforms one that doesn't. Lavern interviews before it acts. The briefing alone is most of the work.</p>
+            <span class="codex-slab-tag">src/api/briefing.ts · LLM-led intake</span>
+          </div>
+          <div class="codex-slab" data-i="4">
+            <span class="codex-slab-num">05 / Providers</span>
+            <h4 class="codex-slab-title">Claude. Mistral. Or local.</h4>
+            <p class="codex-slab-body">Runs on Anthropic or Mistral for EU data sovereignty. Optional on-device mode means confidential documents never leave your machine. The firm follows your jurisdiction.</p>
+            <span class="codex-slab-tag">src/providers/ · Claude · Mistral · Ollama</span>
+          </div>
+          <div class="codex-slab" data-i="5">
+            <span class="codex-slab-num">06 / Clawern</span>
+            <h4 class="codex-slab-title">A firm on retainer.</h4>
+            <p class="codex-slab-body">Pointed at a folder, Lavern becomes Clawern. Runs on a thirty-minute heartbeat with precedent memory, cost forecasting, and a hard budget cap. It watches. You decide.</p>
+            <span class="codex-slab-tag">src/claw/ · 28 modules · LaunchAgent</span>
+          </div>
+          <div class="codex-slab" data-i="6">
+            <span class="codex-slab-num">07 / Open source</span>
+            <h4 class="codex-slab-title">Read the source. Run the firm.</h4>
+            <p class="codex-slab-body">Every agent prompt, debate protocol, precedent rule, and verification pass is there to be read, audited, and argued with. Apache 2.0 licensed. Made in Helsinki.</p>
+            <span class="codex-slab-tag">github.com/AnttiHero/lavern · Apache 2.0</span>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <div class="sp-lg"></div>
-
-    <!-- ═══════ CTA ═══════ -->
-    <section class="cta">
-      <img src="img/cta.jpg" alt="" role="presentation" class="cta-img" loading="lazy">
-      <div class="cta-content">
-        <h2 class="cta-title r"><em>Speak to Us.</em></h2>
-        <a href="mailto:hello@lavern.ai?subject=Knock%20Knock&body=I%E2%80%99d%20like%20to%20see%20a%20demo." class="btn-invite r r1">Knock</a>
+  <!-- ═══════════════════════════════════════════════════════════════════
+       STATS. big counters (Legora ROI reskin)
+       ═══════════════════════════════════════════════════════════════════ -->
+  <section class="stats-section" id="stats">
+    <div class="container">
+      <div class="stats-head r">
+        <span class="section-tag">Numbers</span>
+        <h2 class="section-title word-reveal" data-goblin="Built in a <span>basement.</span>">Built at <em>scale.</em></h2>
       </div>
-    </section>
+      <div class="stats-grid">
+        <div class="stat-cell r">
+          <span class="stat-label">Specialists</span>
+          <div class="stat-num"><span class="count-up" data-target="67">0</span></div>
+          <p class="stat-caption">Senior partners, associates, jurisdictional specialists, dark-pattern auditors. All ready to engage on a single document.</p>
+        </div>
+        <div class="stat-cell r r1">
+          <span class="stat-label">Verification</span>
+          <div class="stat-num"><span class="count-up" data-target="10">0</span><span class="suffix">×</span></div>
+          <p class="stat-caption">Passes through the quality loop before a document reaches the user. One pass produces a draft. Ten produce a deliverable.</p>
+        </div>
+        <div class="stat-cell r r2">
+          <span class="stat-label">Test suite</span>
+          <div class="stat-num"><span class="count-up" data-target="1700" data-format="comma">0</span></div>
+          <p class="stat-caption">Automated tests across the codebase. Unit, integration, security, fuzz. Open source. Read them. Argue with them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       BILLBOARD. brand moment, Times Square
+       ═══════════════════════════════════════════════════════════════════ -->
+  <section class="billboard" id="billboard">
+    <div class="billboard-frame">
+      <img src="img/billboard.jpg" alt="A Lavern billboard at Times Square: the crab mark above 'Lavern', then 'An agentic law firm. Yours.' and 'Sixty-seven specialist agents. Free for you to use and build. Open source.' with www.lavern.ai at the foot." loading="lazy" decoding="async">
+    </div>
+    <p class="billboard-cap">Helsinki built. <span>The world reads.</span></p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       FAQ
+       ═══════════════════════════════════════════════════════════════════ -->
+  <section id="faq">
+    <div class="container">
+      <div class="faq-head r">
+        <span class="section-tag">FAQ</span>
+        <h2 class="section-title word-reveal" data-goblin="Other <span>smelly stuff.</span>">Everything <em>else.</em></h2>
+      </div>
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Is this <em>legal advice?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p><strong>No.</strong> Lavern assists with document design, review, and accessibility. It does not constitute legal advice and does not replace a qualified lawyer. Outputs are dual-artifact for a reason. One document for the operator, one for the counsel who'll check it.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>How is this different from prompting <em>Claude or GPT?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p>A single LLM call is one agent guessing. Lavern is a system of agents with evidence requirements, debate, a soul, a knowledge base, and a ten-pass verification loop. Quality lives in the loops. Not in any single inference. The model is interchangeable. The architecture is not.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Where does my <em>document go?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p>You choose. Frontier mode sends document text to Anthropic or Mistral (EU sovereign). Local mode runs on-device via Ollama. The document never leaves the machine. Hybrid mode runs a local pass first, anonymizes flagged clauses, then dispatches only those to a frontier model. Provenance is tracked per finding.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>What does it <em>cost?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p>The software is free and Apache 2.0 licensed. Running it costs whatever your LLM provider charges. Typically a few cents to a few dollars per engagement, depending on team size and document length. Local mode is $0. Clawern includes per-document cost forecasting and a hard budget cap.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Will agents <em>actually argue</em>, or just take turns agreeing?</span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p>Making language models truly argue is still an open problem. They're sycophantic by default. We've built structures around it: evidence weight requirements, confidence thresholds, adversarial roles, escalation protocols. It works better than no structure. It's not solved. We are still learning, like everybody else.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Can I run it <em>on my own laptop?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p>Yes. The CLI runs anywhere Node 20+ runs. Frontier mode needs API keys (Anthropic or Mistral). Local mode needs Ollama and a model like Llama 3 or Qwen 2.5. Clawern is a macOS LaunchAgent / Linux systemd daemon. Point it at a folder and walk away.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>What's the <em>license?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p>Apache 2.0. Fork it, ship it, sell what you build on top, attribute where appropriate. The agent prompts, the debate protocols, the verification pipeline, the precedent board. All of it. The Apache license includes an explicit patent grant — contributors can't sneak in patented code and then sue your users. Knowledge-base datasets carry their own licenses (CC BY 4.0, CC BY-SA 4.0). Non-commercial restrictions are flagged per-dataset.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Why <em>open source?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p>Legal AI shouldn't be a black box. If a system is going to draft, redline, or critique a document with real-world consequences, the operator deserves to read the prompts, audit the loops, and replace the parts they disagree with. The source is available, the ideas are there to be improved on, and the analogy is there to be argued with. That is the point of publishing it.</p></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       CLOSING + footer
+       ═══════════════════════════════════════════════════════════════════ -->
+  <section class="closing" id="install-bottom">
+    <div class="container-narrow">
+      <h2 class="closing-h2" data-goblin="Don't build a wrapper.<br><span>Build a goblin.</span>">Don't build a wrapper.<br><em>Build a firm.</em></h2>
+      <p class="closing-deck r r1">Claude for Law is already here. <em>We need to build different.</em></p>
+      <div class="cta-row r r2">
+        <a class="btn btn-primary" href="https://github.com/AnttiHero/lavern" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3Z"/></svg>
+          View source on GitHub
+        </a>
+        <button class="install" id="installBottom" type="button" aria-label="Copy install command">
+          <span class="install-prompt">$</span>
+          <span class="install-cmd">curl -fsSL lavern.ai/install.sh | sh</span>
+          <span class="install-copy">Copy</span>
+        </button>
+      </div>
+      <a class='deepdive-link r r3' href='/architecture/'>
+        Architecture deep-dive <span class="arrow">↗</span>
+      </a>
+      <p class="closing-ps r r4" data-goblin="Oh, and the name still means nothing. Smells faintly of swamp.">Oh, and the name means nothing. No famous actor.</p>
+    </div>
+  </section>
 
   </main>
 
-  <div class="smoke"></div>
-
-  <footer class="footer">
-    <div class="footer-left">
-      <span class="footer-mark">LAVERN</span>
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-mark" data-goblin="Lavern · Cave · Sewer">Lavern · Helsinki</div>
+      <div class="footer-links">
+        <a href="/writing/">Writing</a>
+        <a href='/architecture/'>Architecture</a>
+        <a href="/terms/">Terms</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="https://github.com/AnttiHero/lavern" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+    <div class="footer-kindred">
+      <span class="label">Built by:</span>
+      <a href="https://www.wearelegit.ai" rel="noopener" target="_blank">Legit ↗</a>
+      <span class="sep">·</span>
+      <a href="https://www.dot.legal" rel="noopener" target="_blank">Dot. ↗</a>
+      <button class="goblin-toggle" type="button" aria-label="Toggle goblin mode" title="Goblin mode"><span aria-hidden="true">👹</span></button>
     </div>
   </footer>
 
+  <!-- Scroll fog. subtle DOF blur at the bottom of the viewport only -->
+  <div class="scroll-fog bottom" aria-hidden="true"></div>
+
+  <!-- Lavern cursor. dot + blurred trail, difference-blended (matches viz/CustomCursor) -->
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-trail" aria-hidden="true"></div>
+
   <script>
-    const obs=window.IntersectionObserver
-      ?new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('v');obs.unobserve(x.target)}}),{threshold:.06,rootMargin:'0px 0px -80px 0px'})
-      :null;
-    document.querySelectorAll('.r').forEach(el=>obs?obs.observe(el):el.classList.add('v'));
+    // ──────────────────────────────────────────────────────────────────
+    // Lavern cursor — ports viz/src/components/CustomCursor.tsx
+    // Dot follows instantly; trail lags at lerp 0.12. Both use
+    // mix-blend-mode: difference so they auto-invert against any bg.
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      // Skip on touch devices
+      if (window.matchMedia('(pointer:coarse)').matches) return;
+      var dot = document.querySelector('.cursor-dot');
+      var trail = document.querySelector('.cursor-trail');
+      if (!dot || !trail) return;
 
-    // Word-by-word reveal for pull quote
-    document.querySelectorAll('[data-words]').forEach(el=>{
-      const text=el.textContent;
-      el.innerHTML=text.split(/(\s+)/).map(w=>
-        /^\s+$/.test(w)?w:`<span class="w" style="transition-delay:${0}ms">${w}</span>`
-      ).join('');
-      // Set staggered delays
-      let i=0;
-      el.querySelectorAll('.w').forEach(w=>{w.style.transitionDelay=`${i*70}ms`;i++});
-      // Trigger on scroll
-      const wObs=new IntersectionObserver(e=>{
-        if(e[0].isIntersecting){el.classList.add('revealed');wObs.disconnect()}
-      },{threshold:0.3});
-      wObs.observe(el);
-    });
+      var CLICKABLE = 'a, button, [role="button"], input, select, textarea, [tabindex]:not([tabindex="-1"]), label[for], summary, .cursor-pointer, .install, .faq-q';
 
-    // Subtle parallax on full-bleed art (desktop only)
-    if(window.innerWidth>768){
-      let t=false;
-      addEventListener('scroll',()=>{
-        if(!t){requestAnimationFrame(()=>{
-          document.querySelectorAll('.hero-img,.statement-img,.cta-img').forEach(img=>{
-            const r=img.parentElement.getBoundingClientRect();
-            const off=(r.top+r.height/2-innerHeight/2)*0.03;
-            img.style.transform=`translateY(${off}px) scale(1.06)`;
+      var mouse = { x: -100, y: -100 };
+      var trailPos = { x: -100, y: -100 };
+      var hovering = false;
+      var visible = false;
+
+      function applyStyle(){
+        var vis = visible ? '1' : '0';
+        // Dot — follows mouse instantly, centered (8/2 = 4)
+        dot.style.left = (mouse.x - 4) + 'px';
+        dot.style.top  = (mouse.y - 4) + 'px';
+        dot.classList.toggle('hover', hovering);
+        dot.style.opacity = vis;
+
+        // Trail — lags at 0.12, centered (32/2 = 16)
+        trailPos.x += (mouse.x - trailPos.x) * 0.12;
+        trailPos.y += (mouse.y - trailPos.y) * 0.12;
+        trail.style.left = (trailPos.x - 16) + 'px';
+        trail.style.top  = (trailPos.y - 16) + 'px';
+        trail.style.opacity = vis;
+      }
+      function animate(){ applyStyle(); requestAnimationFrame(animate); }
+      requestAnimationFrame(animate);
+
+      document.addEventListener('mousemove', function(e){
+        mouse.x = e.clientX; mouse.y = e.clientY;
+        if (!visible) visible = true;
+      }, { passive: true });
+
+      document.documentElement.addEventListener('mouseleave', function(){
+        visible = false;
+        dot.style.opacity = '0';
+        trail.style.opacity = '0';
+      });
+
+      window.addEventListener('blur', function(){
+        visible = false;
+        dot.style.opacity = '0';
+        trail.style.opacity = '0';
+      });
+
+      document.addEventListener('mouseover', function(e){
+        var t = e.target;
+        if (t && t.closest && t.closest(CLICKABLE)) hovering = true;
+      }, { passive: true });
+      document.addEventListener('mouseout', function(e){
+        var rt = e.relatedTarget;
+        if (!rt || !rt.closest || !rt.closest(CLICKABLE)) hovering = false;
+      }, { passive: true });
+    })();
+
+    // ──────────────────────────────────────────────────────────────────
+    // Hero video — the iMac photo doubles as the demo poster. First click
+    // on the play button fades it out, reveals the video inside the iMac
+    // screen, and starts native playback with controls.
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      var imac  = document.getElementById('heroImac');
+      var btn   = document.getElementById('heroPlay');
+      var video = document.getElementById('heroVideo');
+      if (!imac || !btn || !video) return;
+      btn.addEventListener('click', function(){
+        if (imac.classList.contains('playing')) return;
+        imac.classList.add('playing');
+        video.setAttribute('controls','');
+        var p = video.play();
+        if (p && typeof p.catch === 'function') p.catch(function(){ /* user can hit native play */ });
+      });
+      // Demo nav link points at /demo/ — the cinematic tour ships as
+      // part of this same site (built with VITE_BASE_PATH=/demo/).
+      // No interception — let the browser navigate.
+    })();
+
+    // ──────────────────────────────────────────────────────────────────
+    // THE STACK — interactive deck of cards (Apple-grade)
+    //   · Click a deck-card → matching slab draws out of the stack
+    //   · 3D mouse parallax on the stack image (subtle rotateY / X)
+    //   · Auto-cycles through the seven cards every ~4.6s when idle
+    //   · Pauses on user interaction; resumes after 12s of inactivity
+    //   · Auto-starts the moment the section enters the viewport
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      var stage = document.getElementById('codexStage');
+      if (!stage) return;
+      var cards = stage.querySelectorAll('.codex-deck-card');
+      var slabs = stage.querySelectorAll('.codex-slab');
+      var wrap  = stage.querySelector('.codex-stack-wrap');
+      var img   = stage.querySelector('.codex-stack-img');
+      var currentIdx = -1;
+      var autoTimer = null;
+      var resumeTimer = null;
+
+      // Inject "N / 7" position pills inside each slab so the viewer always
+      // knows where they are in the deck.
+      var total = slabs.length;
+      slabs.forEach(function(s, i){
+        if (s.querySelector('.codex-slab-pos')) return;
+        var pos = document.createElement('span');
+        pos.className = 'codex-slab-pos';
+        var n = String(i + 1).padStart(2, '0');
+        var t = String(total).padStart(2, '0');
+        pos.innerHTML = '<strong>' + n + '</strong> &middot; ' + t;
+        s.appendChild(pos);
+      });
+
+      function setActive(idx){
+        if (idx === currentIdx) return;
+        currentIdx = idx;
+        cards.forEach(function(c,i){ c.classList.toggle('active', i === idx); });
+        slabs.forEach(function(s,i){ s.classList.toggle('active', i === idx); });
+        if (wrap) wrap.classList.add('has-active');
+        // The stack image leans toward the active card's stack-position:
+        // idx 0 (bottom slab) → leans DOWN; idx 6 (top slab) → leans UP.
+        // Maps idx [0..6] → tiltX [+4° .. -4°]. Also a tiny rotateZ for life.
+        if (img && !wrap.classList.contains('parallax')){
+          var tiltX = 4 - (idx / 6) * 8;          // +4 → -4
+          var tiltZ = (idx % 2 === 0 ? -1 : 1) * 0.8;
+          img.style.transform = 'rotateX(' + tiltX.toFixed(1) + 'deg) rotateZ(' + tiltZ + 'deg)';
+        }
+      }
+
+      function startAutoCycle(){
+        stopAutoCycle();
+        stage.classList.add('auto-cycling');
+        autoTimer = setInterval(function(){
+          var next = (currentIdx + 1) % cards.length;
+          setActive(next);
+        }, 4600);
+      }
+      function stopAutoCycle(){
+        if (autoTimer){ clearInterval(autoTimer); autoTimer = null; }
+        stage.classList.remove('auto-cycling');
+      }
+      function pauseForUser(){
+        stopAutoCycle();
+        if (resumeTimer) clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(startAutoCycle, 12000);
+      }
+
+      // Click any deck-card → activate it + pause the auto-cycle.
+      // Inject a glint span into each slab so the shimmer-wipe has
+      // something to animate. (Doing it in JS keeps the HTML clean.)
+      slabs.forEach(function(s){
+        if (s.querySelector('.codex-slab-glint')) return;
+        var g = document.createElement('span');
+        g.className = 'codex-slab-glint';
+        s.insertBefore(g, s.firstChild);
+      });
+
+      cards.forEach(function(c, i){
+        c.addEventListener('click', function(){
+          c.classList.remove('clicked');
+          // Force reflow so the animation re-fires
+          void c.offsetWidth;
+          c.classList.add('clicked');
+          setActive(i);
+          pauseForUser();
+        });
+        c.addEventListener('animationend', function(){
+          c.classList.remove('clicked');
+        });
+        c.addEventListener('mouseenter', pauseForUser);
+      });
+      stage.addEventListener('mouseleave', function(){
+        if (resumeTimer) clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(startAutoCycle, 5000);
+      });
+
+      // 3D mouse parallax — the stack tilts toward the cursor.
+      if (img && wrap){
+        wrap.addEventListener('mouseenter', function(){ wrap.classList.add('parallax'); });
+        wrap.addEventListener('mousemove', function(e){
+          var r = wrap.getBoundingClientRect();
+          var x = (e.clientX - r.left) / r.width  - 0.5;  // -0.5 .. +0.5
+          var y = (e.clientY - r.top)  / r.height - 0.5;
+          var rY = x * 9;    // peak ±4.5 deg
+          var rX = -y * 7;   // peak ±3.5 deg
+          img.style.transform = 'rotateY(' + rY.toFixed(2) + 'deg) rotateX(' + rX.toFixed(2) + 'deg)';
+        });
+        wrap.addEventListener('mouseleave', function(){
+          wrap.classList.remove('parallax');
+          img.style.transform = '';
+        });
+      }
+
+      // Auto-start on first viewport entry
+      var hasStarted = false;
+      var io = new IntersectionObserver(function(items){
+        items.forEach(function(it){
+          if (!it.isIntersecting || hasStarted) return;
+          hasStarted = true;
+          setTimeout(function(){
+            setActive(0);
+            setTimeout(startAutoCycle, 1800);
+          }, 450);
+        });
+      }, { threshold: 0.35 });
+      io.observe(stage);
+    })();
+
+    // ──────────────────────────────────────────────────────────────────
+    // Scroll choreography — feature cards + video scale/fade based on
+    // their distance from viewport center. "Pictures appear and reappear"
+    // as you scroll up/down. Pure scroll-linked, no transitions, rAF.
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      var els = [];
+      function collect(){
+        els = Array.prototype.slice.call(
+          document.querySelectorAll('.feature, .billboard-frame, .hero-imac, .codex-stage')
+        );
+      }
+      function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+      var ticking = false;
+      function update(){
+        ticking = false;
+        var vh = window.innerHeight;
+        var vc = vh / 2; // viewport center y
+        for (var i = 0; i < els.length; i++){
+          var el = els[i];
+          var r = el.getBoundingClientRect();
+          if (r.bottom < -200 || r.top > vh + 200){
+            // Far outside viewport — park at neutral state and skip.
+            // CRITICAL: opacity must stay at 1 so cards never go fully
+            // invisible. The old "fade-to-zero" behaviour murdered cards
+            // on wide-but-short viewports where multiple cards are
+            // visible simultaneously and none can be exactly centered.
+            el.style.setProperty('--so', '1');
+            el.style.setProperty('--ss', '.96');
+            el.style.setProperty('--sy', '0px');
+            continue;
+          }
+          var center = r.top + r.height / 2;
+          // d in [-1, 1] approximately: -1 = center is at viewport bottom,
+          // 0 = element is centered in viewport, +1 = center is at top.
+          var d = (center - vc) / vh;
+          var absD = Math.abs(d);
+          // Opacity: always 1. Fading via opacity is what broke wide
+          // viewports — left as a CSS var so existing selectors keep
+          // working, but it no longer drives an actual fade.
+          var so = 1;
+          // Scale: very subtle 4% pop at centre. Was 32% swing which
+          // looked dramatic on tall mobile but exaggerated on desktop.
+          var ss = clamp(1.02 - absD * 0.06, 0.96, 1.02);
+          // Drift: 14px max, gentle parallax. Was 38, too much.
+          var sy = d * 14; // px
+          el.style.setProperty('--so', so.toFixed(3));
+          el.style.setProperty('--ss', ss.toFixed(3));
+          el.style.setProperty('--sy', sy.toFixed(1) + 'px');
+        }
+      }
+      function onScroll(){
+        if (!ticking){
+          requestAnimationFrame(update);
+          ticking = true;
+        }
+      }
+      collect();
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function(){ collect(); update(); }, { passive: true });
+    })();
+
+    // ──────────────────────────────────────────────────────────────────
+    // Word splitter — wraps each visible word in <span class="word">,
+    // preserving inline tags like <span> and <br>. After splitting we add
+    // a cumulative transition-delay to each word so they cascade.
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      function splitWords(el){
+        if (el._wordSplit) return; el._wordSplit = true;
+        function wrap(node){
+          if (node.nodeType === 3) { // text node
+            var parent = node.parentNode;
+            var frag = document.createDocumentFragment();
+            var parts = node.textContent.split(/(\s+)/);
+            parts.forEach(function(part){
+              if (!part) return;
+              if (/^\s+$/.test(part)) {
+                frag.appendChild(document.createTextNode(part));
+              } else {
+                var mask = document.createElement('span');
+                mask.className = 'word-mask';
+                var word = document.createElement('span');
+                word.className = 'word';
+                word.textContent = part;
+                mask.appendChild(word);
+                frag.appendChild(mask);
+              }
+            });
+            parent.replaceChild(frag, node);
+          } else if (node.nodeType === 1 && node.tagName !== 'BR') {
+            // recurse into children (handles <span>, etc.)
+            Array.from(node.childNodes).forEach(wrap);
+          }
+        }
+        Array.from(el.childNodes).forEach(wrap);
+        // Assign cumulative delays
+        var words = el.querySelectorAll('.word');
+        words.forEach(function(w, i){
+          w.style.transitionDelay = (i * 0.06) + 's';
+        });
+      }
+      // Apply to all headlines that should reveal word-by-word
+      document.querySelectorAll('.word-reveal').forEach(splitWords);
+    })();
+
+    // ──────────────────────────────────────────────────────────────────
+    // Mac chrome injection — one window bar per feature mockup
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      var titles = [
+        'briefing.app','staffing.app','debate-board.app','my-page.app',
+        'knowledge-base.app','verification.app','delivery.app',
+        'voice.app','clawern.app','precedent-board.app'
+      ];
+      document.querySelectorAll('.feature-mockup').forEach(function(m, i){
+        if (m.querySelector('.mac-chrome')) return;
+        var c = document.createElement('div');
+        c.className = 'mac-chrome';
+        c.setAttribute('aria-hidden','true');
+        c.innerHTML =
+          '<i class="r"></i><i class="y"></i><i class="g"></i>' +
+          '<span class="stage-title">' +
+            '<span class="live-dot" aria-hidden="true"></span>' +
+            (titles[i]||'lavern.app') +
+          '</span>';
+        m.insertBefore(c, m.firstChild);
+      });
+    })();
+
+    // ──────────────────────────────────────────────────────────────────
+    // Number tween — counts up from 0 to data-target with easeOutCubic
+    // ──────────────────────────────────────────────────────────────────
+    function tweenCounter(el){
+      if (el._tweened) return; el._tweened = true;
+      var target = parseFloat(el.dataset.target);
+      if (isNaN(target)) return;
+      var suffix = el.dataset.suffix || '';
+      var format = el.dataset.format || '';
+      function fmt(n){
+        if (format === 'comma') return n.toLocaleString('en-US');
+        return String(n);
+      }
+      var dur = 1400;
+      var t0 = performance.now();
+      function step(now){
+        var p = Math.min((now - t0) / dur, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(Math.round(target * eased)) + suffix;
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = fmt(target) + suffix;
+      }
+      requestAnimationFrame(step);
+    }
+    // Hero stats — rotate through multiple sets every ~6s.
+    // Each set is 4 cells of {value, label, count?: bool, target?: n, suffix?}.
+    // When a numeric cell appears, it tweens up from 0 with the existing
+    // tweenCounter. Text cells just crossfade.
+    (function(){
+      var items = document.querySelectorAll('.hero .hero-meta-item');
+      if (items.length !== 4) return;
+
+      var SETS = [
+        // Set 1 — the scale + openness pitch
+        [
+          { value: '67',   label: 'Specialist agents',  count: true, target: 67 },
+          { value: '10×',  label: 'Verification passes', count: true, target: 10, suffix: '×' },
+          { value: '100%', label: 'Open source',        count: true, target: 100, suffix: '%' },
+          { value: 'Local', label: 'On-device option' }
+        ],
+        // Set 2 — the capabilities pitch
+        [
+          { value: 'Agent',  label: 'Builder' },
+          { value: 'Verify', label: 'Loops' },
+          { value: 'Folder', label: 'Watcher' },
+          { value: 'Local',  label: 'First mode' }
+        ],
+        // Set 3 — the engineering pitch (numeric)
+        [
+          { value: '1,700', label: 'Tests',          count: true, target: 1700, format: 'comma' },
+          { value: '21',    label: 'MCP tools',      count: true, target: 21 },
+          { value: '27',    label: 'API routes',     count: true, target: 27 },
+          { value: '8',     label: 'Workflows',      count: true, target: 8 }
+        ],
+        // Set 4 — the philosophy pitch
+        [
+          { value: 'Open',     label: 'Source' },
+          { value: 'Apache',   label: '2.0 Licensed' },
+          { value: 'Helsinki', label: 'Built' },
+          { value: '∞',        label: 'Forkable' }
+        ]
+      ];
+
+      var idx = 0;
+
+      function applySet(set){
+        // Phase 1: fade old content out by tagging .swapping on each item
+        items.forEach(function(it){ it.classList.add('swapping'); });
+
+        setTimeout(function(){
+          items.forEach(function(it, i){
+            var cell = set[i];
+            var num = it.querySelector('.hero-meta-num');
+            var lbl = it.querySelector('.hero-meta-label');
+            if (!num || !lbl || !cell) return;
+
+            lbl.textContent = cell.label;
+
+            if (cell.count && typeof cell.target === 'number'){
+              num.classList.add('count-up');
+              num.dataset.target = String(cell.target);
+              if (cell.suffix) num.dataset.suffix = cell.suffix;
+              else delete num.dataset.suffix;
+              if (cell.format === 'comma') num.dataset.format = 'comma';
+              else delete num.dataset.format;
+              num._tweened = false;
+              num.textContent = '0' + (cell.suffix || '');
+            } else {
+              num.classList.remove('count-up');
+              delete num.dataset.target;
+              delete num.dataset.suffix;
+              delete num.dataset.format;
+              num.textContent = cell.value;
+            }
           });
-          t=false;
-        });t=true}
-      },{passive:true});
-    }
 
-    // Autoplay video when visible (iOS Safari needs a nudge)
-    const vid=document.querySelector('.video-container video');
-    if(vid){
-      const vObs=new IntersectionObserver(e=>{
-        if(e[0].isIntersecting){vid.play().catch(()=>{});vObs.disconnect()}
-      },{threshold:0.3});
-      vObs.observe(vid);
-    }
+          // Force layout, then fade back in
+          requestAnimationFrame(function(){
+            items.forEach(function(it){ it.classList.remove('swapping'); });
+            // Kick the counters now that the cells are visible again
+            items.forEach(function(it){
+              var num = it.querySelector('.count-up');
+              if (num) tweenCounter(num);
+            });
+          });
+        }, 360);
+      }
 
-    // Quote parallax — rises on scroll, stops before hitting video-label
-    const qWrap=document.querySelector('.art-quote-text');
-    const qText=qWrap&&qWrap.querySelector('.pull-quote');
-    const vLabel=document.querySelector('.video-label');
-    if(qText&&vLabel){
-      addEventListener('scroll',()=>{
-        requestAnimationFrame(()=>{
-          const rect=qWrap.getBoundingClientRect();
-          const progress=(rect.top+rect.height/2-innerHeight/2)/innerHeight;
-          // Text rises as you scroll past — moves UP, never toward video-label
-          const y=10+progress*30;
-          qText.style.transform=`translateY(${y}px)`;
+      // First display — apply set 0 immediately, with delayed initial tween
+      // so the user notices the count-up. Then rotate every ~6s.
+      setTimeout(function(){ applySet(SETS[0]); }, 400);
+      function next(){
+        if (document.visibilityState !== 'hidden'){
+          idx = (idx + 1) % SETS.length;
+          applySet(SETS[idx]);
+        }
+        setTimeout(next, 6200);
+      }
+      setTimeout(next, 6200);
+    })();
+
+    // Stats section counters — fire when scrolled into view
+    (function(){
+      var grid = document.querySelector('.stats-grid');
+      if (!grid) return;
+      if (!('IntersectionObserver' in window)) {
+        grid.querySelectorAll('.count-up').forEach(tweenCounter);
+        return;
+      }
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if (!e.isIntersecting) return;
+          grid.querySelectorAll('.count-up').forEach(tweenCounter);
+          io.unobserve(e.target);
         });
-      },{passive:true});
-    }
+      }, { threshold: 0.4 });
+      io.observe(grid);
+    })();
 
-    // Smooth anchor
-    document.querySelectorAll('a[href^="#"]').forEach(a=>
-      a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}})
-    );
+    // ──────────────────────────────────────────────────────────────────
+    // Scroll reveal — IntersectionObserver
+    // Adds .v on entrance. For .feature also adds .built (triggers
+    // inner mockup stagger + signature animations).
+    // Also observes .faq-list / .hero-meta so children can stagger
+    // via their nth-child delays.
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      var reveals = document.querySelectorAll('.r');
+      var lists = document.querySelectorAll('.faq-list, .hero-meta');
+      // Universal "build on scroll" — every element that has a transition
+      // tied to a .v class needs to be observed.
+      var built = document.querySelectorAll(
+        '.word-reveal, footer, .section-tag, .feature, .feature-caption'
+      );
 
-    // Mist — fade out when near bottom of page so footer is visible
-    const smokeEl=document.querySelector('.smoke');
-    if(smokeEl){
-      addEventListener('scroll',()=>{
-        const distFromBottom=document.documentElement.scrollHeight-window.scrollY-window.innerHeight;
-        smokeEl.style.opacity=distFromBottom<200?String(distFromBottom/200):'1';
-      },{passive:true});
-    }
+      function fire(el){
+        if (el.classList.contains('v')) return;
+        el.classList.add('v');
+        if (el.classList.contains('feature')) {
+          setTimeout(function(){ el.classList.add('built'); }, 300);
+        }
+      }
 
-    // Magnetic buttons — pull towards cursor on hover (fine pointer / desktop only)
-    if(matchMedia('(pointer:fine)').matches){
-      document.querySelectorAll('.btn-invite, .login, .footer-link').forEach(btn=>{
-        btn.addEventListener('mousemove',e=>{
-          const r=btn.getBoundingClientRect();
-          const x=e.clientX-r.left-r.width/2;
-          const y=e.clientY-r.top-r.height/2;
-          btn.style.transform=`translate(${x*0.3}px,${y*0.3}px)`;
-          btn.style.transition='transform 0.15s ease-out';
+      if (!('IntersectionObserver' in window)) {
+        reveals.forEach(fire);
+        document.querySelectorAll('.feature').forEach(function(f){ f.classList.add('built'); });
+        lists.forEach(fire);
+        built.forEach(fire);
+        return;
+      }
+
+      // Two observers — light reveals fire early (~10% threshold), but
+      // feature cards fire later (35% threshold) so the user is looking
+      // at them when they build.
+      var ioLight = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if (!e.isIntersecting) return;
+          fire(e.target);
+          ioLight.unobserve(e.target);
         });
-        btn.addEventListener('mouseleave',()=>{
-          btn.style.transform='translate(0,0)';
-          btn.style.transition='transform 0.5s var(--ease)';
+      }, { threshold: 0.10, rootMargin: '0px 0px -8% 0px' });
+
+      var ioDeep = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if (!e.isIntersecting) return;
+          fire(e.target);
+          ioDeep.unobserve(e.target);
+        });
+      }, { threshold: 0.35, rootMargin: '-12% 0px -12% 0px' });
+
+      reveals.forEach(function(el){ if (!el.classList.contains('v')) ioLight.observe(el); });
+      lists.forEach(function(l){ ioLight.observe(l); });
+      built.forEach(function(el){
+        if (el.classList.contains('feature')) ioDeep.observe(el);
+        else ioLight.observe(el);
+      });
+
+      // Hero headline is in view on load — trigger immediately
+      setTimeout(function(){
+        var hero = document.getElementById('heroHeadline');
+        if (hero) hero.classList.add('v');
+      }, 120);
+    })();
+
+    // Copy install command
+    (function(){
+      var cmd = 'curl -fsSL https://lavern.ai/install.sh | sh';
+      function bind(btn){
+        if (!btn) return;
+        btn.addEventListener('click', function(){
+          var label = btn.querySelector('.install-copy');
+          var original = label ? label.textContent : 'Copy';
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(cmd).then(function(){
+              btn.classList.add('copied');
+              if (label) label.textContent = 'Copied';
+              setTimeout(function(){
+                btn.classList.remove('copied');
+                if (label) label.textContent = original;
+              }, 1800);
+            }).catch(function(){});
+          }
+        });
+      }
+      bind(document.getElementById('install'));
+      bind(document.getElementById('installBottom'));
+    })();
+
+    // FAQ accordion
+    (function(){
+      var items = document.querySelectorAll('.faq-item');
+      items.forEach(function(item){
+        var btn = item.querySelector('.faq-q');
+        if (!btn) return;
+        btn.addEventListener('click', function(){
+          var open = item.classList.toggle('open');
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
       });
-    }
+    })();
 
-    // Custom cursor (desktop only — fine pointer)
-    if(matchMedia('(pointer:fine)').matches){
-      const dot=document.createElement('div');
-      const trail=document.createElement('div');
-      Object.assign(dot.style,{position:'fixed',width:'8px',height:'8px',borderRadius:'50%',background:'#fff',pointerEvents:'none',zIndex:'99999',mixBlendMode:'difference',left:'-100px',top:'-100px',transition:'width 0.2s,height 0.2s,background 0.2s,border 0.2s'});
-      Object.assign(trail.style,{position:'fixed',width:'32px',height:'32px',borderRadius:'50%',background:'rgba(255,255,255,0.12)',filter:'blur(8px)',pointerEvents:'none',zIndex:'99998',mixBlendMode:'difference',left:'-100px',top:'-100px'});
-      document.body.appendChild(dot);
-      document.body.appendChild(trail);
-      const mouse={x:-100,y:-100},tPos={x:-100,y:-100};
-      let hovering=false;
-      document.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY},{passive:true});
-      document.addEventListener('mouseover',e=>{
-        hovering=!!e.target.closest('a,button,[role="button"],input,select,textarea,[tabindex]:not([tabindex="-1"]),label[for],summary');
-        if(hovering){dot.style.width='16px';dot.style.height='16px';dot.style.background='transparent';dot.style.border='1.5px solid rgba(255,255,255,0.6)'}
-        else{dot.style.width='8px';dot.style.height='8px';dot.style.background='#fff';dot.style.border='none'}
+    // ──────────────────────────────────────────────────────────────────
+    // SCROLL FOG — clear the bottom DOF fog when the footer enters view
+    // so the footer links read crisp instead of permanently misty.
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      var fog = document.querySelector('.scroll-fog.bottom');
+      var footer = document.querySelector('footer');
+      if (!fog || !footer) return;
+      var io = new IntersectionObserver(function(items){
+        items.forEach(function(it){
+          fog.classList.toggle('cleared', it.isIntersecting);
+        });
+      }, { rootMargin: '0px 0px -2% 0px', threshold: 0.05 });
+      io.observe(footer);
+    })();
+
+    // ──────────────────────────────────────────────────────────────────
+    // Goblin Mode — easter egg toggle.
+    // ──────────────────────────────────────────────────────────────────
+    (function(){
+      var btn = document.querySelector('.goblin-toggle');
+      if (!btn) return;
+      var KEY = 'lavern-goblin';
+      var root = document.documentElement;
+
+      function setGoblin(on){
+        root.classList.toggle('goblin', on);
+        document.querySelectorAll('[data-goblin]').forEach(function(el){
+          if (on){
+            if (el.dataset.original === undefined) el.dataset.original = el.innerHTML;
+            el.innerHTML = el.dataset.goblin;
+          } else if (el.dataset.original !== undefined){
+            el.innerHTML = el.dataset.original;
+          }
+        });
+        try { localStorage.setItem(KEY, on ? '1' : '0'); } catch(_){}
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.setAttribute('aria-label', on ? 'Exit goblin mode' : 'Enter goblin mode');
+      }
+
+      // Restore prior session
+      try { if (localStorage.getItem(KEY) === '1') setGoblin(true); } catch(_){}
+
+      btn.addEventListener('click', function(){
+        setGoblin(!root.classList.contains('goblin'));
       });
-      document.addEventListener('mouseout',()=>{if(!hovering)return;hovering=false;dot.style.width='8px';dot.style.height='8px';dot.style.background='#fff';dot.style.border='none'});
-      (function tick(){
-        tPos.x+=(mouse.x-tPos.x)*0.12;
-        tPos.y+=(mouse.y-tPos.y)*0.12;
-        dot.style.left=(mouse.x-parseInt(dot.style.width)/2)+'px';
-        dot.style.top=(mouse.y-parseInt(dot.style.height)/2)+'px';
-        trail.style.left=(tPos.x-16)+'px';
-        trail.style.top=(tPos.y-16)+'px';
-        requestAnimationFrame(tick);
-      })();
-    }
+    })();
+
+
+
+
   </script>
+
 </body>
 </html>

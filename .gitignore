@@ -74,7 +74,15 @@ Boris.docx
 site/demo.mp4
 site/demo.mov
 
+# Embedded demo SPA — Vite build output regenerated on every deploy
+# by `npm run build:site` (or by Netlify when GitHub auto-deploy is
+# wired up). Source of truth lives in viz/src/. 273 files of minified
+# JS would just be diff noise in PRs.
+site/demo/
+
 # OS
 Thumbs.db
 london
 TEST_CHECKLIST.md
+BUGS.md
+DEV_B_TASKS.md

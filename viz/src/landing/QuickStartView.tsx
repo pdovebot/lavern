@@ -20,6 +20,7 @@ import { useDocumentUpload } from '../briefing/hooks/useDocumentUpload.js';
 import { useCoworkFolder } from '../cowork/useCoworkFolder.js';
 import { CoworkFolderPanel } from '../cowork/CoworkFolderPanel.js';
 import { YOLO_CONFIGS, type YoloTier } from './yolo-config.js';
+import { useUserProfile } from '../my-page/hooks/useUserProfile.js';
 import type { FrontendParsedDocument } from '../briefing/hooks/useDocumentUpload.js';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -30,6 +31,18 @@ const TIER_MAP: Record<EngagementTier, YoloTier> = {
   counsel: 'standard',
   review: 'white-shoe',
   'full-bench': 'elite',
+};
+
+// Workflow IDs that have no QuickStart tier collapse onto the closest match.
+// Picked by team size: adversarial/roundtable are mid-size like 'review';
+// pre-engagement is a lightweight intake like 'counsel'.
+const WORKFLOW_TO_TIER: Record<string, EngagementTier> = {
+  counsel: 'counsel',
+  review: 'review',
+  adversarial: 'review',
+  roundtable: 'review',
+  'full-bench': 'full-bench',
+  'pre-engagement': 'counsel',
 };
 
 interface QuickStartProps {
@@ -59,7 +72,7 @@ function ShimmerButton({
         'relative overflow-hidden border-[1.5px] border-text rounded-sm',
         'font-sans text-[11px] font-semibold tracking-[1px] uppercase',
         'px-[18px] py-2 cursor-pointer',
-        'transition-[background-color,color,border-color] duration-250 ease-in-out',
+        'transition-[background-color,color,border-color] duration-250 ease-[cubic-bezier(0.28,0.11,0.32,1)]',
         className,
       )}
       style={{
@@ -88,10 +101,13 @@ function ShimmerButton({
 
 export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge }: QuickStartProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { profile } = useUserProfile();
+  const defaultTier: EngagementTier = WORKFLOW_TO_TIER[profile.defaultWorkflowId] ?? 'counsel';
 
   // Core state
   const [question, setQuestion] = useState('');
-  const [tier, setTier] = useState<EngagementTier>('counsel');
+  const [tier, setTier] = useState<EngagementTier>(defaultTier);
+  const userPickedTierRef = useRef(false);
   const [submitting, setSubmitting] = useState(false);
   const submittedRef = useRef(false); // Sync guard against double-click race
   const [instructHovered, setInstructHovered] = useState(false);
@@ -99,6 +115,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
   const [archiveHovered, setArchiveHovered] = useState(false);
   const [agentsHovered, setAgentsHovered] = useState(false);
   const [challengeHovered, setChallengeHovered] = useState(false);
+  const [ralphHovered, setRalphHovered] = useState(false);
 
   // Tier fill animation — black slides inside each pill
   const prevTierRef = useRef<EngagementTier>(tier);
@@ -136,10 +153,12 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
   const hasFolder = cowork.status !== 'disconnected';
   const folderHasSelected = cowork.files.some(f => f.selected);
 
-  // Smart defaults
+  // Smart defaults — adapt to whether the user dropped docs in, but never
+  // clobber an explicit pick, and respect their My Page workflow default.
   useEffect(() => {
-    setTier(documents.length > 0 ? 'review' : 'counsel');
-  }, [documents.length]);
+    if (userPickedTierRef.current) return;
+    setTier(documents.length > 0 ? 'review' : defaultTier);
+  }, [documents.length, defaultTier]);
 
   // Auto-focus textarea on mount
   useEffect(() => {
@@ -238,19 +257,24 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
 
       {/* ── Top nav ────────────────────────────────────── */}
       <div
-        className="relative z-2 w-full flex justify-between items-center pt-5 px-7 box-border"
-        style={{ animation: 'qsFadeIn 0.5s ease 0.7s both' }}
+        className="fixed top-0 left-0 right-0 z-30 flex justify-between items-center pt-5 pb-3 px-4 sm:px-7 box-border gap-2"
+        style={{
+          animation: 'qsFadeIn 0.5s ease 0.7s both',
+          backgroundColor: 'rgba(250, 249, 246, 0.65)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          borderBottom: '1px solid rgba(20, 18, 14, 0.04)',
+        }}
       >
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 sm:gap-5">
           {/* The Archive — quiet serif, just typography */}
           <button
             onClick={() => { window.location.hash = '#/archive'; }}
-            className="cursor-pointer bg-transparent border-none transition-all duration-300 ease-in-out"
+            className="cursor-pointer bg-transparent border-none transition-all duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]"
             style={{
               padding: '4px 0',
               color: archiveHovered ? colors.text : colors.textMuted,
               fontFamily: fonts.serif,
-              fontStyle: 'italic',
               fontSize: 15,
               fontWeight: 400,
               letterSpacing: 0.5,
@@ -264,12 +288,11 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
           {onChallenge && (
             <button
               onClick={onChallenge}
-              className="cursor-pointer bg-transparent border-none transition-all duration-300 ease-in-out"
+              className="hidden sm:inline-flex cursor-pointer bg-transparent border-none transition-all duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]"
               style={{
                 padding: '4px 0',
                 color: challengeHovered ? colors.text : colors.textMuted,
                 fontFamily: fonts.serif,
-                fontStyle: 'italic',
                 fontSize: 15,
                 fontWeight: 400,
                 letterSpacing: 0.5,
@@ -287,7 +310,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
           {/* Claw — the night shift */}
           <button
             onClick={() => { window.location.hash = '#/claw'; }}
-            className="cursor-pointer bg-transparent border-none transition-all duration-300 ease-in-out"
+            className="hidden sm:inline-flex cursor-pointer bg-transparent border-none transition-all duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]"
             style={{
               fontSize: 18,
               padding: '2px 6px',
@@ -302,7 +325,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
           </button>
 
           {/* Separator */}
-          <div className="w-px h-4 bg-border opacity-40 mx-1" />
+          <div className="hidden sm:block w-px h-4 bg-border opacity-40 mx-1" />
 
           {/* Account buttons — compact */}
           <ShimmerButton onClick={() => { window.location.hash = '#/my-cases'; }} className="px-[14px] py-1.5 text-[10px]">
@@ -316,12 +339,12 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
       </div>
 
       {/* ── Hero heading ─────────────────────────────────── */}
-      <div className="relative z-2 text-center mt-12 sm:mt-16 lg:mt-20 mb-6 sm:mb-8 lg:mb-9 px-6">
+      <div className="relative z-2 text-center mt-[88px] sm:mt-[96px] lg:mt-[112px] mb-6 sm:mb-8 lg:mb-9 px-6">
         <h1
           className="text-3xl sm:text-4xl lg:text-[52px] font-light font-serif text-text m-0 tracking-tight leading-[1.15]"
           style={{ animation: 'qsFadeUp 0.7s ease 0.1s both' }}
         >
-          Your firm is{' '}<span className="italic">ready.</span>
+          Your firm is{' '}<span className="font-serif font-light text-text-muted">ready.</span>
         </h1>
         <p
           className="text-[13px] sm:text-sm font-serif text-text-muted mt-4 tracking-[0.3px] leading-normal"
@@ -356,14 +379,14 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
         className={cn(
           'relative z-2 w-full max-w-[680px] mx-4 sm:mx-auto',
           'bg-bg-card rounded-xl p-0 box-border overflow-hidden',
-          'transition-[border-color,box-shadow] duration-300 ease-in-out',
+          'transition-[border-color,box-shadow,transform] duration-[350ms]',
         )}
         style={{
           animation: 'qsFadeUp 0.6s ease 0.5s both',
           border: `1.5px solid ${isDragOver ? colors.accent : inputFocused ? 'rgba(0,0,0,0.10)' : 'rgba(0,0,0,0.06)'}`,
           boxShadow: inputFocused
-            ? '0 8px 40px rgba(0,0,0,0.10), 0 2px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03)'
-            : '0 2px 24px rgba(0,0,0,0.06), 0 1px 6px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02)',
+            ? '0 3px 6px rgba(20,18,14,0.08), 0 20px 48px rgba(20,18,14,0.12), 0 48px 100px rgba(20,18,14,0.14), 0 0 0 1px rgba(0,0,0,0.05)'
+            : '0 2px 4px rgba(20,18,14,0.06), 0 10px 28px rgba(20,18,14,0.09), 0 32px 72px rgba(20,18,14,0.10), 0 0 0 1px rgba(0,0,0,0.03)',
         }}
       >
         {/* Textarea */}
@@ -381,7 +404,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
             'text-base lg:text-[17px] font-serif text-text',
             'bg-transparent border-none resize-none outline-none',
             'leading-[1.7] box-border min-h-[120px]',
-            'placeholder:font-serif placeholder:italic placeholder:text-text-dim',
+            'placeholder:font-serif placeholder:text-text-dim',
           )}
         />
 
@@ -408,7 +431,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
           <p className="text-xs font-sans text-danger mx-7 mb-2">{uploadError}</p>
         )}
         {parsing && (
-          <p className="text-[11px] font-sans text-text-muted mx-7 mb-2 italic">
+          <p className="text-[11px] font-sans text-text-muted mx-7 mb-2">
             Parsing{'\u2026'}
           </p>
         )}
@@ -434,7 +457,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
                   'flex items-center bg-transparent border-none',
                   'font-sans text-[13px] cursor-pointer',
                   'py-1.5 px-2.5 rounded-sm',
-                  'transition-colors duration-200 ease-in-out whitespace-nowrap',
+                  'transition-colors duration-200 ease-[cubic-bezier(0.28,0.11,0.32,1)] whitespace-nowrap',
                   hasFolder ? 'text-text-dim cursor-default opacity-40' : 'text-text-muted hover:text-text hover:bg-black/[0.04]',
                 )}
               >
@@ -453,7 +476,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
                     'flex items-center bg-transparent border-none',
                     'font-sans text-[13px] cursor-pointer',
                     'py-1.5 px-2.5 rounded-sm',
-                    'transition-colors duration-200 ease-in-out whitespace-nowrap',
+                    'transition-colors duration-200 ease-[cubic-bezier(0.28,0.11,0.32,1)] whitespace-nowrap',
                     documents.length > 0
                       ? 'text-text-dim cursor-default opacity-40'
                       : hasFolder
@@ -477,7 +500,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
                 'relative overflow-hidden',
                 'py-2.5 px-7 rounded-lg border-none',
                 'font-sans text-sm font-semibold tracking-[0.5px]',
-                'transition-[background-color,opacity,box-shadow,transform] duration-200 ease-in-out whitespace-nowrap',
+                'transition-[background-color,opacity,box-shadow,transform] duration-200 ease-[cubic-bezier(0.28,0.11,0.32,1)] whitespace-nowrap',
               )}
               style={{
                 backgroundColor: instructHovered && canSubmit ? '#B5523A' : colors.accent,
@@ -485,10 +508,10 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
                 opacity: canSubmit ? 1 : 0.35,
                 cursor: canSubmit ? 'pointer' : 'default',
                 boxShadow: instructPulsed
-                  ? '0 0 0 4px rgba(196, 93, 62, 0.15), 0 4px 16px rgba(196, 93, 62, 0.25)'
+                  ? '0 0 0 4px rgba(196, 93, 62, 0.18), 0 2px 4px rgba(196, 93, 62, 0.22), 0 16px 36px rgba(196, 93, 62, 0.32), 0 32px 64px rgba(196, 93, 62, 0.24)'
                   : instructHovered && canSubmit
-                    ? '0 4px 16px rgba(196, 93, 62, 0.35), 0 2px 6px rgba(196, 93, 62, 0.2)'
-                    : '0 1px 4px rgba(196, 93, 62, 0.15)',
+                    ? '0 2px 4px rgba(196, 93, 62, 0.26), 0 12px 28px rgba(196, 93, 62, 0.32), 0 32px 64px rgba(196, 93, 62, 0.22), inset 0 1px 0 rgba(255,255,255,0.20)'
+                    : '0 2px 4px rgba(196, 93, 62, 0.22), 0 8px 20px rgba(196, 93, 62, 0.24), 0 22px 48px rgba(196, 93, 62, 0.18), inset 0 1px 0 rgba(255,255,255,0.18)',
                 transform: instructPulsed
                   ? 'scale(1.04)'
                   : instructHovered && canSubmit ? 'translateY(-1px)' : 'none',
@@ -554,16 +577,21 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
               return (
                 <button
                   key={t.key}
-                  onClick={() => setTier(t.key)}
+                  onClick={() => { userPickedTierRef.current = true; setTier(t.key); }}
                   className={cn(
                     'relative flex-1 flex flex-col items-start py-2 px-3 rounded-md border cursor-pointer overflow-hidden',
                   )}
                   style={{
                     borderColor: active ? colors.text : colors.border,
-                    boxShadow: active ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
+                    // Button's own bg matches the fill color when active, so any
+                    // subpixel gap between fill <div> and border still reads as solid.
+                    backgroundColor: active ? colors.text : 'transparent',
+                    boxShadow: active
+                      ? '0 2px 4px rgba(20,18,14,0.16), 0 12px 28px rgba(20,18,14,0.20), 0 32px 64px rgba(20,18,14,0.16), inset 0 1px 0 rgba(255,255,255,0.08)'
+                      : '0 1px 2px rgba(20,18,14,0.05), 0 6px 14px rgba(20,18,14,0.06)',
                     transition: active
-                      ? 'border-color 0.25s ease 0.08s, box-shadow 0.3s ease 0.1s'
-                      : 'border-color 0.2s ease, box-shadow 0.2s ease',
+                      ? 'background-color 0.25s ease 0.08s, border-color 0.25s ease 0.08s, box-shadow 0.3s ease 0.1s'
+                      : 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
                   }}
                   onMouseEnter={e => {
                     if (!active) {
@@ -578,10 +606,12 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
                     }
                   }}
                 >
-                  {/* ── Black fill — slides in/out within this pill, waves through middle ── */}
+                  {/* ── Black fill — slides in/out within this pill, waves through middle.
+                       Fill extends 1px past the button edge so it sits *over* the border
+                       (overflow-hidden on the button clips it). No white sliver at corners. */}
                   <div
                     key={isPassThrough ? tierAnimKey : undefined}
-                    className="absolute inset-0 rounded-[5px] pointer-events-none"
+                    className="absolute -inset-px rounded-md pointer-events-none"
                     style={fillStyle}
                   />
                   <span className="relative" style={{
@@ -596,10 +626,10 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
                     {t.name}
                   </span>
                   <span className="relative" style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     fontFamily: 'var(--font-sans)',
-                    color: active ? 'rgba(255,255,255,0.6)' : colors.textDim,
-                    marginTop: 1,
+                    color: active ? 'rgba(255,255,255,0.65)' : colors.textDim,
+                    marginTop: 2,
                     transition: textTransition,
                     whiteSpace: 'nowrap',
                     zIndex: 1,
@@ -630,19 +660,19 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
           'flex flex-col sm:flex-row items-start sm:items-center gap-6',
           'p-5 sm:p-6 lg:px-8 lg:py-7',
           'rounded-xl box-border cursor-pointer',
-          'transition-[border-color,background-color,box-shadow,transform] duration-300 ease-in-out',
+          'transition-[border-color,background-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]',
         )}
         style={{
           animation: 'qsFadeUp 0.6s ease 0.8s both',
           backgroundColor: 'rgba(255,255,255,0.7)',
           border: '1.5px solid rgba(0,0,0,0.06)',
-          boxShadow: '0 1px 8px rgba(0,0,0,0.03)',
+          boxShadow: '0 2px 4px rgba(20,18,14,0.06), 0 8px 22px rgba(20,18,14,0.08), 0 24px 56px rgba(20,18,14,0.10)',
         }}
         onClick={onGuidedFlow}
         onMouseEnter={e => {
           e.currentTarget.style.borderColor = colors.borderHover;
           e.currentTarget.style.backgroundColor = colors.bgCard;
-          e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08), 0 1px 6px rgba(0,0,0,0.04)';
+          e.currentTarget.style.boxShadow = '0 4px 8px rgba(20,18,14,0.09), 0 16px 40px rgba(20,18,14,0.12), 0 48px 96px rgba(20,18,14,0.14)';
           e.currentTarget.style.transform = 'translateY(-2px)';
           const arrow = e.currentTarget.querySelector('.arrow-nudge') as HTMLElement;
           if (arrow) arrow.style.transform = 'translateX(3px)';
@@ -650,7 +680,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
         onMouseLeave={e => {
           e.currentTarget.style.borderColor = 'rgba(0,0,0,0.06)';
           e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.7)';
-          e.currentTarget.style.boxShadow = '0 1px 8px rgba(0,0,0,0.03)';
+          e.currentTarget.style.boxShadow = '0 2px 4px rgba(20,18,14,0.06), 0 8px 22px rgba(20,18,14,0.08), 0 24px 56px rgba(20,18,14,0.10)';
           e.currentTarget.style.transform = 'none';
           const arrow = e.currentTarget.querySelector('.arrow-nudge') as HTMLElement;
           if (arrow) arrow.style.transform = 'none';
@@ -677,7 +707,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
             Hand-picked team selection. The complete Lavern experience.
           </p>
         </div>
-        <div className="shrink-0 w-12 h-12 rounded-full border-[1.5px] border-border flex items-center justify-center transition-[border-color] duration-300 ease-in-out">
+        <div className="shrink-0 w-12 h-12 rounded-full border-[1.5px] border-border flex items-center justify-center transition-[border-color] duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]">
           <span className="arrow-nudge text-xl text-text-muted" style={{ transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>{'\u2192'}</span>
         </div>
       </div>
@@ -690,19 +720,19 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
             'flex flex-col sm:flex-row items-start sm:items-center gap-6',
             'p-5 sm:p-6 lg:px-8 lg:py-7',
             'rounded-xl cursor-pointer',
-            'transition-[border-color,background-color,box-shadow,transform] duration-300 ease-in-out',
+            'transition-[border-color,background-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]',
           )}
           style={{
             animation: 'qsFadeUp 0.6s ease 1s both',
             backgroundColor: 'rgba(10, 10, 15, 0.85)',
             border: '1.5px solid rgba(184, 150, 11, 0.2)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.28), 0 18px 44px rgba(0,0,0,0.32), 0 52px 100px rgba(0,0,0,0.30), inset 0 1px 0 rgba(184,150,11,0.10)',
           }}
           onClick={onChallenge}
           onMouseEnter={e => {
             e.currentTarget.style.borderColor = 'rgba(184, 150, 11, 0.5)';
             e.currentTarget.style.backgroundColor = 'rgba(10, 10, 15, 0.95)';
-            e.currentTarget.style.boxShadow = '0 6px 28px rgba(0,0,0,0.25), 0 0 20px rgba(184, 150, 11, 0.08)';
+            e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.34), 0 28px 64px rgba(0,0,0,0.40), 0 72px 140px rgba(0,0,0,0.34), 0 0 56px rgba(184,150,11,0.14), inset 0 1px 0 rgba(184,150,11,0.20)';
             e.currentTarget.style.transform = 'translateY(-2px)';
             const arrow = e.currentTarget.querySelector('.arrow-nudge') as HTMLElement;
             if (arrow) arrow.style.transform = 'translateX(3px)';
@@ -732,7 +762,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
             </p>
           </div>
           <div
-            className="shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-[border-color] duration-300 ease-in-out"
+            className="shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-[border-color] duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]"
             style={{ border: '1.5px solid rgba(184, 150, 11, 0.3)' }}
           >
             <span className="arrow-nudge text-xl" style={{ color: '#B8960B', transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>{'\u2192'}</span>
@@ -752,6 +782,38 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
           style={{ fontSize: 9, letterSpacing: 4 }}
         />
       </div>
+
+      {/* Ralph mode — discreet bottom-right entry. Hidden in plain sight. */}
+      <button
+        onClick={() => { window.location.hash = '#/ralph'; }}
+        aria-label="Ralph mode — experimental goal loop"
+        title="Ralph mode"
+        style={{
+          position: 'fixed',
+          bottom: 18,
+          right: 18,
+          zIndex: 20,
+          width: 32,
+          height: 32,
+          borderRadius: '50%',
+          border: 'none',
+          backgroundColor: 'transparent',
+          color: colors.textDim,
+          fontSize: 18,
+          lineHeight: 1,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: ralphHovered ? 0.85 : 0.25,
+          transform: ralphHovered ? 'scale(1.18)' : 'scale(1)',
+          transition: 'opacity 0.3s cubic-bezier(0.28,0.11,0.32,1), transform 0.3s cubic-bezier(0.28,0.11,0.32,1)',
+        }}
+        onMouseEnter={() => setRalphHovered(true)}
+        onMouseLeave={() => setRalphHovered(false)}
+      >
+        {'🙂'}
+      </button>
 
     </div>
   );

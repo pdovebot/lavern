@@ -258,8 +258,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: spacing.sm,
     padding: '6px 10px',
     borderRadius: radii.sm,
-    backgroundColor: 'rgba(46, 93, 156, 0.04)',
-    fontStyle: 'italic' as const,
+    backgroundColor: 'rgba(46, 93, 156, 0.04)' as const,
   },
   fieldGrid: {
     display: 'grid',
@@ -325,6 +324,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     fontFamily: fonts.sans,
     color: CLAW.textDim,
-    fontStyle: 'italic' as const,
   },
 };

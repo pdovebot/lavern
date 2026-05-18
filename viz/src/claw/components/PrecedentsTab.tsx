@@ -248,7 +248,6 @@ const styles: Record<string, React.CSSProperties> = {
   evidenceText: {
     fontSize: 12,
     fontFamily: fonts.sans,
-    fontStyle: 'italic' as const,
     color: CLAW.textMuted,
     lineHeight: 1.4,
   },
@@ -270,7 +269,6 @@ const styles: Record<string, React.CSSProperties> = {
   empty: {
     fontSize: 14,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: CLAW.textMuted,
     padding: `${spacing.xxl}px`,
     textAlign: 'center' as const,

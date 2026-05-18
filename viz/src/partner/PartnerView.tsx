@@ -527,7 +527,7 @@ export default function PartnerView({ onSessionCreated, onManualFlow, onBack, is
         {/* Status hint */}
         <div style={{
           ...S.statusHint,
-          ...(orbIsListening ? { fontStyle: 'italic', color: GOLD } : {}),
+          ...(orbIsListening ? { color: GOLD } : {}),
         }}>
           {statusText}
         </div>
@@ -727,7 +727,7 @@ const S: Record<string, React.CSSProperties> = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 12,
     fontWeight: 500,
     letterSpacing: 1,
@@ -739,7 +739,7 @@ const S: Record<string, React.CSSProperties> = {
     border: '1px solid rgba(26, 26, 26, 0.2)',
     borderRadius: 3,
     cursor: 'pointer',
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 10,
     fontWeight: 600,
     letterSpacing: 1.5,
@@ -770,7 +770,7 @@ const S: Record<string, React.CSSProperties> = {
     gap: 4,
   },
   name: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 22,
     fontWeight: 700,
     color: '#1a1a1a',
@@ -778,7 +778,7 @@ const S: Record<string, React.CSSProperties> = {
     textAlign: 'center',
   },
   title: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 10,
     fontWeight: 600,
     color: '#4a4a4a',
@@ -799,7 +799,7 @@ const S: Record<string, React.CSSProperties> = {
     marginTop: 4,
   },
   statusHint: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 12,
     color: '#6b6b67',
     textAlign: 'center',
@@ -817,7 +817,7 @@ const S: Record<string, React.CSSProperties> = {
     border: '2px solid rgba(150, 135, 95, 0.3)',
     backgroundColor: 'rgba(150, 135, 95, 0.06)',
     color: '#1a1a1a',
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 14,
     fontWeight: 600,
     letterSpacing: 1,
@@ -827,10 +827,9 @@ const S: Record<string, React.CSSProperties> = {
     marginTop: 8,
   },
   catherineText: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 20,
     fontWeight: 500,
-    fontStyle: 'italic',
     lineHeight: 1.65,
     color: '#1a1a1a',
     textAlign: 'center',
@@ -838,7 +837,7 @@ const S: Record<string, React.CSSProperties> = {
     animation: 'partnerTextFadeIn 0.6s ease both',
   },
   userEcho: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 13,
     color: '#1a1a1a',
     textAlign: 'center',
@@ -852,7 +851,7 @@ const S: Record<string, React.CSSProperties> = {
     transition: 'opacity 0.3s',
   },
   textInput: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 12,
     color: colors.text,
     backgroundColor: 'transparent',
@@ -875,7 +874,7 @@ const S: Record<string, React.CSSProperties> = {
     width: '100%',
   },
   memoTitle: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 24,
     fontWeight: 600,
     color: '#1a1a1a',
@@ -884,7 +883,7 @@ const S: Record<string, React.CSSProperties> = {
     marginBottom: 6,
   },
   memoPrepared: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 10,
     fontWeight: 600,
     letterSpacing: 1.5,
@@ -904,7 +903,7 @@ const S: Record<string, React.CSSProperties> = {
     marginBottom: 20,
   },
   memoParagraph: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 16,
     fontWeight: 400,
     lineHeight: 1.75,
@@ -912,7 +911,7 @@ const S: Record<string, React.CSSProperties> = {
     margin: '0 0 14px',
   },
   memoSummary: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 11,
     fontWeight: 500,
     letterSpacing: 0.5,
@@ -931,7 +930,7 @@ const S: Record<string, React.CSSProperties> = {
     flexWrap: 'wrap',
   },
   proceedBtn: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: 2,
@@ -945,7 +944,7 @@ const S: Record<string, React.CSSProperties> = {
     transition: 'all 0.2s',
   },
   downloadBtn: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 11,
     fontWeight: 500,
     letterSpacing: 1,
@@ -959,7 +958,7 @@ const S: Record<string, React.CSSProperties> = {
     transition: 'opacity 0.2s',
   },
   configureBtn: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 11,
     fontWeight: 500,
     letterSpacing: 1,
@@ -973,7 +972,7 @@ const S: Record<string, React.CSSProperties> = {
     textUnderlineOffset: 3,
   },
   errorMsg: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 12,
     color: '#9a6b00',
     opacity: 0.8,
@@ -997,7 +996,7 @@ const S: Record<string, React.CSSProperties> = {
     overflowY: 'auto',
   },
   pickerTitle: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 48,
     fontWeight: 600,
     color: '#1a1a1a',
@@ -1006,7 +1005,7 @@ const S: Record<string, React.CSSProperties> = {
     animation: 'casePickerTitle 0.8s cubic-bezier(0.4, 0, 0.2, 1) both',
   },
   pickerSubtitle: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 14,
     fontWeight: 400,
     color: '#4a4a4a',
@@ -1014,7 +1013,6 @@ const S: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     maxWidth: 500,
     lineHeight: 1.7,
-    fontStyle: 'italic',
     marginBottom: 8,
     animation: 'partnerTextFadeIn 1s ease 0.3s both',
   },
@@ -1051,7 +1049,7 @@ const S: Record<string, React.CSSProperties> = {
     transition: 'transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)',
   } as React.CSSProperties,
   caseSubtitle: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 9,
     fontWeight: 700,
     letterSpacing: 3,
@@ -1061,7 +1059,7 @@ const S: Record<string, React.CSSProperties> = {
     padding: '0 26px',
   },
   caseTitle: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 28,
     fontWeight: 700,
     color: '#1a1a1a',
@@ -1070,7 +1068,7 @@ const S: Record<string, React.CSSProperties> = {
     padding: '0 26px',
   },
   caseDescription: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 12,
     fontWeight: 400,
     color: '#555',
@@ -1093,14 +1091,14 @@ const S: Record<string, React.CSSProperties> = {
     marginBottom: 6,
   } as React.CSSProperties,
   casePricingLabel: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 10,
     fontWeight: 500,
     color: '#aaa',
     letterSpacing: 0.3,
   } as React.CSSProperties,
   casePricingStrike: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 14,
     fontWeight: 500,
     color: '#bbb',
@@ -1112,14 +1110,14 @@ const S: Record<string, React.CSSProperties> = {
     alignItems: 'baseline',
   } as React.CSSProperties,
   casePricingWsLabel: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 10,
     fontWeight: 600,
     color: GOLD,
     letterSpacing: 0.3,
   } as React.CSSProperties,
   casePricingValue: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 32,
     fontWeight: 700,
     color: '#1a1a1a',

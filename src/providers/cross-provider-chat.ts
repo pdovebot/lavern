@@ -77,8 +77,15 @@ function pricingFor(model: string): { input: number; output: number } {
 export interface CrossProviderChatOptions {
   /** System prompt. */
   system: string;
-  /** User message. */
-  user: string;
+  /** Single user message. Mutually exclusive with `messages`. */
+  user?: string;
+  /**
+   * Full conversation history (multi-turn). Mutually exclusive with `user`.
+   * When provided, the user roles + assistant roles in the array are passed
+   * to the model verbatim — useful for chat-style routes (briefing
+   * interview, partner consult) that need to preserve turn structure.
+   */
+  messages?: Array<{ role: 'user' | 'assistant'; content: string }>;
   /** Semantic cost tier. Resolves to a per-provider model. */
   tier: 'opus' | 'sonnet' | 'haiku';
   /** Max output tokens. */
@@ -144,13 +151,23 @@ export async function crossProviderChat(
   const model = modelFor(opts.tier);
   const temperature = opts.temperature ?? 0.2;
 
+  // Either `user` or `messages` must be provided — but not both.
+  if (!opts.user && (!opts.messages || opts.messages.length === 0)) {
+    throw new Error('crossProviderChat: must provide either `user` or a non-empty `messages` array');
+  }
+  if (opts.user && opts.messages) {
+    throw new Error('crossProviderChat: pass `user` for single-turn or `messages` for multi-turn — not both');
+  }
+  const turnList: Array<{ role: 'user' | 'assistant'; content: string }> =
+    opts.messages ?? [{ role: 'user', content: opts.user ?? '' }];
+
   // ── LOCAL ──
   if (config.provider === 'local') {
     const res = await localChat({
       model,
       messages: [
         { role: 'system', content: opts.system },
-        { role: 'user', content: opts.user },
+        ...turnList,
       ],
       temperature,
       maxTokens: opts.maxTokens,
@@ -166,7 +183,7 @@ export async function crossProviderChat(
       model,
       messages: [
         { role: 'system', content: opts.system },
-        { role: 'user', content: opts.user },
+        ...turnList,
       ],
       temperature,
       maxTokens: opts.maxTokens,
@@ -191,7 +208,7 @@ export async function crossProviderChat(
     model,
     max_tokens: opts.maxTokens,
     system: opts.system,
-    messages: [{ role: 'user', content: opts.user }],
+    messages: turnList,
   };
   if (!isOpus47) {
     requestBody.temperature = temperature;

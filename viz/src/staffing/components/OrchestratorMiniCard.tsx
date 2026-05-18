@@ -81,7 +81,7 @@ export function OrchestratorMiniCard({ profile, workflowId, showTagline = false 
           </div>
         </div>
 
-        {/* Tagline — big italic pull-quote when enabled */}
+        {/* Tagline — serif pull-quote when enabled */}
         {showTagline && profile.tagline && (
           <div style={styles.tagline}>
             {profile.tagline}
@@ -166,7 +166,6 @@ const styles: Record<string, React.CSSProperties> = {
   archetype: {
     fontSize: 10,
     fontFamily: fonts.sans,
-    fontStyle: 'italic',
     color: colors.accent,
   },
   workflow: {
@@ -177,7 +176,6 @@ const styles: Record<string, React.CSSProperties> = {
   tagline: {
     fontSize: 12,
     fontFamily: fonts.serif,
-    fontStyle: 'italic',
     color: colors.text,
     lineHeight: '17px',
     marginTop: 6,
@@ -186,7 +184,6 @@ const styles: Record<string, React.CSSProperties> = {
   workStyle: {
     fontSize: 10,
     fontFamily: fonts.sans,
-    fontStyle: 'italic',
     color: colors.textDim,
     lineHeight: '14px',
     marginTop: 4,

@@ -37,7 +37,7 @@ import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 import { DERIVATIVE_TYPES, DERIVATIVE_TYPE_LIST, buildFullContext } from '../derivatives/derivative-types.js';
 import { agentProfiles } from '../../agents/profiles.js';
 import { getOrchestratorForWorkflow } from '../../workflows/orchestrator-mapping.js';
-import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchivedSessionById, getRecentArchivedSessions, getUserById, logAuditEvent, holdBillableHours, debitBillableHours, updateArchiveUserId } from '../../db/database.js';
+import { getSessionArchive, getAllSessionArchive, getArchivedSession, getArchivedSessionById, getUserById, logAuditEvent, holdBillableHours, debitBillableHours, updateArchiveUserId, updateArchiveTitle } from '../../db/database.js';
 import type { Moment, Audience, Jurisdiction } from '../../types/index.js';
 import type { ClientIdentity } from '../../types/client.js';
 import { config } from '../../config.js';
@@ -92,6 +92,36 @@ function lavernFilename(sessionId: string, suffix: string): string {
   const tag = isBareExt ? 'WorkProduct' : '';
   const parts = ['Lavern', tag, today, shortId].filter(Boolean);
   return `${parts.join('-')}.${tail}`.replace('..', '.');
+}
+
+/**
+ * Pick a human-readable title for the session_archive row at create time.
+ * Order: matter title → request text (first sentence) → first uploaded doc
+ * (sans extension) → legacy documentPath basename. Returns '' when nothing
+ * usable is available — caller leaves the early-archive default in place.
+ */
+function deriveCreateTitle(body: CreateSessionBody, session: SessionState): string {
+  const matterTitle = session.matterRecord?.title?.trim();
+  if (matterTitle) return matterTitle;
+
+  const requestText = body.request?.requestText?.trim();
+  if (requestText) {
+    const oneLine = requestText.replace(/\s+/g, ' ');
+    const sentenceEnd = oneLine.search(/[.?!]\s/);
+    const cut = sentenceEnd > 0 ? oneLine.slice(0, sentenceEnd + 1) : oneLine;
+    return cut.length > 100 ? cut.slice(0, 97).trimEnd() + '…' : cut;
+  }
+
+  const firstDoc = session.documents[0]?.name?.trim();
+  if (firstDoc) return firstDoc.replace(/\.[^.]+$/, '');
+
+  const legacyPath = body.documentPath?.trim();
+  if (legacyPath) {
+    const base = legacyPath.split(/[/\\]/).pop() ?? legacyPath;
+    return base.replace(/\.[^.]+$/, '');
+  }
+
+  return '';
 }
 
 /** Check if the requesting user owns the session (or session has no owner). */
@@ -298,6 +328,20 @@ export function registerSessionRoutes(
       session.provider = body.options.provider;
     }
 
+    // Overwrite the early-archive title now that documents / matter / request
+    // are attached. Without this, every row in My Cases collapses to the
+    // "Session Results" fallback set at sessionManager.createSession() time
+    // (long before this handler sees the body).
+    try {
+      const derivedTitle = deriveCreateTitle(body, session);
+      if (derivedTitle) {
+        session.title = derivedTitle;
+        updateArchiveTitle(session.id, derivedTitle);
+      }
+    } catch (err) {
+      logger.warn('Failed to set session title', { sessionId: session.id, error: err });
+    }
+
     if (body.request) {
       // v5 dispatch mode
       let legalRequest = body.request;
@@ -413,8 +457,16 @@ export function registerSessionRoutes(
   fastify.get('/api/sessions', async (request, reply) => {
     const userId = (request as typeof request & { userId?: string }).userId;
     const allSessions = sessionManager.getAllSessions();
-    // Filter to only this user's sessions (or show all if no auth — backward compat for CLI)
-    const activeSessions = userId ? allSessions.filter(s => s.userId === userId) : allSessions;
+    // Multi-user installs (auth on): scope the listing to the requester.
+    // LOCAL MODE (the default in v0.15.0): userId is always 'local-user'.
+    // Filtering on it would hide any session whose userId is something
+    // else — historical sessions, CLI-created sessions, integration-test
+    // fixtures — so we show everything instead. The CLI-backward-compat
+    // branch (no userId at all) keeps working untouched.
+    const activeSessions =
+      userId && userId !== 'local-user'
+        ? allSessions.filter(s => s.userId === userId)
+        : allSessions;
     const active = activeSessions.map((s) => ({
       id: s.id,
       currentStep: s.genericWorkflow?.currentStep ?? s.workflow.currentStep,
@@ -424,24 +476,14 @@ export function registerSessionRoutes(
       budget: s.budgetUsd,
     }));
 
-    // Include recent archived sessions so work survives server restarts
-    const archived = getRecentArchivedSessions(5);
-    const activeIds = new Set(active.map(s => s.id));
-    const archivedEntries = archived
-      .filter(a => !activeIds.has(a.id))
-      .map(a => ({
-        id: a.id,
-        currentStep: 'delivered' as const,
-        completedSteps: 0,
-        eventCount: 0,
-        cost: a.cost_usd,
-        budget: a.budget_usd,
-        _restored: true,
-      }));
-
+    // Archived sessions are surfaced separately via /api/sessions/archive and
+    // routed through the delivery view (which hydrates from SQLite). Including
+    // them here used to leak post-restart sessions into the "Active Sessions"
+    // list, where clicking opened the working view and triggered a "Session
+    // Expired" overlay because the WS handshake couldn't find them in memory.
     return reply.send({
-      sessions: [...active, ...archivedEntries],
-      total: active.length + archivedEntries.length,
+      sessions: active,
+      total: active.length,
     });
   });
 
@@ -530,7 +572,12 @@ export function registerSessionRoutes(
         const summary = safeJsonParse<Record<string, unknown>>(archived.summary_json, {});
         return reply.send({
           id: archived.id,
-          workflow: { currentStep: 'delivered', completedSteps: [], gateDecisions: [] },
+          workflow: {
+            currentStep: 'delivered',
+            completedSteps: Array.from({ length: archived.completed_steps_count ?? 0 }, (_, i) => `step-${i + 1}`),
+            completedStepsCount: archived.completed_steps_count ?? 0,
+            gateDecisions: [],
+          },
           debate: {
             findingsCount: archived.findings_count,
             challengesCount: 0,
@@ -707,7 +754,9 @@ export function registerSessionRoutes(
       afterScores: session.afterScores,
 
       reportCard: session.reportCard ?? null,
-      matterTitle: session.matterRecord?.title ?? null,
+      matterTitle: session.matterRecord?.title
+        ?? session.documents[0]?.name?.replace(/\.[^.]+$/, '')
+        ?? null,
       workflowTemplateId: session.workflowTemplateId ?? null,
       provider: session.provider ?? config.provider,
       selectedTeam: session.selectedTeam,

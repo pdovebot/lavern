@@ -1,7 +1,7 @@
 /**
  * Timeline — Workflow progress bar showing the 10-step pipeline.
  *
- * Warm editorial design — Inter font, white background, muted step colors.
+ * Warm editorial design — Geist font, white background, muted step colors.
  * Displays which steps are completed, current, and upcoming.
  */
 

@@ -4,7 +4,7 @@
  * Shows: DiceBear avatar, display name, archetype, skill radar,
  * cost tier badge, seniority badge, billing rate.
  *
- * Warm editorial design — Inter font, paper-white card.
+ * Warm editorial design — Geist font, paper-white card.
  * v2: Fixed overlaps — removed absolute checkmark, repositioned bottom row.
  */
 
@@ -111,13 +111,13 @@ export function AgentCard({ profile, selected, hideSeniorityBadge }: Props) {
 
       {/* Name */}
       <div style={{
-        fontSize: 14,
+        fontSize: 16,
         fontFamily: fonts.serif,
         fontWeight: 500,
         color: colors.text,
         textAlign: 'center',
         lineHeight: 1.2,
-        marginBottom: 4,
+        marginBottom: 6,
         maxWidth: '100%',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -131,12 +131,12 @@ export function AgentCard({ profile, selected, hideSeniorityBadge }: Props) {
 
       {/* Tagline */}
       <div style={{
-        fontSize: 10,
+        fontSize: 11.5,
         fontFamily: fonts.sans,
         color: colors.textMuted,
         textAlign: 'center',
         lineHeight: 1.45,
-        maxWidth: '90%',
+        maxWidth: '92%',
         marginBottom: 10,
         display: '-webkit-box',
         WebkitLineClamp: 2,
@@ -160,14 +160,14 @@ export function AgentCard({ profile, selected, hideSeniorityBadge }: Props) {
         }}>
           {profile.practiceAreas.slice(0, 2).map(area => (
             <span key={area} style={{
-              fontSize: 8.5,
+              fontSize: 10,
               fontFamily: fonts.sans,
               fontWeight: 500,
               color: catColor,
               backgroundColor: `${catColor}0D`,
               border: `1px solid ${catColor}22`,
               borderRadius: radii.pill,
-              padding: '2px 8px',
+              padding: '3px 9px',
               whiteSpace: 'nowrap',
             }}>{area}</span>
           ))}
@@ -185,19 +185,19 @@ export function AgentCard({ profile, selected, hideSeniorityBadge }: Props) {
         borderTop: `1px solid ${colors.border}`,
       }}>
         <span style={{
-          fontSize: 15,
+          fontSize: 17,
           fontFamily: fonts.serif,
           fontWeight: 400,
           color: colors.text,
         }}>
-          ${profile.billingRateUsd.toLocaleString()}<span style={{ fontSize: 10, fontFamily: fonts.sans, color: colors.textMuted, marginLeft: 1 }}>/hr</span>
+          ${profile.billingRateUsd.toLocaleString()}<span style={{ fontSize: 11, fontFamily: fonts.sans, color: colors.textMuted, marginLeft: 2 }}>/hr</span>
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {!profile.optional && (
-            <span style={{ fontSize: 8.5, fontFamily: fonts.sans, fontWeight: 600, color: colors.accent }}>Required</span>
+            <span style={{ fontSize: 10, fontFamily: fonts.sans, fontWeight: 600, color: colors.accent, letterSpacing: 0.3 }}>Required</span>
           )}
           <span style={{
-            fontSize: 9,
+            fontSize: 10.5,
             fontFamily: fonts.sans,
             fontWeight: 500,
             color: catColor,

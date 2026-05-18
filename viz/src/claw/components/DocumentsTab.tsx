@@ -326,7 +326,6 @@ const styles: Record<string, React.CSSProperties> = {
   empty: {
     fontSize: 14,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: CLAW.textMuted,
     padding: `${spacing.xl}px`,
     textAlign: 'center' as const,
@@ -353,6 +352,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 12,
     fontFamily: fonts.sans,
     color: CLAW.textMuted,
-    fontStyle: 'italic' as const,
   },
 };

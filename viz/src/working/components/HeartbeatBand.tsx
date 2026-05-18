@@ -23,6 +23,9 @@ interface HeartbeatBandProps {
   findingCount: number;
   sessionStartTime: string | null;
   lastEventTimestamp: string | null;
+  /** Replay mode: when set, the elapsed timer freezes at endTime - start
+   *  instead of ticking against wall clock. */
+  replayEndTime?: string | null;
 }
 
 /** Rotating color palette for phase dots. */
@@ -43,6 +46,7 @@ export function HeartbeatBand({
   findingCount,
   sessionStartTime,
   lastEventTimestamp,
+  replayEndTime,
 }: HeartbeatBandProps) {
   const [workflowId] = useState<string>(() => {
     try {
@@ -128,6 +132,7 @@ export function HeartbeatBand({
         cost={cost}
         certaintyPct={certaintyPct}
         frozen={currentStep === 'delivered' || completedSteps.includes('delivered')}
+        endTime={replayEndTime}
       />
     </nav>
   );

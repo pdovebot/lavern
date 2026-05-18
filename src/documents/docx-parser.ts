@@ -6,8 +6,22 @@
  */
 
 import mammoth from 'mammoth';
-import { detectSections, detectDefinedTerms } from './structure-detector.js';
+import { detectSections, detectDefinedTerms, detectParseWarnings } from './structure-detector.js';
 import type { ParsedDocument, DocumentSection, DocumentTable } from './types.js';
+
+/**
+ * Normalize mammoth's raw text output. Word documents leak layout whitespace
+ * (runs of spaces inside paragraphs, blank lines between every paragraph)
+ * that bloat agent context and depress confidence vs. PDF-extracted text.
+ */
+function normalizeDocxText(text: string): string {
+  return text
+    .split('\n')
+    .map(line => line.replace(/[ \t ]+/g, ' ').trimEnd())
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
 
 /**
  * Parse a DOCX buffer into a structured ParsedDocument.
@@ -23,7 +37,7 @@ export async function parseDocx(
 
   // Also get plain text for fullText field
   const textResult = await mammoth.extractRawText({ buffer });
-  const fullText = textResult.value;
+  const fullText = normalizeDocxText(textResult.value);
 
   const wordCount = fullText.split(/\s+/).filter(w => w.length > 0).length;
   // Estimate page count (~250 words per page)
@@ -33,6 +47,7 @@ export async function parseDocx(
   const sections = extractSectionsFromHtml(html, fullText);
   const tables = extractTablesFromHtml(html);
   const definedTerms = extractDefinedTermsFromHtml(html, fullText);
+  const parseWarnings = detectParseWarnings(fullText, 'mammoth');
 
   return {
     id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -47,6 +62,7 @@ export async function parseDocx(
     definedTerms,
     parseMethod: 'mammoth',
     parsedAt: new Date().toISOString(),
+    parseWarnings: parseWarnings.length > 0 ? parseWarnings : undefined,
   };
 }
 

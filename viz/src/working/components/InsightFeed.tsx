@@ -9,7 +9,7 @@
  * Visual hierarchy:
  *   Rich cards  — FindingCard, ChallengeCard, etc. (white bg, borders, evidence)
  *   Activity    — ActivityCard (no bg, inline text — visually light)
- *   System      — WorkflowStepCard, ReassuranceCard (centered, serif italic)
+ *   System      — WorkflowStepCard, ReassuranceCard (centered, serif)
  */
 
 import { useEffect, useRef, useMemo } from 'react';

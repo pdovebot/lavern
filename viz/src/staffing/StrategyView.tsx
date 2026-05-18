@@ -67,32 +67,30 @@ export default function StrategyView({ onComplete, onBack, onSkip }: Props) {
       ...styles.container,
       ...(isMobile ? { padding: spacing.lg } : isTablet ? { padding: spacing.xl } : {}),
     }} id="main-content">
-      {/* Header */}
-      <div style={styles.header}>
-        <div style={styles.headerLeft}>
+      {/* Nav row \u2014 back/skip aligned to viewport edges */}
+      <div style={styles.navRow}>
+        <button
+          onClick={onBack}
+          style={styles.backButton}
+          onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
+          onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
+        >
+          {'\u2190'} Back
+        </button>
+        {onSkip && (
           <button
-            onClick={onBack}
-            style={styles.backButton}
-            onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
-            onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
+            onClick={onSkip}
+            style={styles.skipButton}
+            onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; b.style.borderColor = colors.text; }}
+            onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.textMuted; b.style.borderColor = colors.border; }}
           >
-            {'\u2190'} Back
+            Skip {'\u2192'}
           </button>
-          <h1 style={styles.title}>Lavern <span style={{ fontStyle: 'italic' }}>Strategy</span></h1>
-          {onSkip && (
-            <button
-              onClick={onSkip}
-              style={styles.skipButton}
-              onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; b.style.borderColor = colors.text; }}
-              onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.textMuted; b.style.borderColor = colors.border; }}
-            >
-              Skip {'\u2192'}
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Intro */}
+      {/* Title + intro \u2014 share the same left edge as everything below */}
+      <h1 style={styles.title}>Lavern <span style={{ fontWeight: 500 }}>Strategy</span></h1>
       <p style={styles.intro}>
         Defaults work well for most engagements. Adjust only if you need to.
       </p>
@@ -142,17 +140,11 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 1400,
     margin: '0 auto',
   },
-  header: {
+  navRow: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: spacing.xl,
-  },
-  headerLeft: {
-    display: 'flex',
-    alignItems: 'baseline',
-    gap: spacing.lg,
-    width: '100%',
   },
   backButton: {
     padding: '6px 14px',
@@ -184,12 +176,13 @@ const styles: Record<string, React.CSSProperties> = {
     transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 300,
-    fontFamily: fonts.serif,
+    fontSize: 'clamp(22px, 5.5vw, 32px)',
+    fontWeight: 400,
+    fontFamily: fonts.sans,
     color: colors.text,
     letterSpacing: -0.5,
     margin: 0,
+    marginBottom: spacing.xs,
   },
   ctaRow: {
     display: 'flex',
@@ -199,7 +192,6 @@ const styles: Record<string, React.CSSProperties> = {
   intro: {
     fontSize: 13,
     fontFamily: fonts.serif,
-    fontStyle: 'italic',
     color: colors.textMuted,
     margin: `0 0 ${spacing.lg}px`,
     lineHeight: 1.5,

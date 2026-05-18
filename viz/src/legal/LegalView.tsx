@@ -183,7 +183,7 @@ const styles: Record<string, React.CSSProperties> = {
     minHeight: '100vh',
     backgroundColor: '#0A0A0F',
     color: '#FAF9F6',
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
     display: 'flex',
     justifyContent: 'center',
     padding: '48px 24px',
@@ -200,7 +200,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1.5px solid rgba(250, 249, 246, 0.3)',
     backgroundColor: 'transparent',
     color: 'rgba(250, 249, 246, 0.7)',
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 11,
     fontWeight: 600,
     letterSpacing: 1,
@@ -234,7 +234,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   title: {
-    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontFamily: "'Newsreader', Georgia, serif",
     fontSize: 36,
     fontWeight: 300,
     margin: 0,
@@ -258,7 +258,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   sectionTitle: {
-    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontFamily: "'Newsreader', Georgia, serif",
     fontSize: 20,
     fontWeight: 400,
     margin: '0 0 8px',
@@ -282,7 +282,6 @@ const styles: Record<string, React.CSSProperties> = {
 
   placeholderText: {
     fontSize: 13,
-    fontStyle: 'italic',
     opacity: 0.6,
     margin: 0,
     textAlign: 'center' as const,

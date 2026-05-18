@@ -31,12 +31,13 @@ export function CostTierBadge({ tier }: Props) {
       borderRadius: radii.pill,
       backgroundColor: tierBg(tier),
       color: tierColor(tier),
-      fontSize: 10,
+      fontSize: 11,
       fontFamily: fonts.sans,
       fontWeight: 500,
       lineHeight: '16px',
+      letterSpacing: 0.2,
     }}>
-      <span style={{ fontSize: 7 }}>{tierIcons[tier] ?? ''}</span>
+      <span style={{ fontSize: 8 }}>{tierIcons[tier] ?? ''}</span>
       {tierLabels[tier] ?? tier}
     </span>
   );

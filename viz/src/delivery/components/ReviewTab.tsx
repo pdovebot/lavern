@@ -469,7 +469,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     fontFamily: fonts.sans,
     color: colors.textMuted,
-    fontStyle: 'italic' as const,
     padding: `${spacing.lg}px ${spacing.xl}px`,
     backgroundColor: colors.bgCard,
     border: `1px solid ${colors.border}`,

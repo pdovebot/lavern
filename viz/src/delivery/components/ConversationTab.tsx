@@ -36,7 +36,7 @@ function renderInline(text: string, keyPrefix: string): ReactNode[] {
     if (match[2] !== undefined) {
       nodes.push(<strong key={key}>{match[2]}</strong>);
     } else if (match[3] !== undefined) {
-      nodes.push(<em key={key}>{match[3]}</em>);
+      nodes.push(<span key={key}>{match[3]}</span>);
     } else if (match[4] !== undefined) {
       nodes.push(<code key={key} style={{ fontFamily: 'ui-monospace, monospace', fontSize: '0.92em', backgroundColor: 'rgba(0,0,0,0.05)', padding: '1px 4px', borderRadius: 3 }}>{match[4]}</code>);
     }
@@ -532,7 +532,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: fonts.sans,
     fontSize: 13,
     color: colors.textMuted,
-    fontStyle: 'italic',
   },
   thinkingDots: {
     animation: 'thinkingPulse 1.4s ease-in-out infinite',

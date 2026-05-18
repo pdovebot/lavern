@@ -206,7 +206,7 @@ export default function LobbyView({ onEnter, onMyPage, onLogin, onAgentDocs, onD
           style={{ animation: 'lobbyFadeUp 0.8s ease 2s both' }}
         >
           Excellence doesn{'\u2019'}t scale.{' '}
-          <span className="italic">Until now.</span>
+          <span className="font-light text-text-muted">Until now.</span>
         </HoverText>
 
         <ShimmerButton

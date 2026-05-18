@@ -5,7 +5,7 @@
  * src/assembly/format-converter.ts:
  *
  *   traditional  — Times New Roman, numbered headings, navy accent, formal
- *   elegant      — Cormorant Garamond + Inter, warm terracotta, open tables
+ *   elegant      — Newsreader + Geist, warm terracotta, open tables
  *   accessible   — Verdana/Arial, WCAG AA, large type, letter spacing
  *
  * Handles: h1–h6, bold/italic/code, bullets, numbered lists,
@@ -72,9 +72,9 @@ const TRADITIONAL: StyleProfile = {
 };
 
 const ELEGANT: StyleProfile = {
-  bodyFont: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  headingFont: "'Cormorant Garamond', Georgia, serif",
-  fontImport: 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap',
+  bodyFont: "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  headingFont: "'Newsreader', Georgia, serif",
+  fontImport: 'https://fonts.googleapis.com/css2?family=Newsreader:wght@300;400;500;600;700;800&family=Geist:wght@400;500;600;700&display=swap',
   ink: '#1A1A1A',
   inkSecondary: '#4A4A4A',
   inkMuted: '#7A7A76',
@@ -151,7 +151,7 @@ function renderInline(text: string, p: StyleProfile): React.ReactNode[] {
     if (match[2]) {
       parts.push(<strong key={match.index}>{match[2]}</strong>);
     } else if (match[3]) {
-      parts.push(<em key={match.index}>{match[3]}</em>);
+      parts.push(<span key={match.index}>{match[3]}</span>);
     } else if (match[4]) {
       parts.push(
         <code key={match.index} style={{
@@ -379,7 +379,6 @@ export function SimpleMarkdown({ content, docStyle = 'elegant' }: Props) {
             borderLeft: `3px solid ${p.accent}`,
             paddingLeft: 14,
             color: p.inkMuted,
-            fontStyle: 'italic',
             margin: '10px 0',
           };
       elements.push(

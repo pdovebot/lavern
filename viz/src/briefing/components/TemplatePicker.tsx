@@ -45,18 +45,18 @@ export function TemplatePicker({ onSelect }: Props) {
   };
 
   return (
-    <div className="mb-5">
-      <div className="text-[11px] font-sans text-text-dim uppercase tracking-[1px] mb-3">
+    <div className="mt-10 mb-8">
+      <div className="text-[11px] font-sans text-text-dim uppercase tracking-[1px] mb-4">
         Or start from a template
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {templates.map(t => (
           <button
             key={t.id}
             onClick={() => handleSelect(t.id, t.name)}
             disabled={loading !== null}
             aria-label={`Start from ${t.name} template — ${t.description}`}
-            className="text-left p-3 rounded-lg border border-border bg-surface hover:bg-surface-hover transition-colors cursor-pointer disabled:opacity-50"
+            className="text-left p-3 rounded-lg border border-border bg-surface hover:bg-surface-hover transition-all duration-200 cursor-pointer disabled:opacity-50 shadow-[0_2px_6px_rgba(20,18,14,0.05),0_1px_2px_rgba(20,18,14,0.03)] hover:shadow-[0_8px_20px_rgba(20,18,14,0.10),0_2px_6px_rgba(20,18,14,0.06)] hover:-translate-y-[1px]"
           >
             <div className="text-[10px] font-sans text-text-dim uppercase tracking-[0.5px] mb-1">
               {t.category}
