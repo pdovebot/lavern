@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!--
+    Social profile icon. Square, 1200x1200, downscales cleanly to:
+      · LinkedIn company avatar (400x400)
+      · X / Twitter profile (200x200, and 128x128 in feeds)
+      · Slack workspace icon (132x132)
+      · Apple touch icon (180x180)
+      · Favicon (32x32)
+    The big serif "L" reads at every size because it's a single
+    high-contrast glyph with generous negative space. Cream paper
+    + vignette + grain match the OG card and LinkedIn banners.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    html,body{margin:0;padding:0;background:#FAFAFA}
+    .card{
+      position:relative;
+      width:1200px;height:1200px;
+      background:#FAFAFA;
+      overflow:hidden;
+      box-sizing:border-box;
+    }
+    .card::before{
+      content:'';position:absolute;inset:0;
+      background:
+        radial-gradient(circle at 50% 42%,
+          rgba(255,253,247,0.95) 0%,
+          rgba(252,250,242,0.55) 50%,
+          rgba(244,239,227,0.4) 90%),
+        linear-gradient(180deg, #FBF9F2 0%, #F4EFE3 100%);
+      pointer-events:none;
+    }
+    .card::after{
+      content:'';position:absolute;inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:300px 300px;opacity:0.035;mix-blend-mode:multiply;pointer-events:none;
+    }
+
+    .glyph{
+      position:absolute;inset:0;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Newsreader',Georgia,serif;
+      font-weight:500;
+      font-size:880px;
+      color:#141310;
+      line-height:1;
+      letter-spacing:-0.04em;
+      /* Slight optical adjustment — the L has more visual weight on the
+         left, so nudge it right to feel balanced in the square. */
+      transform:translate(28px,-22px);
+      z-index:5;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="glyph">L</div>
+  </div>
+</body>
+</html>
