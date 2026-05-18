@@ -11,10 +11,9 @@
  * law-firm gravity instead of productivity-tool energy.
  */
 
-import { useState, useCallback, useContext, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { colors, fonts } from '../staffing/styles/tokens.js';
 import { cn } from '../utils/cn.js';
-import { UserContext } from '../auth/UserContext.js';
 import { LavernIlluminated } from '../components/LavernIlluminated.js';
 import { DocumentList } from '../briefing/components/DocumentList.js';
 import { useDocumentUpload } from '../briefing/hooks/useDocumentUpload.js';
@@ -36,7 +35,6 @@ const TIER_MAP: Record<EngagementTier, YoloTier> = {
 interface QuickStartProps {
   onQuickStart: (question: string, tier: YoloTier, parsedDocs: FrontendParsedDocument[]) => Promise<void>;
   onGuidedFlow: () => void;
-  onPricing?: () => void;
   onChallenge?: () => void;
 }
 
@@ -88,25 +86,8 @@ function ShimmerButton({
 
 // ── Component ──────────────────────────────────────────────────────────
 
-export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, onChallenge }: QuickStartProps) {
-  const userCtx = useContext(UserContext);
-  const isLoggedIn = !!userCtx?.user;
+export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge }: QuickStartProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Billable hours balance
-  const [billableBalance, setBillableBalance] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    fetch('/api/billing/status', { credentials: 'include' })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.billableHours?.balance != null) {
-          setBillableBalance(data.billableHours.balance);
-        }
-      })
-      .catch(() => { /* silently ignore */ });
-  }, [isLoggedIn]);
 
   // Core state
   const [question, setQuestion] = useState('');
@@ -116,7 +97,6 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
   const [instructHovered, setInstructHovered] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [archiveHovered, setArchiveHovered] = useState(false);
-  const [pricingHovered, setPricingHovered] = useState(false);
   const [agentsHovered, setAgentsHovered] = useState(false);
   const [challengeHovered, setChallengeHovered] = useState(false);
   const [ralphHovered, setRalphHovered] = useState(false);
@@ -287,47 +267,6 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onPricing, 
           >
             The Archive
           </button>
-          {/* Billable Hours — pricing */}
-          {onPricing && (
-            <div className="flex items-center gap-2">
-              {/* <button
-                onClick={onPricing}
-                className="cursor-pointer bg-transparent border-none transition-all duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)]"
-                style={{
-                  padding: '4px 0',
-                  color: pricingHovered ? colors.text : colors.textMuted,
-                  fontFamily: fonts.serif,
-                  fontSize: 15,
-                  fontWeight: 400,
-                  letterSpacing: 0.5,
-                  borderBottom: pricingHovered ? `1px solid ${colors.text}` : '1px solid transparent',
-                }}
-                onMouseEnter={() => setPricingHovered(true)}
-                onMouseLeave={() => setPricingHovered(false)}
-              >
-                The Billable Hours
-              </button> */}
-              {billableBalance != null && billableBalance <= 0 && (
-                <button
-                  onClick={onPricing}
-                  className="cursor-pointer bg-transparent"
-                  style={{
-                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: '#EF5350',
-                    letterSpacing: 0.3,
-                    padding: '2px 8px',
-                    borderRadius: 12,
-                    backgroundColor: 'rgba(229, 115, 115, 0.1)',
-                    border: '1px solid rgba(229, 115, 115, 0.2)',
-                  }}
-                >
-                  0h — top off
-                </button>
-              )}
-            </div>
-          )}
           {onChallenge && (
             <button
               onClick={onChallenge}

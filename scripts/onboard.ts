@@ -371,7 +371,7 @@ async function main() {
     open ${c.cyan}http://localhost:3000${c.reset}   Open the dashboard
 
   Docs:    ${c.dim}README.md${c.reset}
-  Issues:  ${c.dim}https://github.com/AnttiHero/Marble/issues${c.reset}
+  Issues:  ${c.dim}https://github.com/AnttiHero/lavern/issues${c.reset}
 `);
 
   const { launch } = await prompts({

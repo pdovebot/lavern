@@ -21,7 +21,6 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { Readable } from 'node:stream';
 import { timingSafeEqual } from 'node:crypto';
 import Fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
@@ -52,7 +51,6 @@ import { registerKnowledgeBaseRoutes } from './routes/knowledge-base.js';
 import { registerVerifyRoutes } from './routes/verify.js';
 import { registerClawRoutes } from './routes/claw.js';
 import { registerChallengeRoutes } from './routes/challenge.js';
-import { registerBillingRoutes } from './routes/billing.js';
 import { registerWaitlistRoutes } from './routes/waitlist.js';
 import { registerAdminRoutes } from './routes/admin.js';
 import { maybeRegisterRemoteBridge } from '../mcp/remote-bridge/index.js';
@@ -195,25 +193,6 @@ export async function startApiServer(port: number): Promise<void> {
   // We capture it via preParsing hook (only for the webhook route) and
   // store it on the request object via Fastify request decorator.
 
-  // Declare the rawBody property on FastifyRequest for Stripe webhook signature verification.
-  // We use decorateRequest so the property exists on the prototype, then assign via `as any`
-  // because Fastify's generic types don't expose custom decorators without module augmentation.
-  fastify.decorateRequest('rawBody', undefined);
-
-  fastify.addHook('preParsing', async (request, _reply, payload) => {
-    if (request.url === '/api/billing/webhook') {
-      const chunks: Buffer[] = [];
-      for await (const chunk of payload as AsyncIterable<Buffer>) {
-        chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-      }
-      const rawBody = Buffer.concat(chunks);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- decorated via fastify.decorateRequest above
-      (request as any).rawBody = rawBody.toString('utf8');
-      return Readable.from(rawBody);
-    }
-    return payload;
-  });
-
   // ── Database ────────────────────────────────────────────────────────
 
   initDatabase();
@@ -333,9 +312,6 @@ export async function startApiServer(port: number): Promise<void> {
     'POST /api/documents/parse',
     // The Lavern Challenge — zero-friction, no auth required
     'POST /api/challenge',
-    // Stripe — webhook must be public, config returns publishable key only
-    'POST /api/billing/webhook',
-    'GET /api/billing/stripe-config',
     // v22: Waitlist — public join + status, admin endpoints verify X-Admin-Key internally
     'POST /api/waitlist',
     'GET /api/waitlist/status',
@@ -351,38 +327,24 @@ export async function startApiServer(port: number): Promise<void> {
     '/dashboard/',
   ];
 
-  // x402: When payment-based auth is enabled, unauthenticated callers
-  // can reach /api/engage to receive 402 Payment Required responses.
-  // Auth is then handled inside the route (Bearer OR x402 payment).
-  if (config.x402Enabled) {
-    publicPaths.push('POST /api/engage');
-  }
-
   const authMiddleware = createAuthMiddleware(clientRegistry, publicPaths);
   fastify.addHook('onRequest', authMiddleware);
 
   // ── Email Verification Enforcement ────────────────────────────────────
   // Runs AFTER auth (needs userId). Blocks unverified browser users from
   // paid mutations. Anonymous QuickStart, GET requests, API clients, and
-  // exempt paths (auth, billing) pass through.
-  //
-  // Gated by config.authEnabled: with auth off (LOCAL MODE default), every
-  // request is the synthetic local-user and there's no email to verify, so
-  // wiring the hook would be pure overhead.
-  if (config.authEnabled) {
-    const { createRequireVerifiedHook } = await import('./middleware/require-verified.js');
-    const requireVerified = createRequireVerifiedHook([
-      '/api/auth/',       // All auth routes (login, signup, verify, reset, etc.)
-      '/api/billing/',    // Must buy hours even if unverified (waitlist = identity check)
-      '/api/waitlist',    // Public waitlist operations
-      '/api/documents/',  // Document parsing (needed by Challenge + Briefing)
-      '/api/challenge',   // Zero-friction challenge
-      '/api/partner/',    // Conversational intake
-      '/api/briefing/',   // Intake flow
-      '/api/voice/',      // STT/TTS proxy
-    ]);
-    fastify.addHook('onRequest', requireVerified);
-  }
+  // exempt paths (auth, waitlist, etc.) pass through.
+  const { createRequireVerifiedHook } = await import('./middleware/require-verified.js');
+  const requireVerified = createRequireVerifiedHook([
+    '/api/auth/',       // All auth routes (login, signup, verify, reset, etc.)
+    '/api/waitlist',    // Public waitlist operations
+    '/api/documents/',  // Document parsing (needed by Challenge + Briefing)
+    '/api/challenge',   // Zero-friction challenge
+    '/api/partner/',    // Conversational intake
+    '/api/briefing/',   // Intake flow
+    '/api/voice/',      // STT/TTS proxy
+  ]);
+  fastify.addHook('onRequest', requireVerified);
 
   // ── Per-User Rate Limiting ────────────────────────────────────────────
   // Runs AFTER auth so we have userId. 30 req/min per user, 5 concurrent sessions.
@@ -500,12 +462,6 @@ export async function startApiServer(port: number): Promise<void> {
     checks.email = {
       ok: !!config.email.resendApiKey,
       detail: config.email.resendApiKey ? 'configured' : 'RESEND_API_KEY not set',
-    };
-
-    // Stripe billing
-    checks.stripe = {
-      ok: !!config.stripe.secretKey,
-      detail: config.stripe.secretKey ? 'configured' : 'STRIPE_SECRET_KEY not set',
     };
 
     // Disk space (data directory)
@@ -682,12 +638,6 @@ export async function startApiServer(port: number): Promise<void> {
   registerClawRoutes(fastify);
   // v19: The Lavern Challenge — blind document comparison
   registerChallengeRoutes(fastify);
-  // Billing + referral routes both read `lavern_token` cookies via
-  // parseCookieToken to identify a user. Without auth, that cookie is
-  // never set — every request becomes 401. Gate them off in LOCAL MODE.
-  if (config.authEnabled) {
-    registerBillingRoutes(fastify);
-  }
   // v22: Waitlist — join, status, admin invite & listing
   registerWaitlistRoutes(fastify);
   // Admin observability endpoints (X-Admin-Key gated)
@@ -695,9 +645,7 @@ export async function startApiServer(port: number): Promise<void> {
   // Remote MCP bridge — Managed Agents integration (Stage 1: scaffolded, off
   // unless both LAVERN_MANAGED_AGENTS_BRIDGE=1 and the shared secret are set).
   maybeRegisterRemoteBridge(fastify, sessionManager);
-  if (config.authEnabled) {
-    registerReferralRoutes(fastify);
-  }
+  registerReferralRoutes(fastify);
   registerTemplateRoutes(fastify);
 
   // ── Frontend Static Files ──────────────────────────────────────────

@@ -12,11 +12,9 @@
  *   #/team       → Browse & select agents
  *   #/working    → Live agent dashboard (thinking stream)
  *   #/delivery   → Work results presentation
- *   #/billing    → Invoice & cost summary
  *   #/my-cases   → Active & past sessions
  *   #/my-page    → User profile & settings
  *   #/claw       → Claw Mode remote monitoring dashboard
- *   #/pricing    → Billable Hours — pricing page
  *   #/challenge  → The Lavern Challenge — blind document comparison
  *   #/agent-builder → NBA2K-style custom agent builder wizard
  *
@@ -41,7 +39,6 @@ import { LoadingW } from './components/LoadingW.js';
 import { ErrorBoundary } from './components/ErrorBoundary.js';
 import { YOLO_CONFIGS, type YoloTier } from './landing/yolo-config.js';
 import { CustomCursor } from './components/CustomCursor.js';
-import { TopUpDialog } from './components/TopUpDialog.js';
 
 // Lazy-load all views (separate code-split chunks)
 const DemoTourView = lazy(() => import('./demo/DemoTourView.js'));
@@ -54,7 +51,6 @@ const StrategyView = lazy(() => import('./staffing/StrategyView.js'));
 const TeamView = lazy(() => import('./staffing/TeamView.js'));
 const WorkingView = lazy(() => import('./working/WorkingView.js'));
 const DeliveryView = lazy(() => import('./delivery/DeliveryView.js'));
-const BillingView = lazy(() => import('./billing/BillingView.js'));
 const MyPageView = lazy(() => import('./my-page/MyPageView.js'));
 const MyCasesView = lazy(() => import('./my-cases/MyCasesView.js'));
 const AgentDocsView = lazy(() => import('./agent-docs/AgentDocsView.js'));
@@ -66,7 +62,6 @@ const ClawLiveView = lazy(() => import('./claw/ClawLiveView.js'));
 const RalphLoopView = lazy(() => import('./ralph/RalphLoopView.js'));
 const DispatchView = lazy(() => import('./dispatch/DispatchView.js'));
 const ArchiveView = lazy(() => import('./archive/ArchiveView.js'));
-const PricingView = lazy(() => import('./pricing/PricingView.js'));
 const ChallengeView = lazy(() => import('./challenge/ChallengeView.js'));
 const AgentBuilderView = lazy(() => import('./agent-builder/AgentBuilderView.js'));
 const PublicAgentShareView = lazy(() => import('./agent-builder/PublicAgentShareView.js'));
@@ -75,7 +70,7 @@ const LegalView = lazy(() => import('./legal/LegalView.js'));
 const PartnerView = lazy(() => import('./partner/PartnerView.js'));
 const ShowcaseView = lazy(() => import('./showcase/ShowcaseView.js'));
 
-type AppView = 'foyer' | 'partner' | 'quickstart' | 'landing' | 'lobby' | 'login' | 'reset-password' | 'verify-email' | 'dashboard' | 'intake' | 'briefing' | 'strategy' | 'team' | 'working' | 'delivery' | 'billing' | 'my-page' | 'my-cases' | 'agent-docs' |'claw' | 'claw-live' | 'dispatch' | 'archive' | 'pricing' | 'challenge' | 'agent-builder' | 'shared-agent' | 'shared-team' | 'terms' | 'privacy' | 'showcase' | 'demo' | 'ralph';
+type AppView = 'foyer' | 'partner' | 'quickstart' | 'landing' | 'lobby' | 'login' | 'reset-password' | 'verify-email' | 'dashboard' | 'intake' | 'briefing' | 'strategy' | 'team' | 'working' | 'delivery' | 'my-page' | 'my-cases' | 'agent-docs' |'claw' | 'claw-live' | 'dispatch' | 'archive' | 'challenge' | 'agent-builder' | 'shared-agent' | 'shared-team' | 'terms' | 'privacy' | 'showcase' | 'demo' | 'ralph';
 
 function getViewFromHash(): AppView {
   const hash = window.location.hash;
@@ -103,7 +98,6 @@ function getViewFromHash(): AppView {
   if (hash.startsWith('#/staffing')) return 'strategy'; // backward compat redirect
   if (hash.startsWith('#/working')) return 'working';
   if (hash.startsWith('#/delivery')) return 'delivery';
-  if (hash.startsWith('#/billing')) return 'billing';
   if (hash.startsWith('#/my-cases')) return 'my-cases';
   if (hash.startsWith('#/my-page')) return 'my-page';
   if (hash.startsWith('#/agent-docs')) return 'agent-docs';
@@ -112,7 +106,6 @@ function getViewFromHash(): AppView {
   if (hash.startsWith('#/claw')) return 'claw';
   if (hash.startsWith('#/ralph')) return 'ralph';
   if (hash.startsWith('#/archive')) return 'archive';
-  if (hash.startsWith('#/pricing')) return 'pricing';
   if (hash.startsWith('#/challenge')) return 'challenge';
   if (hash.startsWith('#/agent-builder')) return 'agent-builder';
   if (hash.startsWith('#/a/')) return 'shared-agent';
@@ -202,26 +195,6 @@ function DemoLauncher() {
 export function App() {
   const [view, setView] = useState<AppView>(getViewFromHash);
   const [errorToast, setErrorToast] = useState<string | null>(null);
-  const [showTopUp, setShowTopUp] = useState(false);
-  // Server-advertised capabilities. The backend's /api/capabilities tells
-  // us whether the auth/billing/Google-OAuth routes are wired up on this
-  // deployment. Default to `auth: false` (LOCAL MODE) so the first paint
-  // matches the OSS-default; a probe in the effect below corrects the
-  // value if the operator set LAVERN_AUTH_ENABLED=true.
-  const [capabilities, setCapabilities] = useState<{ auth: boolean; billing: boolean }>(
-    { auth: false, billing: false },
-  );
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/capabilities', { credentials: 'include' })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (cancelled || !data) return;
-        setCapabilities({ auth: !!data.auth, billing: !!data.billing });
-      })
-      .catch(() => { /* offline / pre-server-up — keep the LOCAL MODE default */ });
-    return () => { cancelled = true; };
-  }, []);
   const { isOnline } = useOnlineStatus();
   const userCtx = useContext(UserContext);
   const userRef = useRef(userCtx?.user);
@@ -252,21 +225,6 @@ export function App() {
       sessionStorage.removeItem('shem-demo-case');
     }
   }, [userCtx?.user]);
-
-  // ── Stripe redirect handler ─────────────────────────────────────────
-  // Stripe redirects to ?billing=success or ?billing=cancelled (query params).
-  // Our SPA uses hash routing, so we detect and redirect on mount.
-  const [billingResult, setBillingResult] = useState<'success' | 'cancelled' | null>(null);
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const billing = params.get('billing');
-    if (billing === 'success' || billing === 'cancelled') {
-      setBillingResult(billing);
-      // Clean the URL (remove query params, keep hash)
-      const cleanUrl = window.location.pathname + (window.location.hash || '');
-      window.history.replaceState(null, '', cleanUrl);
-    }
-  }, []);
 
   // ── Google OAuth redirect handler ──────────────────────────────────
   // Google OAuth redirects to /#/?oauth=success (hash contains the param).
@@ -371,14 +329,6 @@ export function App() {
       // API returned non-ok — log the actual error
       console.error('[YOLO] Session creation failed:', res.status, data);
       sessionStorage.removeItem('shem-session-id');
-
-      // Out of hours — show top-off prompt
-      if (res.status === 402) {
-        setErrorToast(null);
-        setShowTopUp(true);
-        return;
-      }
-
       setErrorToast('Something went wrong. Please try again.');
     } catch {
       // API unreachable — show error, don't silently fall through to demo
@@ -490,14 +440,6 @@ export function App() {
 
       console.error('[QuickStart] Session creation failed:', res.status, data);
       sessionStorage.removeItem('shem-session-id');
-
-      // Out of hours — show top-off prompt
-      if (res.status === 402) {
-        setErrorToast(null);
-        setShowTopUp(true);
-        return;
-      }
-
       setErrorToast('Something went wrong. Please try again.');
     } catch {
       console.error('[QuickStart] API unreachable');
@@ -628,14 +570,8 @@ export function App() {
         return;
       }
 
-      // API returned non-ok — show specific error for billing, generic for others
       console.error('[Session] Session creation failed:', res.status, data);
       sessionStorage.removeItem('shem-session-id');
-      if (res.status === 402) {
-        setErrorToast('No billable hours remaining. Top up to continue.');
-        window.location.hash = '#/pricing';
-        return;
-      }
       setErrorToast(data?.error || 'Something went wrong. Please try again.');
     } catch {
       // API unreachable — show error, don't silently fall through to demo
@@ -645,13 +581,8 @@ export function App() {
     }
   }, []);
 
-  /** Delivery → Billing */
+  /** Delivery → clear all state → Landing */
   const handleDeliveryDone = useCallback(() => {
-    window.location.hash = '#/billing';
-  }, []);
-
-  /** Billing → clear all state → Landing */
-  const handleBillingClose = useCallback(() => {
     const keysToRemove = [
       'shem-matter-id', 'shem-matter-data',
       'shem-briefing-memo', 'shem-briefing-docs',
@@ -680,8 +611,6 @@ export function App() {
       if (detail.type === 'auth-expired') {
         setErrorToast(detail.message);
         userCtx?.logout();
-      } else if (detail.type === 'payment-required') {
-        setShowTopUp(true);
       } else {
         setErrorToast(detail.message);
       }
@@ -689,43 +618,6 @@ export function App() {
     window.addEventListener('shem:api-error', handler);
     return () => window.removeEventListener('shem:api-error', handler);
   }, [userCtx]);
-
-  // ── Post-purchase overlay ───────────────────────────────────────────
-  // Shown after Stripe redirects back with ?billing=success or ?billing=cancelled.
-  if (billingResult) {
-    const isSuccess = billingResult === 'success';
-    return (
-      <div style={{
-        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#0A0A0F', color: '#FAF9F6', fontFamily: "'Geist', -apple-system, sans-serif",
-        zIndex: 99999,
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>{isSuccess ? '✓' : '×'}</div>
-        <h1 style={{
-          fontFamily: "'Newsreader', Georgia, serif", fontSize: 32,
-          fontWeight: 300, letterSpacing: -0.5, margin: '0 0 12px',
-        }}>
-          {isSuccess ? 'Hours credited.' : 'Purchase cancelled.'}
-        </h1>
-        <p style={{ fontSize: 14, opacity: 0.55, margin: '0 0 32px', maxWidth: 360, textAlign: 'center', lineHeight: 1.7 }}>
-          {isSuccess
-            ? 'Your billable hours have been added to your account. They never expire.'
-            : 'No charge was made. You can try again anytime.'}
-        </p>
-        <button
-          onClick={() => { setBillingResult(null); window.location.hash = '#/quickstart'; }}
-          style={{
-            padding: '14px 36px', fontSize: 12, fontWeight: 600, letterSpacing: 2,
-            textTransform: 'uppercase', color: '#0A0A0F', backgroundColor: '#C9A227',
-            border: 'none', borderRadius: 6, cursor: 'pointer',
-          }}
-        >
-          {isSuccess ? 'Start Working' : 'Back to Lavern'}
-        </button>
-      </div>
-    );
-  }
 
   // ── Verification banner for unverified users ─────────────────────────
   const verifyBanner = userCtx?.user && !userCtx.user.emailVerified
@@ -738,11 +630,6 @@ export function App() {
   // ── ErrorToast rendered globally above all views ─────────────────────
   const toast = errorToast ? (
     <ErrorToast message={errorToast} onDismiss={() => setErrorToast(null)} />
-  ) : null;
-
-  // ── Top-up dialog — shown on 402 instead of redirect ─────────────────
-  const topUpDialog = showTopUp ? (
-    <TopUpDialog onDismiss={() => setShowTopUp(false)} />
   ) : null;
 
   // ── Custom cursor — auto-inverts via mix-blend-mode ──────────────────
@@ -759,13 +646,11 @@ export function App() {
         {toast}
         {offlineBanner}
         {verifyBanner}
-        {topUpDialog}
         {cursor}
         <Suspense fallback={<ViewFallback text="Loading..." />}>
           <QuickStartView
             onQuickStart={handleQuickStart}
             onGuidedFlow={() => { window.location.hash = '#/intake'; }}
-            onPricing={() => { window.location.hash = '#/pricing'; }}
             onChallenge={() => { window.location.hash = '#/challenge'; }}
           />
         </Suspense>
@@ -902,27 +787,6 @@ export function App() {
                 const sid = sessionStorage.getItem('shem-session-id') ?? '';
                 window.location.hash = sid.startsWith('demo-session') ? '#/demo' : '#/quickstart';
               }}
-              onSkip={() => { window.location.hash = '#/billing'; }}
-            />
-          </Suspense>
-        </ViewTransition>
-      </ErrorBoundary>
-    );
-  }
-
-  if (view === 'billing') {
-    return (
-      <ErrorBoundary>
-        {skipLink}
-        {toast}
-        {offlineBanner}
-        {verifyBanner}
-        {cursor}
-        <ViewTransition>
-          <Suspense fallback={<ViewFallback text="Loading billing..." />}>
-            {showMark && <LavernMark />}
-            <BillingView
-              onClose={handleBillingClose}
             />
           </Suspense>
         </ViewTransition>
@@ -997,16 +861,6 @@ export function App() {
   }
 
   // ── Login — standalone login page ──────────────────────────────────────
-  // In LOCAL MODE (LAVERN_AUTH_ENABLED off) the backend doesn't register
-  // the auth routes — the form would submit to a 404. Skip the LoginView
-  // entirely and send the user back to the landing page.
-  if (view === 'login' && !capabilities.auth) {
-    if (typeof window !== 'undefined') {
-      // Fire-and-forget; hashchange listener will pick up the new view.
-      window.location.hash = '#/';
-    }
-    return <ViewFallback text="Local mode — you're already signed in." />;
-  }
   if (view === 'login') {
     return (
       <ErrorBoundary>
@@ -1082,24 +936,6 @@ export function App() {
     );
   }
 
-
-  // ── Pricing — Billable Hours ───────────────────────────────────────
-  if (view === 'pricing') {
-    return (
-      <ErrorBoundary>
-        {skipLink}
-        {toast}
-        {offlineBanner}
-        {verifyBanner}
-        {cursor}
-        <ViewTransition>
-          <Suspense fallback={<ViewFallback text="Loading..." />}>
-            <PricingView onBack={() => { window.location.hash = '#/quickstart'; }} />
-          </Suspense>
-        </ViewTransition>
-      </ErrorBoundary>
-    );
-  }
 
   // ── The Lavern Challenge — blind document comparison ────────────────
   if (view === 'challenge') {
@@ -1335,7 +1171,6 @@ export function App() {
             onEnter={() => { window.location.hash = '#/lobby'; }}
             onMyPage={() => { window.location.hash = '#/my-page'; }}
             onAgentDocs={() => { window.location.hash = '#/agent-docs'; }}
-            authEnabled={capabilities.auth}
           />
         </Suspense>
       </ErrorBoundary>
@@ -1351,7 +1186,6 @@ export function App() {
         {toast}
         {offlineBanner}
         {verifyBanner}
-        {topUpDialog}
         {cursor}
         <ViewTransition>
           <Suspense fallback={<ViewFallback text="Loading..." />}>
@@ -1391,7 +1225,6 @@ export function App() {
         <QuickStartView
           onQuickStart={handleQuickStart}
           onGuidedFlow={() => { window.location.hash = '#/intake'; }}
-          onPricing={() => { window.location.hash = '#/pricing'; }}
           onChallenge={() => { window.location.hash = '#/challenge'; }}
         />
       </Suspense>

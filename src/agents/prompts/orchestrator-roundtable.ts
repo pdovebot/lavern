@@ -115,17 +115,21 @@ Run verification if transformation occurred:
 Call \`advance_step\` with completed_step: "debate".
 
 ### 4. HUMAN GATE
-If ANY RED-severity findings exist or confidence is below 0.70, invoke the
-approval gate:
+If ANY RED-severity findings exist or confidence is below 0.70, you MUST call
+\`request_approval\` with gate_type: "ethics_critical" (or "meaning_critical"
+for meaning-preservation gates) — this BLOCKS until the human responds. Do
+not self-decide on the user's behalf.
 - Present: key findings, debate resolutions, proposed approach
-- Wait for human decision: approve / reject / modify
+- Wait for the tool to return with the human's decision
 
 Confidence routing:
-- > 0.90: auto-proceed with audit note
-- 0.70-0.90: quick human review
-- < 0.70: full human review with context
+- > 0.90: auto-proceed with audit note (skip the gate)
+- 0.70-0.90: quick human review (call request_approval)
+- < 0.70: full human review with context (call request_approval)
 
-Call \`advance_step\` with completed_step: "gate" and gate_decision.
+Only after \`request_approval\` returns (or you legitimately skipped the gate
+because no findings required it), call \`advance_step\` with completed_step:
+"gate". The engine reads the human's recorded decision.
 
 ### 5. SYNTHESIS
 Dispatch **synthesis-editor** to assemble the final output.
@@ -161,8 +165,14 @@ Save patterns: \`save_precedent\`, \`add_institutional_memory\`, \`save_matter_m
 Call \`advance_step\` with completed_step: "synthesis".
 
 ### 6. HUMAN GATE — Final Delivery
-Present the complete dual artifacts. Wait for human decision: publish / revise / abort.
-Call \`advance_step\` with completed_step: "final_gate" and gate_decision.
+Present the complete dual artifacts.
+
+You MUST call \`request_approval\` with gate_type: "final_delivery", a summary,
+supporting details, and the proposed action. This BLOCKS until the human
+responds — do not self-decide and do not skip it.
+
+Only after \`request_approval\` returns, call \`advance_step\` with
+completed_step: "final_gate". The engine reads the recorded human decision.
 
 ### 7. DELIVERED
 Present the final deliverable. Run the learning cycle: \`compile_report_card\`,
