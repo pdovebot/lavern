@@ -49,6 +49,22 @@ export default function MyPageView({ onBack }: Props) {
   const { agents: customAgents, removeAgent } = useCustomAgents();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // LOCAL MODE (the default in v0.15.0) has no auth surface, so the
+  // referral and change-password endpoints 404 and their cards render
+  // empty under "Share Lavern" / "Security" headers. Read the runtime
+  // `auth` flag from /api/capabilities and hide both sections when off.
+  // Default `null` = "still loading" so we don't flash the sections
+  // briefly before the fetch resolves.
+  const [authEnabled, setAuthEnabled] = useState<boolean | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/capabilities', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (!cancelled && d && typeof d.auth === 'boolean') setAuthEnabled(d.auth); })
+      .catch(() => { if (!cancelled) setAuthEnabled(false); });
+    return () => { cancelled = true; };
+  }, []);
+
   // Simple field updater
   const field = useCallback(
     <K extends keyof UserProfile>(key: K) =>
@@ -77,8 +93,12 @@ export default function MyPageView({ onBack }: Props) {
       </p>
 
       {/* ── Share Lavern (Referral) ──────────────────────────────── */}
-      <SectionDivider label="Share Lavern" />
-      <ReferralCard />
+      {authEnabled && (
+        <>
+          <SectionDivider label="Share Lavern" />
+          <ReferralCard />
+        </>
+      )}
 
       {/* ── Section 1: About You ───────────────────────────────────── */}
       <SectionDivider label="About You" />
@@ -114,8 +134,12 @@ export default function MyPageView({ onBack }: Props) {
       </div>
 
       {/* ── Security: Change Password ──────────────────────────────── */}
-      <SectionDivider label="Security" />
-      <ChangePasswordSection />
+      {authEnabled && (
+        <>
+          <SectionDivider label="Security" />
+          <ChangePasswordSection />
+        </>
+      )}
 
       {/* ── Section 2: Default Settings ────────────────────────────── */}
       <SectionDivider label="Default Settings" />

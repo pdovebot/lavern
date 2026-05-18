@@ -70,6 +70,15 @@ export interface WorkingState {
   sessionExpired: boolean;
   /** True when the session ended due to an error (orchestrator failure, LLM error, etc.). */
   sessionFailed: boolean;
+  /**
+   * True once the assembled deliverable is confirmed ready to view. Gates the
+   * "View Results" failsafe button so users can't click into an empty Delivery
+   * screen while the LLM is still assembling. Set true by the periodic poll
+   * the moment `data.assembledDocument` arrives (or the 5-min fallback hits),
+   * and short-circuited true for demo + replay sessions where there's nothing
+   * to assemble.
+   */
+  isAssemblyReady: boolean;
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────
@@ -91,6 +100,7 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [sessionExpired, setSessionExpired] = useState(false);
   const [sessionFailed, setSessionFailed] = useState(false);
+  const [isAssemblyReady, setIsAssemblyReady] = useState(false);
   const [sessionId, setSessionId] = useState<string | undefined>();
   const [isReplay, setIsReplay] = useState(false);
   const [replayPaused, setReplayPaused] = useState(false);
@@ -158,7 +168,9 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
       setCurrentStep('delivered');
 
       if (sessionIdRef.current?.startsWith('demo-session-')) {
-        // Demo sessions: just show the delivered state — user clicks "View Results" to proceed
+        // Demo sessions: just show the delivered state — user clicks "View Results" to proceed.
+        // No real document to assemble, so the failsafe button is safe to enable immediately.
+        setIsAssemblyReady(true);
       } else {
         // Live sessions: don't transition yet — periodic poll will confirm
         // assembledDocument is ready before navigating to Delivery
@@ -233,6 +245,7 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
     deliveredAtRef.current = null;
     setSessionExpired(false);
     setSessionFailed(false);
+    setIsAssemblyReady(false);
     isReplayRef.current = false;
     setIsReplay(false);
     setEvents([]);
@@ -264,6 +277,9 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
     setPendingGate(null);
     setSessionExpired(false);
     setSessionFailed(false);
+    // Replay attaches to an already-delivered archived session — the document
+    // is already on disk, no assembly to wait on. Unlock the failsafe button.
+    setIsAssemblyReady(true);
     wsClientRef.current?.connectToReplay(id);
   }, []);
 
@@ -279,6 +295,7 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
     setCost(undefined);
     setPendingGate(null);
     setIsReplay(false);
+    setIsAssemblyReady(false);
   }, []);
 
   const dismissGate = useCallback(() => {
@@ -379,6 +396,9 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
           // Transition when: assembled document is ready, OR 2-min fallback exceeded
           if ((hasAssembledDoc || waitedMs > MAX_ASSEMBLY_WAIT_MS) && !completionFiredRef.current) {
             completionFiredRef.current = true;
+            // Unlock the "View Results" failsafe button now that the document
+            // is actually fetchable — same gate the auto-nav uses below.
+            setIsAssemblyReady(true);
             clearInterval(poll);
             if (onSessionEndRef.current) setTimeout(onSessionEndRef.current, 1500);
           }
@@ -488,10 +508,19 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
 
   const streamCards = useMemo(() => {
     const cards: StreamCard[] = [];
+    // De-dupe workflow_step cards by step name. The backend can legitimately
+    // emit the same step transition more than once (session_end after a
+    // workflow_step, replay-buffer flushes on WS reconnect, retries), and
+    // each duplicate produced its own "DELIVERED ✨ Your work is ready!"
+    // banner in the feed. Pipeline steps are linear in Lavern's workflows,
+    // so the first transition into a step is the only one we want to show.
+    const seenWorkflowSteps = new Set<string>();
 
     for (const event of events) {
       switch (event.type) {
         case 'workflow_step':
+          if (seenWorkflowSteps.has(event.step)) break;
+          seenWorkflowSteps.add(event.step);
           cards.push({
             kind: 'workflow_step',
             step: event.step,
@@ -754,6 +783,7 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
     lastEventTimestamp: events.length > 0 ? events[events.length - 1].timestamp : null,
     sessionExpired,
     sessionFailed,
+    isAssemblyReady,
   };
 
   return {
