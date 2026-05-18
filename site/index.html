@@ -3,33 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lavern — an agentic law firm. Yours.</title>
+  <title>Lavern — a multi-agent legal system. Yours.</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="canonical" href="https://lavern.ai/">
-  <meta name="description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate, institutional memory. Runs locally on a Mac Mini or against frontier models. Helsinki. Apache 2.0.">
-  <meta name="keywords" content="agentic law firm, legal AI, multi-agent legal system, contract review AI, open source legal tech, Lavern, Clawern, Apache 2.0">
+  <meta name="description" content="An open-source multi-agent legal system. 67 specialist agents, evidence-backed debate, institutional memory. Runs locally or against frontier models. Helsinki. Apache 2.0. Use at your own risk; not legal advice.">
+  <meta name="keywords" content="multi-agent legal system, legal AI, agentic AI, contract review AI, open source legal tech, Lavern, Clawern, Apache 2.0">
   <meta name="author" content="Lavern">
   <meta name="theme-color" content="#FAFAFA">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Lavern — an agentic law firm. Yours.">
-  <meta property="og:description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate, institutional memory. Apache 2.0.">
+  <meta property="og:title" content="Lavern — a multi-agent legal system. Yours.">
+  <meta property="og:description" content="An open-source multi-agent legal system. 67 specialist agents, evidence-backed debate, institutional memory. Apache 2.0. Use at your own risk; not legal advice.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://lavern.ai/">
   <meta property="og:site_name" content="Lavern">
   <meta property="og:locale" content="en_US">
-  <meta property="og:image" content="/img/og.png?v=2">
+  <meta property="og:image" content="/img/og.png?v=3">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Lavern. An Agentic Law Firm. Free. Open source, Apache 2.0.">
+  <meta property="og:image:alt" content="Lavern. A multi-agent legal system. Free. Open source, Apache 2.0.">
 
   <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Lavern — an agentic law firm. Yours.">
-  <meta name="twitter:description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate. Apache 2.0.">
-  <meta name="twitter:image" content="/img/og.png?v=2">
-  <meta name="twitter:image:alt" content="Lavern. An Agentic Law Firm. Free. Open source, Apache 2.0.">
+  <meta name="twitter:title" content="Lavern — a multi-agent legal system. Yours.">
+  <meta name="twitter:description" content="An open-source multi-agent legal system. 67 specialist agents, evidence-backed debate. Apache 2.0. Use at your own risk; not legal advice.">
+  <meta name="twitter:image" content="/img/og.png?v=3">
+  <meta name="twitter:image:alt" content="Lavern. A multi-agent legal system. Free. Open source, Apache 2.0.">
 
   <!-- Structured data — helps Google understand what Lavern is. -->
   <script type="application/ld+json">
@@ -42,7 +42,7 @@
         "name": "Lavern",
         "url": "https://lavern.ai/",
         "logo": "https://lavern.ai/favicon.svg",
-        "description": "An open-source agentic law firm. Multi-agent legal system with 67 specialist agents.",
+        "description": "An open-source multi-agent legal system with 67 specialist agents. Use at your own risk; not legal advice.",
         "sameAs": [
           "https://github.com/AnttiHero/lavern"
         ],
@@ -1025,6 +1025,15 @@
       max-width:580px;line-height:1.5;margin:0 auto 32px
     }
     .hero-deck strong{color:var(--text);font-weight:600}
+    /* Small mono disclaimer line right under the hero deck — keeps the
+       "this is not actually a law firm, and you use it at your own
+       risk" message visible from the first paint. */
+    .hero-disclaimer{
+      display:inline-block;margin-top:14px;
+      font-family:var(--mono);font-size:clamp(10px,1.05vw,12px);
+      letter-spacing:1.6px;text-transform:uppercase;
+      color:var(--dim);font-weight:500;
+    }
 
     /* Hero CTAs */
     .cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center}
@@ -2329,6 +2338,7 @@
       <strong>Free</strong> for you to use and build.
       <strong style="white-space:nowrap">Open source.</strong>
       Built by a <strong style="white-space:nowrap">law firm founder.</strong>
+      <br><span class="hero-disclaimer">Use at your own risk. Not legal advice. Not a real law firm.</span>
     </p>
     <div class="cta-row r r3 v">
       <a class="btn btn-primary" href="https://github.com/AnttiHero/lavern" rel="noopener">
@@ -2636,7 +2646,7 @@
           <div class="codex-slab" data-i="0">
             <span class="codex-slab-num">01 / Architecture</span>
             <h4 class="codex-slab-title">A multi-agent legal system, not a chatbot.</h4>
-            <p class="codex-slab-body">Architecture borrowed from law firms. Partners, associates, debate rooms, institutional memory. Sixty-seven specialist agents organised to do the work the way a firm does it.</p>
+            <p class="codex-slab-body">Architecture borrowed from law firms as an analogy. Partners, associates, debate rooms, institutional memory. Sixty-seven specialist agents organised the way a firm would organise itself, in software. Lavern itself is not a law firm.</p>
             <span class="codex-slab-tag">src/agents/ · 67 specialists</span>
           </div>
           <div class="codex-slab" data-i="1">
@@ -2660,7 +2670,7 @@
           <div class="codex-slab" data-i="4">
             <span class="codex-slab-num">05 / Providers</span>
             <h4 class="codex-slab-title">Claude. Mistral. Or local.</h4>
-            <p class="codex-slab-body">Runs on Anthropic or Mistral for EU data sovereignty. Optional on-device mode means confidential documents never leave your machine. The firm follows your jurisdiction.</p>
+            <p class="codex-slab-body">Runs on Anthropic or Mistral for EU data sovereignty. Optional on-device mode means confidential documents never leave your machine. The system follows your jurisdiction.</p>
             <span class="codex-slab-tag">src/providers/ · Claude · Mistral · Ollama</span>
           </div>
           <div class="codex-slab" data-i="5">
@@ -2714,7 +2724,7 @@
        ═══════════════════════════════════════════════════════════════════ -->
   <section class="billboard" id="billboard">
     <div class="billboard-frame">
-      <img src="img/billboard.jpg" alt="A Lavern billboard at Times Square: the crab mark above 'Lavern', then 'An agentic law firm. Yours.' and 'Sixty-seven specialist agents. Free for you to use and build. Open source.' with www.lavern.ai at the foot." loading="lazy" decoding="async">
+      <img src="img/billboard.jpg" alt="A Lavern billboard at Times Square: the crab mark above 'Lavern', then 'A multi-agent legal system. Yours.' and 'Sixty-seven specialist agents. Free for you to use and build. Open source.' with www.lavern.ai at the foot." loading="lazy" decoding="async">
     </div>
     <p class="billboard-cap">Helsinki built. <span>The world reads.</span></p>
   </section>
@@ -2789,7 +2799,7 @@
        ═══════════════════════════════════════════════════════════════════ -->
   <section class="closing" id="install-bottom">
     <div class="container-narrow">
-      <h2 class="closing-h2" data-goblin="Don't build a wrapper.<br><span>Build a goblin.</span>">Don't build a wrapper.<br><em>Build a firm.</em></h2>
+      <h2 class="closing-h2" data-goblin="Don't build a wrapper.<br><span>Build a goblin.</span>">Don't build a wrapper.<br><em>Build a system.</em></h2>
       <p class="closing-deck r r1">Claude for Law is already here. <em>We need to build different.</em></p>
       <div class="cta-row r r2">
         <a class="btn btn-primary" href="https://github.com/AnttiHero/lavern" rel="noopener">

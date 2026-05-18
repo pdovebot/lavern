@@ -1,6 +1,6 @@
 # Lavern
 
-**An agentic law firm. Yours.**
+**A multi-agent legal system. Yours.**
 
 Sixty-seven AI agents that review documents, debate risks, and deliver defensible outputs. Every finding cited. Every decision auditable. Every critical call gated by a human. Apache 2.0.
 
@@ -8,7 +8,7 @@ Run it interactively, brief it like a partner. Or run **Clawern** mode and let i
 
 [**Watch the demo →**](https://lavern.ai/demo/) · [**lavern.ai**](https://lavern.ai) · [**Architecture deep-dive →**](https://lavern.ai/architecture/) · [**Quick Start →**](QUICKSTART.md)
 
-> **Disclaimer:** Lavern assists with document analysis and legal design. It does not provide legal advice. Always verify outputs with qualified legal professionals.
+> **Disclaimer.** Lavern is **not a law firm** and does **not provide legal advice**. The "agentic law firm" framing used in some of these docs is an analogy for the software's architecture, not a description of what Lavern is. Lavern is software that assists with document analysis and legal design. **You use it at your own risk.** Always have qualified legal counsel verify anything that matters before relying on it.
 
 ## Install
 
@@ -78,7 +78,7 @@ Lavern is a different shape of thing. Not a plugin pack. A firm. End-to-end enga
 The honest split:
 
 - **Use Claude for Legal** if you want to augment an existing lawyer's workflow with task-specific AI skills inside Claude.
-- **Use Lavern** if you want an autonomous law firm. Multi-agent, end-to-end, with a continuous-practice mode (Clawern) that watches your folders and an EU-sovereign mode for European in-house teams.
+- **Use Lavern** if you want an autonomous multi-agent legal system. End-to-end, with a continuous-practice mode (Clawern) that watches your folders and an EU-sovereign mode for European in-house teams. Still software; still your responsibility.
 
 They're compatible. Lavern runs on Claude (or Mistral), the same models Claude for Legal does. A future release will let Lavern's orchestrator dispatch to `claude-for-legal` plugins as installable specialists.
 
