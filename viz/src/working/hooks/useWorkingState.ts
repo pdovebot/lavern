@@ -488,10 +488,19 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
 
   const streamCards = useMemo(() => {
     const cards: StreamCard[] = [];
+    // De-dupe workflow_step cards by step name. The backend can legitimately
+    // emit the same step transition more than once (session_end after a
+    // workflow_step, replay-buffer flushes on WS reconnect, retries), and
+    // each duplicate produced its own "DELIVERED ✨ Your work is ready!"
+    // banner in the feed. Pipeline steps are linear in Lavern's workflows,
+    // so the first transition into a step is the only one we want to show.
+    const seenWorkflowSteps = new Set<string>();
 
     for (const event of events) {
       switch (event.type) {
         case 'workflow_step':
+          if (seenWorkflowSteps.has(event.step)) break;
+          seenWorkflowSteps.add(event.step);
           cards.push({
             kind: 'workflow_step',
             step: event.step,
