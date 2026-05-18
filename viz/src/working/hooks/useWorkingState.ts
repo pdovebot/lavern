@@ -82,6 +82,7 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
   const deliveredAtRef = useRef<number | null>(null);
   /** Stable ref for current sessionId (accessible inside handleEvent without deps). */
   const sessionIdRef = useRef<string | undefined>(undefined);
+  const isReplayRef = useRef(false);
   // Stable ref for onSessionEnd to avoid restarting effects when callback identity changes
   const onSessionEndRef = useRef(onSessionEnd);
   onSessionEndRef.current = onSessionEnd;
@@ -145,6 +146,12 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
         setSessionFailed(true);
       }
     } else if (event.type === 'session_end') {
+      // Replay mode: don't auto-transition to delivery. Otherwise viewing an
+      // archived case's recording navigates back to delivery the moment the
+      // replay finishes, creating a Delivery → Working → Delivery loop.
+      if (isReplayRef.current) {
+        return;
+      }
       setCompletedSteps(prev =>
         prev.includes('delivered') ? prev : [...prev, 'delivered']
       );
@@ -226,6 +233,7 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
     deliveredAtRef.current = null;
     setSessionExpired(false);
     setSessionFailed(false);
+    isReplayRef.current = false;
     setIsReplay(false);
     setEvents([]);
     setCurrentStep('intake');
@@ -246,12 +254,16 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
 
   const connectToReplay = useCallback((id: string) => {
     setSessionId(id);
+    sessionIdRef.current = id;
+    isReplayRef.current = true;
     setIsReplay(true);
     setEvents([]);
     setCurrentStep('intake');
     setCompletedSteps([]);
     setCost(undefined);
     setPendingGate(null);
+    setSessionExpired(false);
+    setSessionFailed(false);
     wsClientRef.current?.connectToReplay(id);
   }, []);
 
@@ -315,6 +327,11 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
 
   useEffect(() => {
     if (!sessionId || sessionId.startsWith('demo-session-') || completionFiredRef.current) return;
+    // Replay mode: the session was already delivered before we attached. The
+    // poll would see currentStep='delivered' on its first tick and fire
+    // onSessionEnd → navigate to Delivery, creating a Delivery → Working →
+    // Delivery loop when the user clicks "View Agent Work".
+    if (isReplay) return;
 
     // v0.14.5: was 30s — way too aggressive. LLM assembly on long contexts
     // can legitimately take 60–180s. With Counsel's deterministic fast-path
@@ -370,7 +387,7 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
     }, 3_000);
 
     return () => clearInterval(poll);
-  }, [sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sessionId, isReplay]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Demo simulator ──────────────────────────────────────────────────
 

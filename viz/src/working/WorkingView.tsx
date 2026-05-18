@@ -167,6 +167,10 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
     if (state.pendingGate) return 0;
     if (state.currentStep === 'delivered' || state.currentStep === 'complete') return 0;
     if (state.sessionExpired || state.sessionFailed) return 0;
+    // Replay mode plays back events with their ORIGINAL timestamps, which
+    // can be days old — that would falsely trip the idle threshold against
+    // wall-clock now. The rescue is for stalled LIVE work, not playback.
+    if (state.isReplay) return 0;
     // No events yet — use session open time from the first connection signal.
     // lastEventTimestamp is null until first event; treat as "not stuck yet".
     if (!state.lastEventTimestamp) return 0;
@@ -181,7 +185,7 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
     // stuckTick forces re-evaluation on the interval above
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.sessionId, state.pendingGate, state.currentStep, state.sessionExpired,
-      state.sessionFailed, state.lastEventTimestamp, stuckDismissedAt, stuckTick]);
+      state.sessionFailed, state.isReplay, state.lastEventTimestamp, stuckDismissedAt, stuckTick]);
   const showStuckRescue = idleMinutes > 0;
   const handleStuckDismiss = useCallback(() => {
     setStuckDismissedAt(state.lastEventTimestamp);
