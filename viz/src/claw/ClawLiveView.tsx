@@ -19,9 +19,9 @@ const ACCENT    = '#E8845C';
 const AMBER     = '#C9A84C';
 const GREEN     = '#5C9E6E';
 const RED       = '#C45D3E';
-const MONO      = "'SF Mono','Fira Code',Menlo,monospace";
-const SERIF     = "'Cormorant Garamond',Georgia,serif";
-const SANS      = "'Inter',-apple-system,sans-serif";
+const MONO      = "'Geist Mono','SF Mono','Fira Code',Menlo,monospace";
+const SERIF     = "'Newsreader',Georgia,serif";
+const SANS      = "'Geist',-apple-system,sans-serif";
 
 // ── Types ─────────────────────────────────────────────────────────────
 

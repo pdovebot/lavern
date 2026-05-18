@@ -58,8 +58,7 @@ const styles: Record<string, React.CSSProperties> = {
   heading: {
     fontFamily: fonts.serif,
     fontSize: 24,
-    fontWeight: 300,
-    fontStyle: 'italic' as const,
+    fontWeight: 300 as const,
     color: '#1A1A1A',
     margin: '0 0 6px',
     letterSpacing: -0.3,
@@ -79,7 +78,6 @@ const styles: Record<string, React.CSSProperties> = {
   emptyText: {
     fontSize: 14,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: 'rgba(26, 26, 26, 0.35)',
     padding: `${spacing.lg}px 0`,
   },

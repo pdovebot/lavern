@@ -90,7 +90,12 @@ export class ClientRegistry {
       apiKeyHash: keyHash,
     });
 
-    // Persist to SQLite
+    // Persist to SQLite. At-most-once: if the write fails (DB locked,
+    // schema drift, disk full), the client stays in memory and serves
+    // the current process, but disappears on restart. That's a
+    // deliberate availability trade-off — we'd rather lose persistence
+    // than fail registration during a transient DB hiccup. Caller is
+    // documented to treat persistence as best-effort.
     try {
       saveApiClient({
         id: client.id,
@@ -103,8 +108,10 @@ export class ClientRegistry {
         registeredAt: client.registeredAt,
       });
     } catch (err) {
-      logger.error('Failed to persist client to database', { error: err });
-      // Continue — in-memory still works
+      // Demoted from error to warn: not a system failure, just a
+      // single-process degradation. Test fixtures and tests that
+      // don't init the DB legitimately hit this path.
+      logger.warn('Client not persisted to DB; lives in-memory only', { clientId: client.id, error: err });
     }
 
     // Update memory cache

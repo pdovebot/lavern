@@ -404,7 +404,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     lineHeight: 1.6,
     color: colors.textMuted,
-    fontStyle: 'italic' as const,
     textDecoration: 'line-through',
     textDecorationColor: 'rgba(26, 26, 26, 0.15)',
   },

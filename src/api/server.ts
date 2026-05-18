@@ -593,14 +593,23 @@ export async function startApiServer(port: number): Promise<void> {
     },
   }));
 
+  // /api/capabilities is registered by registerCapabilitiesRoutes() below —
+  // it serves both the dashboard runtime flags and the agent-facing rich
+  // manifest from a single endpoint. Do not duplicate it here.
+
   // Register route groups
   registerSessionRoutes(fastify, sessionManager);
   registerReplayRoutes(fastify);
-  registerAuthRoutes(fastify, clientRegistry);
-  // v14: User auth (signup, login, logout, profile)
-  registerUserAuthRoutes(fastify);
-  // v0.12: Google OAuth
-  registerGoogleAuthRoutes(fastify);
+  // Auth surface is gated off in LOCAL MODE (v0.15.0 default). When
+  // LAVERN_AUTH_ENABLED=true is set, the API-key client registry,
+  // user-account signup/login/email-verify routes, and Google OAuth
+  // come online together. When off, every request runs as the
+  // synthetic `local-user` injected by createAuthMiddleware.
+  if (config.authEnabled) {
+    registerAuthRoutes(fastify, clientRegistry);
+    registerUserAuthRoutes(fastify);
+    registerGoogleAuthRoutes(fastify);
+  }
   // v8: Pre-engagement & team staffing routes
   registerMatterRoutes(fastify);
   registerAgentRoutes(fastify);
@@ -752,6 +761,11 @@ export async function startApiServer(port: number): Promise<void> {
     await fastify.listen({ port, host: config.host });
 
     const dashboardAvailable = fs.existsSync(frontendDir);
+    const hasAnthropicKey = !!config.anthropic.apiKey && config.anthropic.apiKey.length > 10;
+    const hasMistralKey = !!config.mistral.apiKey && config.mistral.apiKey.length > 10;
+    const provider = config.provider;
+    const authEnabled = config.authEnabled === true;
+
     console.log(`
 ╔══════════════════════════════════════════════════════════════╗
 ║                       LAVERN API SERVER                      ║
@@ -763,18 +777,25 @@ export async function startApiServer(port: number): Promise<void> {
   Health:    http://localhost:${port}/health
 ${dashboardAvailable ? `  Dashboard: http://localhost:${port}/dashboard/` : '  Dashboard: Not built (run "cd viz && npm run build")'}
 
-  Create a session:
-    curl -X POST http://localhost:${port}/api/sessions \\
-      -H 'Content-Type: application/json' \\
-      -d '{"documentPath": "./doc.txt", "context": {"moment": "signup"}}'
+  ┌─ First 90 seconds ─────────────────────────────────────────┐
+  │                                                            │
+  │  1.  In another terminal:                                  │
+  │        cd viz && npm run dev                               │
+  │                                                            │
+  │  2.  Open http://localhost:5173                            │
+  │                                                            │
+  │  3.  Click "Step In" to start an engagement, or try the    │
+  │      cinematic guided tour at http://localhost:5173/#/demo │
+  │                                                            │
+  └────────────────────────────────────────────────────────────┘
 
-  Stream events:
-    wscat -c ws://localhost:${port}/api/sessions/<id>/events
+  Mode:        ${authEnabled ? 'multi-user (LAVERN_AUTH_ENABLED=true)' : 'LOCAL MODE (single-user, auth disabled)'}
+  Provider:    ${provider}${provider === 'anthropic' && !hasAnthropicKey ? ` (no ANTHROPIC_API_KEY — demo only)` : ''}${provider === 'mistral' && !hasMistralKey ? ` (no MISTRAL_API_KEY — set it in .env)` : ''}
+  Bundled try: lavern samples/sample-terms-of-service.txt --workflow review
 
-  Submit gate decision:
-    curl -X POST http://localhost:${port}/api/sessions/<id>/gate \\
-      -d '{"decision": "approve", "notes": "Looks good"}'
-`);
+  ${provider === 'anthropic' && !hasAnthropicKey ? `Tip: set ANTHROPIC_API_KEY in .env to enable real engagements.
+       (.env was auto-created from .env.example on first run.)
+` : ''}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

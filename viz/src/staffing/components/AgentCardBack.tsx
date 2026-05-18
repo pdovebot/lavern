@@ -2,7 +2,7 @@
  * AgentCardBack — Back face of an agent card.
  *
  * Shows: personality bars, practice areas, strengths, limitations, workStyle.
- * Warm editorial design — Inter font, warm tones.
+ * Warm editorial design — Geist font, warm tones.
  */
 
 import { PersonalityBars } from './PersonalityBars.js';
@@ -20,15 +20,15 @@ export function AgentCardBack({ profile }: Props) {
     <div style={{
       width: '100%',
       height: '100%',
-      padding: 16,
+      padding: '14px 14px 16px',
       display: 'flex',
       flexDirection: 'column',
-      gap: 10,
+      gap: 7,
       overflow: 'hidden',
     }}>
       {/* Header */}
       <div style={{
-        fontSize: 11,
+        fontSize: 12,
         fontFamily: fonts.sans,
         fontWeight: 600,
         color: colors.text,
@@ -45,7 +45,7 @@ export function AgentCardBack({ profile }: Props) {
         {Object.keys(traits).length > 0 ? (
           <PersonalityBars traits={traits} />
         ) : (
-          <div style={{ fontSize: 11, color: colors.textDim, textAlign: 'center' }}>
+          <div style={{ fontSize: 12, color: colors.textDim, textAlign: 'center' }}>
             No trait data
           </div>
         )}
@@ -54,24 +54,24 @@ export function AgentCardBack({ profile }: Props) {
       {/* Practice Areas */}
       <div style={{ flexShrink: 0 }}>
         <div style={{
-          fontSize: 10,
+          fontSize: 10.5,
           fontFamily: fonts.sans,
           fontWeight: 500,
           color: colors.textMuted,
-          marginBottom: 4,
+          marginBottom: 5,
           textTransform: 'uppercase',
-          letterSpacing: 0.5,
+          letterSpacing: 0.7,
         }}>
           Practice Areas
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           {profile.practiceAreas.slice(0, 3).map(pa => (
             <span key={pa} style={{
-              fontSize: 9,
+              fontSize: 10.5,
               fontFamily: fonts.sans,
               color: colors.textSecondary,
               backgroundColor: colors.bgPanel,
-              padding: '2px 6px',
+              padding: '3px 7px',
               borderRadius: radii.sm,
             }}>
               {pa}
@@ -85,19 +85,20 @@ export function AgentCardBack({ profile }: Props) {
         <div style={{
           fontSize: 10,
           fontFamily: fonts.sans,
-          fontWeight: 500,
+          fontWeight: 600,
           color: colors.success,
           marginBottom: 3,
+          textTransform: 'uppercase',
+          letterSpacing: 0.7,
         }}>
           Strengths
         </div>
-        {profile.strengths.slice(0, 2).map(s => (
+        {profile.strengths.slice(0, 1).map(s => (
           <div key={s} style={{
-            fontSize: 10,
+            fontSize: 11,
             fontFamily: fonts.sans,
             color: colors.textSecondary,
             lineHeight: 1.35,
-            marginBottom: 2,
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -113,15 +114,17 @@ export function AgentCardBack({ profile }: Props) {
         <div style={{
           fontSize: 10,
           fontFamily: fonts.sans,
-          fontWeight: 500,
+          fontWeight: 600,
           color: colors.warning,
           marginBottom: 3,
+          textTransform: 'uppercase',
+          letterSpacing: 0.7,
         }}>
           Limitations
         </div>
         {profile.limitations.slice(0, 1).map(l => (
           <div key={l} style={{
-            fontSize: 10,
+            fontSize: 11,
             fontFamily: fonts.sans,
             color: colors.textMuted,
             lineHeight: 1.35,
@@ -137,16 +140,16 @@ export function AgentCardBack({ profile }: Props) {
 
       {/* Work style (quote, bottom-anchored) */}
       <div style={{
-        fontSize: 10,
-        fontFamily: fonts.sans,
-        fontStyle: 'italic',
+        fontSize: 10.5,
+        fontFamily: fonts.serif,
+        fontStyle: 'normal',
         color: colors.textDim,
         lineHeight: 1.4,
         marginTop: 'auto',
-        paddingTop: 8,
+        paddingTop: 6,
         borderTop: `1px solid ${colors.border}`,
         display: '-webkit-box',
-        WebkitLineClamp: 3,
+        WebkitLineClamp: 2,
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
         flexShrink: 0,

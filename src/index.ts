@@ -332,7 +332,7 @@ async function main(): Promise<void> {
       console.log('╚══════════════════════════════════════════════════════════════╝\n');
     } else if (provider === 'mistral') {
       console.log('╔══════════════════════════════════════════════════════════════╗');
-      console.log('║  EU SOVEREIGN MODE — Mistral (Paris)                        ║');
+      console.log('║  EU SOVEREIGN MODE — Mistral                                ║');
       console.log('╚══════════════════════════════════════════════════════════════╝\n');
     } else if (!hasAnthropicKey) {
       console.log('╔══════════════════════════════════════════════════════════════╗');
@@ -357,14 +357,21 @@ async function main(): Promise<void> {
     return;
   }
 
+  // Doctor — quick health check of the install
+  if (args[0] === 'doctor') {
+    const { runDoctor } = await import('./cli/doctor.js');
+    const code = await runDoctor();
+    process.exit(code);
+  }
+
   // Show help
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
     console.log(`
 \u2554${'═'.repeat(62)}\u2557
-\u2551                          LAVERN v0.14.5                      \u2551
+\u2551                          LAVERN v0.15.0                      \u2551
 \u2551                                                              \u2551
-\u2551         The world's first driverless law firm.               \u2551
-\u2551         Multi-agent legal design system.                     \u2551
+\u2551         An agentic law firm. Yours.                          \u2551
+\u2551         Open source. Apache 2.0.                             \u2551
 \u2551                                                              \u2551
 \u255a${'═'.repeat(62)}\u255d
 
@@ -398,18 +405,28 @@ CLI Options:
   --workflow <id>            Force a specific workflow (counsel, review, adversarial, roundtable, full-bench, legal-design)
   --help                     Show this help
 
+Doctor:
+  lavern doctor                                     Run a first-90-seconds health check
+                                                      (Node version, native deps, ports, .env state)
+
 API Server:
-  --serve                    Start API + WebSocket server
-  --serve --claw             API + Clawern together (Mac Mini mode)
-  --port <port>              Server port (default: 3000)
+  lavern --serve                                    Start API + WebSocket server
+  lavern --serve --claw                             API + Clawern together (Mac Mini mode)
+  lavern --serve --port <port>                      Server port (default: 3000)
+
+Try it (bundled sample):
+  lavern samples/sample-terms-of-service.txt --workflow review
+                                                    A short, fabricated SaaS Terms of Service
+                                                    that lives at samples/. Plenty for a contract
+                                                    review to chew on.
 
 Examples:
-  npx tsx src/index.ts ./terms-of-service.txt --moment signup --audience consumer --jurisdiction EU
-  npx tsx src/index.ts --request "Review this NDA for red flags" --budget 3.00
-  npx tsx src/index.ts ./contract.pdf --request "Review this contract" --workflow review
-  npx tsx src/index.ts --request "What is force majeure?" --workflow counsel
-  npx tsx src/index.ts --request "Research non-compete enforceability in California" --workflow adversarial
-  npx tsx src/index.ts --serve --port 3000
+  lavern ./terms-of-service.txt --moment signup --audience consumer --jurisdiction EU
+  lavern --request "Review this NDA for red flags" --budget 3.00
+  lavern ./contract.pdf --request "Review this contract" --workflow review
+  lavern --request "What is force majeure?" --workflow counsel
+  lavern --request "Research non-compete enforceability in California" --workflow adversarial
+  lavern --serve --port 3000
 
 What happens:
   1. The Router classifies your request and selects the minimum viable workflow
@@ -417,6 +434,8 @@ What happens:
   3. The Evaluator Gate checks quality (automated, different model)
   4. You approve key decisions at human gates
   5. Output: redesigned document / contract review / legal answer + audit trail
+
+Without a global install, prefix the examples with npx (e.g. "npx lavern --help").
 `);
     return;
   }

@@ -441,7 +441,7 @@ export function PacManGame({ onClose }: Props) {
       ctx.scale(scale, scale);
 
       ctx.fillStyle = M_COLOR;
-      ctx.font = `bold ${CELL}px "Cormorant Garamond", "Georgia", serif`;
+      ctx.font = `bold ${CELL}px "Newsreader", "Georgia", serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('L', 0, 1);
@@ -520,7 +520,7 @@ export function PacManGame({ onClose }: Props) {
     // Lives as mini Ls (Lavern brand mark)
     ctx.textAlign = 'right';
     ctx.fillStyle = M_COLOR;
-    ctx.font = `bold 12px "Cormorant Garamond", serif`;
+    ctx.font = `bold 12px "Newsreader", serif`;
     for (let i = 0; i < livesRef.current; i++) {
       ctx.fillText('L', W - 6 - i * 16, H - 3);
     }

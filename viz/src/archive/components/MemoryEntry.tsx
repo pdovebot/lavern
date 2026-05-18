@@ -65,7 +65,6 @@ const styles: Record<string, React.CSSProperties> = {
   content: {
     fontSize: 14,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: colors.text,
     lineHeight: 1.65,
     marginBottom: spacing.sm,
@@ -106,6 +105,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 9,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic' as const,
   },
 };

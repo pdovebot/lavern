@@ -1,11 +1,57 @@
+# ─────────────────────────────────────────────────────────────────────
+# HTTP headers for lavern.ai (Netlify-style _headers file)
+#
+# Defence in depth, with one calibrated exception: 'unsafe-inline' on
+# script-src and style-src. The rationale lives below the policy.
+# ─────────────────────────────────────────────────────────────────────
+
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src 'self' https://plausible.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.fontshare.com; font-src 'self' https://fonts.gstatic.com https://cdn.fontshare.com; img-src 'self' data: https://api.dicebear.com; media-src 'self'; connect-src 'self' https://plausible.io https://api.dicebear.com https://api.fontshare.com https://cdn.fontshare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
 
+# CSP — what 'unsafe-inline' is doing here and what mitigates it
+# ─────────────────────────────────────────────────────────────────────
+# lavern.ai is a static drag-and-drop deploy: one HTML file, no build
+# pipeline, no Netlify Functions, no per-request nonces. To keep the
+# zero-RTT first paint that the editorial design depends on, the page
+# ships with one inline <style> block (the entire stylesheet), one
+# inline <script> block (the page interactions), and one inline JSON-LD
+# block for structured data. The embedded /demo/ SPA additionally
+# renders React with 48 `style="..."` attributes in the body.
+#
+# Replacing all of that with externals + per-script hashes is a real
+# CSP win, but at the cost of (a) two extra round trips on first
+# paint, and (b) recomputing hashes on every CSS/JS tweak. We accepted
+# the trade-off for v1 and tightened everything else instead:
+#
+#   default-src 'self'          — no fallback wildcard
+#   frame-ancestors 'none'      — no embedding in any frame anywhere
+#   form-action 'self'          — forms can only post back to lavern.ai
+#   base-uri 'self'             — <base> can't be hijacked to change
+#                                 the document's effective origin
+#   img-src 'self' data: dicebear — no third-party image loaders
+#   connect-src — only the four hosts we actually talk to
+#   no `'unsafe-eval'` anywhere — eval / Function() blocked
+#
+# What 'unsafe-inline' on script-src does NOT enable:
+#   · eval, new Function(), setTimeout(string) — still blocked
+#   · loading remote scripts that aren't in the allowlist
+#   · any kind of injection via DOM-based sources we don't sanitise
+#
+# The realistic attack vector it leaves open is: a stored/reflected
+# XSS in our own content. The marketing page renders zero user-supplied
+# strings, so that vector reduces to "compromise the GitHub repo."
+# If an attacker has push access to AnttiHero/lavern, CSP isn't the
+# layer holding the line.
+#
+# Tracked for tightening in https://github.com/AnttiHero/lavern/issues
+# (extract inline assets + hash JSON-LD + drop unsafe-inline).
+
+# ── Long-cache the things that have content-hash filenames ──────────
 /img/*
   Cache-Control: public, max-age=31536000, immutable
 
@@ -14,3 +60,12 @@
 
 /claw/crab.jpg
   Cache-Control: public, max-age=31536000, immutable
+
+/demo/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# ── Install script — plain text so curl | sh works, and so the
+# security-minded visitor can `curl ... -o install.sh; less` it.
+/install.sh
+  Content-Type: text/x-shellscript; charset=utf-8
+  Cache-Control: public, max-age=300

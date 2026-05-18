@@ -55,7 +55,7 @@ function banner() {
   console.log(`
 ${c.bold}${c.magenta}╭──────────────────────────────────────────╮
 │           Lavern · Onboarding            │
-│  The world's first driverless law firm   │
+│      An agentic law firm. Yours.         │
 ╰──────────────────────────────────────────╯${c.reset}
 `);
 }

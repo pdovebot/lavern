@@ -1,0 +1,39 @@
+# Netlify build configuration for lavern.ai
+#
+# The marketing site lives in `site/`. Inside it, `/demo/` is the
+# cinematic guided tour — a Vite build of the dashboard SPA, scoped
+# to the /demo/ base path. We do NOT commit that build to git
+# (273 files of minified output is just noise in PR diffs and
+# slows clones). Instead, Netlify regenerates it on every deploy.
+#
+# Two equivalent ways to ship a new build:
+#   1. git push to main  → Netlify auto-builds (if the GitHub link
+#      is wired up in the Netlify UI).
+#   2. drag-and-drop the `site/` folder → manual deploy; you need
+#      to run the same build locally first:
+#          cd viz
+#          VITE_BASE_PATH=/demo/ npm run build
+#          rm -rf ../site/demo && cp -R dist ../site/demo
+
+[build]
+  base    = "."
+  publish = "site"
+  command = "cd viz && npm ci && VITE_BASE_PATH=/demo/ npm run build && rm -rf ../site/demo && cp -R dist ../site/demo"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NPM_FLAGS    = "--no-audit --no-fund"
+
+# Pretty URLs on the Netlify side too (mirrors what the new index
+# already does in its rel links).
+[[redirects]]
+  from = "/demo"
+  to   = "/demo/"
+  status = 301
+  force  = true
+
+# SPA fallback for any deep path inside /demo/ so refreshes don't 404.
+[[redirects]]
+  from = "/demo/*"
+  to   = "/demo/index.html"
+  status = 200

@@ -128,12 +128,12 @@ function LiveActivityFeed({ entries }: { entries: ClawLogEntry[] }) {
               {entry.detail && (
                 <div style={{
                   ...styles.liveDetail,
-                  ...(entry.debatePhase ? { fontStyle: 'italic', paddingLeft: 12, borderLeft: `2px solid ${CLAW.border}` } : {}),
+                  ...(entry.debatePhase ? { paddingLeft: 12, borderLeft: `2px solid ${CLAW.border}` } : {}),
                 }}>{entry.detail}</div>
               )}
               {entry.evidence && (
                 <div style={{
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'Geist Mono, monospace',
                   fontSize: 11,
                   color: CLAW.textMuted,
                   background: CLAW.panel,

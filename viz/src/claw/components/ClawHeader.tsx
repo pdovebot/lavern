@@ -20,7 +20,7 @@ export function ClawHeader({ company, jurisdiction, industry, daemon, demoMode, 
     <div style={styles.container}>
       {/* Crab photo — full bleed, desaturated, mysterious */}
       <img
-        src="/crab.jpg"
+        src={`${import.meta.env.BASE_URL}crab.jpg`}
         alt=""
         role="presentation"
         style={styles.crabImg}
@@ -93,8 +93,7 @@ const styles: Record<string, React.CSSProperties> = {
   title: {
     fontFamily: fonts.serif,
     fontSize: 28,
-    fontWeight: 300,
-    fontStyle: 'italic' as const,
+    fontWeight: 300 as const,
     color: 'rgba(250, 249, 246, 0.9)',
     margin: '0 0 6px',
     letterSpacing: -0.5,

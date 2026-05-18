@@ -1,10 +1,10 @@
-# Lavern — The World's First Driverless Law Firm
+# Lavern — An agentic law firm. Yours.
 
 ## System Identity
 
-You are part of Lavern v0.14.3, a multi-agent legal design system that transforms
+You are part of Lavern v0.15.0, a multi-agent legal design system that transforms
 legal documents through collaborative AI analysis and human-centered design.
-Lavern is the world's first driverless law firm.
+Lavern is an open-source agentic law firm.
 
 The codebase is called "The Shem" (the name inscribed in the golem's mouth).
 The product is called "Lavern". These names are interchangeable in internal docs.
@@ -68,15 +68,17 @@ with qualified legal professionals.
 
 ### API Server
 - `src/api/` — Fastify API server with WebSocket event streaming
-  - `src/api/middleware/` — Auth (Bearer + cookie), Zod validation, x402 payment
-  - `src/api/routes/` — 27 route modules:
+  - `src/api/middleware/` — Auth (LOCAL-MODE no-op; cookie/Bearer logic preserved for `LAVERN_AUTH_ENABLED=true`), Zod validation, x402 payment
+  - `src/api/routes/` — 27 route modules. The auth-shaped ones (auth-routes, google-auth, billing, referral) only register when `LAVERN_AUTH_ENABLED=true`; in default LOCAL MODE the dashboard runs as the synthetic `local-user` and those routes 404.
     - `sessions.ts` — Session CRUD + gate decisions + soul injection from user profile
     - `engage.ts` — Agent-native engagement (sync + webhook modes)
     - `verify.ts` — Standalone document verification
     - `matters.ts` — Matter management (engagements, team selection)
     - `briefing.ts` — LLM-powered briefing analysis for intake
-    - `auth-routes.ts` — User signup, login, logout, profile (incl. soul)
-    - `google-auth.ts` — Google OAuth login/signup (CSRF state, token exchange, account linking)
+    - `auth-routes.ts` — User signup, login, logout, profile (gated)
+    - `google-auth.ts` — Google OAuth login/signup (gated)
+    - `billing.ts` — Stripe-backed billable-hours subscription (gated)
+    - `referral.ts` — Referral stats (gated)
     - `claw.ts` — Clawern remote monitoring & control
     - `challenge.ts` — Lavern Challenge blind document comparison
     - `challenge-prompt.ts` — Challenge prompt builder
@@ -99,7 +101,7 @@ React single-page app with editorial design language (Inter + Cormorant Garamond
 - `viz/src/cowork/` — Cowork folder mode (File System Access API for non-destructive local saves)
 - `viz/src/components/` — Shared components (GateDialog with focus trap, ErrorToast, LavernMark)
 - `viz/src/hooks/` — Shared hooks (useMediaQuery, useTabLock)
-- `viz/src/pricing/` — Billable Hours pricing page (credits explainer, plan tiers, waitlist CTA)
+- `viz/src/pricing/` — Billable Hours pricing page (visible when `LAVERN_AUTH_ENABLED=true`; the backing billing routes are gated off in LOCAL MODE)
 - `viz/src/challenge/` — Lavern Challenge blind document comparison
 - `viz/src/agent-builder/` — NBA2K-style custom agent builder (3-step wizard: Identity, Face, Stats) with edit mode
 - `viz/src/claw/` — Clawern remote monitoring dashboard (Overview with Portfolio Intelligence, Documents with inline error recovery, Deliveries with change detection, Precedents, Config)
@@ -160,7 +162,7 @@ Static single-page site deployed via Netlify drag-and-drop. Dark cinematic desig
 - `site/index.html` — Entire site in one HTML file (CSS + JS inlined)
   - Hero: LAVERN logo, tagline ("Excellence doesn't scale. Until now."), "Knock" mailto CTA, Log In link
   - Sections: statement, art-quote, video (demo.mp4), CTA ("Speak to Us.")
-  - Footer: Helsinki · Paris
+  - Footer: Helsinki
   - Effects: film grain overlay, parallax scroll, custom cursor (desktop), word-by-word reveal, magnetic buttons, mist/smoke canvas
   - **Mobile (≤768px)**: Single-screen hero + footer only — all mid-sections hidden, no scroll, mist preserved
   - **Desktop**: Full scrolling experience with all sections
@@ -183,7 +185,7 @@ Native macOS SwiftUI status bar app for monitoring Clawern. Polls Claw API every
 - `scripts/seed-knowledge-base.ts` — Legal dataset seeder (6 datasets)
 
 ### Tests
-- `tests/` — 1,695 tests across 108 files (98 unit + 9 integration). 96 new tests landed alongside the lighthouse architecture (claw-watchman, claw-curator, claw-reader-precedent, claw-reader-templates, claw-reader-grounding, claw-precedent-lifecycle, claw-skip-route).
+- `tests/` — 1,677 tests across 109 files. Coverage spans the engine, dashboard hooks, Claw, MCP bridge, auth-gate route registration, and the broader API surface. `npm test` is green.
 
 ## Version History
 

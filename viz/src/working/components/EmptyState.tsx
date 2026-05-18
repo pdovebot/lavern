@@ -107,8 +107,7 @@ const styles: Record<string, React.CSSProperties> = {
   reassurance: {
     fontSize: 12,
     fontFamily: fonts.serif,
-    fontWeight: 400,
-    fontStyle: 'italic' as const,
+    fontWeight: 400 as const,
     color: colors.textDim,
     opacity: 0.7,
     margin: 0,

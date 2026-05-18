@@ -50,10 +50,11 @@
     .lesson-body strong{color:var(--text);font-weight:600}
     .footer{text-align:center;padding:48px 0 0;font-size:12px;color:var(--dim)}
     .footer a{color:var(--muted);text-decoration:none;letter-spacing:1px}
-    .continue{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px 32px;margin-top:56px}
+    .continue{display:block;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px 32px;margin-top:56px;text-decoration:none;color:inherit;transition:border-color 0.2s,box-shadow 0.2s}
+    .continue:hover{border-color:var(--accent);box-shadow:0 4px 24px rgba(232,132,92,0.08)}
     .continue-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
-    .continue a{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--text);text-decoration:none;display:block;margin-bottom:6px;transition:color 0.2s}
-    .continue a:hover{color:var(--accent)}
+    .continue span{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--text);display:block;margin-bottom:6px;transition:color 0.2s}
+    .continue:hover span{color:var(--accent)}
     .continue-sub{font-size:13px;color:var(--dim)}
   </style>
 </head>
@@ -174,7 +175,7 @@
 
     <p>The law firm analogy has been generative. It led to the soul, the debate board, the partner consultations, the retainer model. It implied an architecture we wouldn't have designed from first principles.</p>
 
-    <p>But analogies are also constraints. Real law firms have billing structures, hierarchies, and communication patterns that don't necessarily map to how AI agents should work. There are things the analogy implies that don't make sense for AI, and things AI can do that a real law firm never could — running 66 simultaneous specialists on a single document, for instance, or remembering every finding from every engagement in structured, queryable memory.</p>
+    <p>But analogies are also constraints. Real law firms have billing structures, hierarchies, and communication patterns that don't necessarily map to how AI agents should work. There are things the analogy implies that don't make sense for AI, and things AI can do that a real law firm never could — dispatching fifty-nine specialists in parallel on a single document, for instance, or remembering every finding from every engagement in structured, queryable memory.</p>
 
     <p>At some point, we'll let the analogy go and find out what the system wants to become when it's freed from inherited shapes. The first law firm built from AI-native principles, rather than AI fitted to law-firm-native ones. That's the next question.</p>
 
@@ -197,15 +198,18 @@
 
     <p>Lavern is <a href="https://github.com/AnttiHero/lavern">open source</a> (Apache 2.0). The architecture, the agent prompts, the debate protocols, the precedent board, the verification pipeline — all of it. The source is available, the ideas are there to be improved on, and the analogy is there to be argued with.</p>
 
+    <p>v0.15.0 is the first publicly tagged release. It runs on your machine — Mac Mini, laptop, or any Node 22+ host — as a single-user firm with no account, no login, no billing. Bring an Anthropic key, a Mistral key, or just Ollama and a local model. Set <code>LAVERN_AUTH_ENABLED=true</code> and the cookie-based multi-user flow lights back up. The dial is in your hands.</p>
+
     <p>That is the point of publishing it.</p>
 
-    <div class="continue">
+    <a href="/architecture/" class="continue">
       <div class="continue-label">Continue Reading</div>
+      <span>Architecture of an Agentic Law Firm</span>
       <div class="continue-sub">The full technical deep-dive. Diagrams, mechanisms, and the reasoning behind the decisions.</div>
-    </div>
+    </a>
 
     <div class="footer">
-      <a href="/">LAVERN</a> &nbsp;·&nbsp; Helsinki · Paris
+      <a href="/">LAVERN</a> &nbsp;·&nbsp; Helsinki
     </div>
 
   </div>

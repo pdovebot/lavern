@@ -2,7 +2,7 @@
  * Card Hover Effects — Subtle editorial polish.
  *
  * Replaced holographic shimmer with a soft light sweep.
- * Also loads Inter + Cormorant Garamond fonts. The @keyframes are injected once via a <style> tag.
+ * Also loads Geist + Newsreader fonts. The @keyframes are injected once via a <style> tag.
  */
 
 // Keyframes + font import now live in app.css / index.html — no JS injection needed.

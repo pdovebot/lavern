@@ -1,7 +1,7 @@
 /**
  * Gate Dialog — Modal for human gate approval.
  *
- * Warm editorial design — Inter font, paper-white card, muted accents.
+ * Warm editorial design — Geist font, paper-white card, muted accents.
  * Appears when a gate_requested event arrives.
  * Sends approve/reject/modify back via API.
  */

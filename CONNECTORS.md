@@ -77,12 +77,12 @@ Lavern speaks to a small set of third-party services. All are optional unless th
 | **Anthropic API** | Primary LLM | `ANTHROPIC_API_KEY` | Optional in demo mode |
 | **Mistral API** | EU sovereign LLM | `MISTRAL_API_KEY` | Optional; required if `LAVERN_PROVIDER=mistral` |
 | **Ollama** (local daemon) | Clawern on-device triage for confidential docs | (none — local socket) | Optional; only used by Clawern hybrid/ethical mode |
-| **Stripe** | Billable-hours billing, top-ups, subscriptions | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Optional outside production |
-| **Resend** | Transactional email (verification, password reset, receipts, low-balance, weekly digest, Clawern alerts) | `RESEND_API_KEY` | Optional (warning, not fatal) |
+| **Stripe** | Billable-hours billing, top-ups, subscriptions | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Off in LOCAL MODE; requires `LAVERN_AUTH_ENABLED=true` |
+| **Resend** | Transactional email (verification, password reset, receipts, low-balance, weekly digest, Clawern alerts) | `RESEND_API_KEY` | Verification + password-reset mails only fire with `LAVERN_AUTH_ENABLED=true`; Clawern alerts always |
 | **Telegram Bot API** | Clawern two-way control (status, findings, pause, resume) and alerts | `LAVERN_CLAW_TELEGRAM_BOT_TOKEN`, `LAVERN_CLAW_TELEGRAM_CHAT_ID` | Optional |
 | **Deepgram** | Voice-mode speech-to-text (intake, interrupt, post-case) | `DEEPGRAM_API_KEY` | Optional (Web Speech API fallback) |
 | **ElevenLabs** | Voice-mode text-to-speech (future read-back) | `ELEVENLABS_API_KEY` | Optional |
-| **Google OAuth** | Signup / login with Google | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_URI` | Optional |
+| **Google OAuth** | Signup / login with Google | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_URI` | Off in LOCAL MODE; requires `LAVERN_AUTH_ENABLED=true` |
 | **Plausible Analytics** | Marketing site + dashboard analytics | (client-side, no key) | Optional |
 | **Sentry** | Server + client error monitoring | `SENTRY_DSN`, `VITE_SENTRY_DSN` | Optional |
 

@@ -149,13 +149,11 @@ const styles: Record<string, React.CSSProperties> = {
   archetype: {
     fontSize: 11,
     fontFamily: fonts.sans,
-    fontStyle: 'italic',
     color: colors.accent,
   },
   workStyle: {
     fontSize: 10,
     fontFamily: fonts.sans,
-    fontStyle: 'italic',
     color: colors.textDim,
     lineHeight: '14px',
     overflow: 'hidden',

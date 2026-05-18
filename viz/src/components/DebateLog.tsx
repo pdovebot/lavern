@@ -1,7 +1,7 @@
 /**
  * Debate Log — Scrolling event feed showing findings, challenges, and resolutions.
  *
- * Warm editorial design — Inter font, white background, muted event colors.
+ * Warm editorial design — Geist font, white background, muted event colors.
  * Color-coded by severity and event type. Auto-scrolls to latest.
  */
 

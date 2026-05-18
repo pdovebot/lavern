@@ -276,7 +276,7 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
 
       {/* Smart suggestion chips — only during early phases */}
       {suggestions.length > 0 && (phase === 'documents' || phase === 'questions') && (
-        <div className="flex flex-wrap gap-2 mb-5">
+        <div className="flex flex-wrap gap-2 mb-8">
           {suggestions.map(s => (
             <SuggestionChip
               key={s.id}
@@ -292,7 +292,7 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
         'mb-6 transition-[background-color,color,border-color] duration-300',
         phase === 'documents' ? 'opacity-100' : 'opacity-50 pb-2 border-b border-border mb-5',
       )}>
-        <div className="text-xs font-sans font-medium text-text-muted uppercase tracking-[0.5px] mb-4">
+        <div className="text-[11px] font-sans font-semibold text-text-muted uppercase tracking-[1px] mb-5">
           {phase === 'documents' ? 'Upload relevant documents' : `${upload.documents.length} document${upload.documents.length !== 1 ? 's' : ''} attached`}
         </div>
 
@@ -326,17 +326,32 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
               <div className="text-xs font-sans text-danger mt-2">{upload.error}</div>
             )}
 
-            <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3 mt-5">
-              <span className="text-xs font-sans text-text-dim italic">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3 mt-10">
+              <span className="text-xs font-sans text-text-dim">
                 {upload.documents.length === 0
                   ? 'You can skip this step if you have no documents to upload.'
                   : ''}
               </span>
               <button
                 onClick={advanceToInterviewer}
-                className="px-10 py-3.5 rounded-full border-2 border-text bg-text text-white font-sans text-[11px] font-semibold tracking-[3px] uppercase cursor-pointer transition-[background-color,color,border-color] duration-250 w-full sm:w-auto text-center"
-                onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
-                onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
+                className="px-10 py-3.5 rounded-full border-2 border-text bg-text text-white font-sans text-[11px] font-semibold tracking-[3px] uppercase cursor-pointer transition-all duration-200 w-full sm:w-auto text-center"
+                style={{
+                  boxShadow: '0 2px 4px rgba(20,18,14,0.18), 0 12px 28px rgba(20,18,14,0.16), 0 32px 64px rgba(20,18,14,0.12), inset 0 1px 0 rgba(255,255,255,0.08)',
+                }}
+                onMouseEnter={e => {
+                  const b = e.currentTarget;
+                  b.style.backgroundColor = 'transparent';
+                  b.style.color = colors.text;
+                  b.style.boxShadow = '0 3px 6px rgba(20,18,14,0.20), 0 18px 40px rgba(20,18,14,0.18), 0 44px 88px rgba(20,18,14,0.14)';
+                  b.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={e => {
+                  const b = e.currentTarget;
+                  b.style.backgroundColor = colors.text;
+                  b.style.color = '#fff';
+                  b.style.boxShadow = '0 2px 4px rgba(20,18,14,0.18), 0 12px 28px rgba(20,18,14,0.16), 0 32px 64px rgba(20,18,14,0.12), inset 0 1px 0 rgba(255,255,255,0.08)';
+                  b.style.transform = 'none';
+                }}
               >
                 Continue {'\u2192'}
               </button>
@@ -414,7 +429,7 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
       {analysis.isAnalyzing && phase !== 'brief' && (
         <div className="flex items-center justify-center gap-2.5 p-6">
           <div className="w-2 h-2 rounded-full bg-accent" style={{ animation: 'pulse 1.2s ease-in-out infinite' }} />
-          <span className="text-sm font-serif italic text-text-secondary">Analyzing your intake...</span>
+          <span className="text-sm font-serif text-text-secondary">Analyzing your intake...</span>
         </div>
       )}
 

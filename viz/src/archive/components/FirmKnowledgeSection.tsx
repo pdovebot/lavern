@@ -127,7 +127,6 @@ const styles: Record<string, React.CSSProperties> = {
   emptyText: {
     fontSize: 14,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: colors.textDim,
     padding: `${spacing.xl}px 0`,
     textAlign: 'center' as const,
@@ -142,7 +141,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     fontFamily: fonts.sans,
     color: colors.textDim,
-    fontStyle: 'italic' as const,
     marginTop: spacing.md,
     textAlign: 'center' as const,
   },

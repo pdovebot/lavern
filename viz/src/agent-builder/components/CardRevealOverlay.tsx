@@ -53,6 +53,19 @@ export function CardRevealOverlay({
     // Sound removed
   }, []);
 
+  // Scroll page to top so the reveal is fully in view when it opens.
+  // The user may have triggered it from the bottom of a long form, where
+  // the overlay is technically position:fixed but the centred card was
+  // landing visually off-screen behind virtual-keyboard-style chrome on
+  // smaller windows. Scrolling the page resets the visual frame.
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
   // Phase sequencing
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];
@@ -403,7 +416,7 @@ export function CardRevealOverlay({
                 e.currentTarget.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
               }}
             >
-              {saveLabel ?? 'See the agents work'}
+              {saveLabel ?? 'Hire them'}
             </button>
           </motion.div>
         )}

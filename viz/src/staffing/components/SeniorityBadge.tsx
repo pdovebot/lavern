@@ -36,12 +36,13 @@ export function SeniorityBadge({ seniority }: Props) {
       borderRadius: radii.pill,
       backgroundColor: colors.bgPanel,
       color,
-      fontSize: 10,
+      fontSize: 11,
       fontFamily: fonts.sans,
       fontWeight: 500,
       lineHeight: '16px',
+      letterSpacing: 0.2,
     }}>
-      {seniority === 'partner' && <span style={{ fontSize: 8 }}>{'\u2605'}</span>}
+      {seniority === 'partner' && <span style={{ fontSize: 9 }}>{'\u2605'}</span>}
       {seniorityDisplay[seniority] ?? seniority}
     </span>
   );

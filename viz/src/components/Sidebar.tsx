@@ -1,7 +1,7 @@
 /**
  * Sidebar — Agent roster with status indicators.
  *
- * Warm editorial design — Inter font, white background, muted accents.
+ * Warm editorial design — Geist font, white background, muted accents.
  * Shows agents with their current status (idle/working/talking),
  * event count, and color-coded role.
  */

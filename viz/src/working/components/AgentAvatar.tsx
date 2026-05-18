@@ -93,7 +93,6 @@ export function AgentAvatar({ role, size = 'md', profile, showArchetype }: Agent
         <span style={{
           fontSize: 9,
           fontFamily: fonts.serif,
-          fontStyle: 'italic',
           color: colors.textDim,
           lineHeight: 1,
           whiteSpace: 'nowrap',

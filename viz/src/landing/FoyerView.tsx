@@ -12,8 +12,8 @@ import { useMediaQuery } from '../hooks/useMediaQuery.js';
 
 const DARK = '#080808';
 const TEXT = '#FAF9F6';
-const SERIF = "'Cormorant Garamond', Georgia, serif";
-const SANS = "'Inter', -apple-system, sans-serif";
+const SERIF = "'Newsreader', Georgia, serif";
+const SANS = "'Geist', -apple-system, sans-serif";
 
 interface Props {
   onPartner: () => void;
@@ -155,7 +155,7 @@ export default function FoyerView({ onPartner, onQuickStart, onMyPage, onLogin, 
         }}>
           Excellence<br />
           doesn&rsquo;t scale.<br />
-          <em style={{ fontStyle: 'italic' }}>Until now.</em>
+          <span>Until now.</span>
         </h1>
 
         {/* CTA */}
@@ -177,7 +177,7 @@ export default function FoyerView({ onPartner, onQuickStart, onMyPage, onLogin, 
         )}
       </div>
 
-      {/* Helsinki · Paris */}
+      {/* Helsinki */}
       <div style={{
         position: 'absolute', bottom: 28, left: 0, right: 0,
         display: 'flex', justifyContent: 'center', gap: 10,
@@ -185,8 +185,6 @@ export default function FoyerView({ onPartner, onQuickStart, onMyPage, onLogin, 
         animation: 'foyerFade 0.8s ease 2.2s both',
       }}>
         <span style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 3, textTransform: 'uppercase' as const, color: TEXT, opacity: 0.18 }}>Helsinki</span>
-        <span style={{ fontFamily: SANS, fontSize: 9, color: TEXT, opacity: 0.12 }}>&middot;</span>
-        <span style={{ fontFamily: SANS, fontSize: 9, letterSpacing: 3, textTransform: 'uppercase' as const, color: TEXT, opacity: 0.18 }}>Paris</span>
       </div>
 
       <style>{`
@@ -214,7 +212,7 @@ function NavLink({ onClick, children }: { onClick: () => void; children: React.R
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        fontFamily: SERIF, fontSize: 14, fontWeight: 300, fontStyle: 'italic',
+        fontFamily: SERIF, fontSize: 14, fontWeight: 300,
         cursor: 'pointer', border: 'none', backgroundColor: 'transparent',
         color: TEXT, opacity: hovered ? 0.8 : 0.45,
         transition: 'opacity 0.4s ease', padding: '4px 0',

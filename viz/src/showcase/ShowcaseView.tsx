@@ -78,7 +78,7 @@ const S: Record<string, React.CSSProperties> = {
     padding: '0 24px',
   },
   title: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 38,
     fontWeight: 300,
     letterSpacing: 12,
@@ -89,7 +89,7 @@ const S: Record<string, React.CSSProperties> = {
     animation: 'showcaseTitle 1.2s cubic-bezier(0.4, 0, 0.2, 1) both',
   },
   subtitle: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 9,
     fontWeight: 600,
     letterSpacing: 5,
@@ -108,10 +108,9 @@ const S: Record<string, React.CSSProperties> = {
     animation: 'showcaseDivider 0.8s ease 0.7s both',
   },
   tagline: {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "'Newsreader', serif",
     fontSize: 20,
     fontWeight: 400,
-    fontStyle: 'italic',
     color: '#3a3a3a',
     letterSpacing: 0.5,
     textAlign: 'center',
@@ -151,7 +150,7 @@ const S: Record<string, React.CSSProperties> = {
     animation: 'showcaseOrbBump 2.5s ease-in-out 2.5s infinite',
   },
   orbLabel: {
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Geist', sans-serif",
     fontSize: 13,
     fontWeight: 600,
     letterSpacing: 4,

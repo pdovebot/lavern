@@ -441,8 +441,7 @@ const styles: Record<string, React.CSSProperties> = {
   title: {
     fontFamily: fonts.serif,
     fontSize: 24,
-    fontWeight: 300,
-    fontStyle: 'italic' as const,
+    fontWeight: 300 as const,
     color: colors.text,
     margin: 0,
     letterSpacing: -0.3,
@@ -546,7 +545,6 @@ const styles: Record<string, React.CSSProperties> = {
   waitlistHint: {
     fontSize: 12,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: colors.textMuted,
     margin: `-${spacing.sm}px 0 0`,
     textAlign: 'center' as const,
@@ -556,7 +554,6 @@ const styles: Record<string, React.CSSProperties> = {
   waitlistLink: {
     color: colors.text,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     textDecoration: 'underline',
     cursor: 'pointer',
   },
@@ -599,13 +596,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 12,
     color: colors.textMuted,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
   },
 
   legalConsent: {
     fontSize: 11,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: colors.textMuted,
     textAlign: 'center' as const,
     lineHeight: 1.5,
@@ -615,7 +610,6 @@ const styles: Record<string, React.CSSProperties> = {
   legalLink: {
     color: colors.text,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     textDecoration: 'underline',
     cursor: 'pointer',
   },

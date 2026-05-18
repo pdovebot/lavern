@@ -206,7 +206,16 @@ export function registerAgentBuilderRoutes(fastify: FastifyInstance): void {
   });
 
   // ── POST /api/agents/share — create or rotate a public share token ──
-  // Auth required. Body: { profile: AgentProfile }. Returns { token, url }.
+  //
+  // Body: { profile: AgentProfile }. Returns { token, url }.
+  //
+  // Ownership model:
+  //   · auth on  → owner = the authenticated user's id; only they can delete.
+  //   · auth off → owner = the synthetic 'local-user'; effectively single-
+  //                user installs. Anyone who can reach the API on localhost
+  //                can already manage all shares — that's the LOCAL MODE
+  //                threat model. Shared-with-the-world reads remain
+  //                unauthenticated (that's the point of a share token).
   fastify.post('/api/agents/share', async (request, reply) => {
     const authReq = request as AuthenticatedRequest;
     const userId = authReq.user?.id ?? null;
@@ -230,7 +239,13 @@ export function registerAgentBuilderRoutes(fastify: FastifyInstance): void {
     // Generate a 24-byte token (32 chars base64url) — unguessable in practice
     const token = crypto.randomBytes(24).toString('base64url');
     const owner = getUserById(userId);
-    const ownerName = owner?.display_name || (owner?.email?.split('@')[0]) || '';
+    // In LOCAL MODE getUserById('local-user') returns null. Fall back to a
+    // sensible display name so the public share page doesn't render
+    // "Built by ".
+    const ownerName =
+      owner?.display_name
+      || (owner?.email?.split('@')[0])
+      || (userId === 'local-user' ? 'Local' : '');
 
     upsertSharedAgent(token, userId, ownerName, profileJson);
 
@@ -246,6 +261,8 @@ export function registerAgentBuilderRoutes(fastify: FastifyInstance): void {
   fastify.delete('/api/agents/share/:token', async (request, reply) => {
     const authReq = request as AuthenticatedRequest;
     const userId = authReq.user?.id ?? null;
+    // The `!userId` branch is dead in LOCAL MODE (middleware always
+    // injects 'local-user') but kept for future hosted deployments.
     if (!userId) return reply.status(401).send({ error: 'Authentication required.' });
 
     const { token } = request.params as { token: string };

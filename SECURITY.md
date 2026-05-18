@@ -36,6 +36,12 @@ Out of scope:
 - Physical attacks on the host running Lavern
 - Findings that require already-compromised credentials, root access, or a malicious browser extension
 
+## Deployment shapes
+
+v0.15.0 ships with `LAVERN_AUTH_ENABLED=false` by default. In that **LOCAL MODE**, every request is the synthetic `local-user`, no cookies are set, no passwords are stored, no Stripe webhooks are accepted, and the auth/billing/Google-OAuth/referral routes don't register at all. The threat model collapses to "single user on a machine they own" — most of the trust boundaries below are inert until the flag is flipped.
+
+The multi-user model below applies when `LAVERN_AUTH_ENABLED=true` (shared / hosted deployments). The auth backend code is preserved on the same branch; flipping the flag and restarting brings it back online with no migration.
+
 ## Trust boundaries
 
 Lavern protects:

@@ -56,9 +56,9 @@ export const colors = {
 };
 
 export const fonts = {
-  sans: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  serif: "'Cormorant Garamond', 'Georgia', 'Times New Roman', serif",
-  mono: "'SF Mono', 'Fira Code', 'Fira Mono', Menlo, monospace",
+  sans: "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  serif: "'Newsreader', Georgia, 'Times New Roman', serif",
+  mono: "'Geist Mono', 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, monospace",
 };
 
 export const spacing = {
@@ -78,6 +78,38 @@ export const radii = {
   lg: 12,
   xl: 16,
   pill: 999,
+};
+
+/**
+ * Shadow scale — Apple-inspired multi-layer drop shadows.
+ *
+ * Recipe (the part most teams get wrong):
+ *   - huge blur radius (40–120px)
+ *   - very low opacity (0.02–0.08)
+ *   - 3 stacked layers: contact + mid + ambient
+ *   - warm-toned, not pure black (matches our cream palette)
+ *
+ * The shadow should never *look* like a shadow. It should feel like depth.
+ */
+export const shadows = {
+  /** Barely-there elevation. Pills, badges. */
+  xs: '0 1px 2px rgba(20, 18, 14, 0.05), 0 3px 6px rgba(20, 18, 14, 0.04)',
+  /** Resting card. Default surface above background. */
+  sm: '0 1px 2px rgba(20, 18, 14, 0.06), 0 6px 16px rgba(20, 18, 14, 0.07), 0 16px 40px rgba(20, 18, 14, 0.08)',
+  /** Standard card. Most surfaces. */
+  md: '0 2px 4px rgba(20, 18, 14, 0.06), 0 10px 28px rgba(20, 18, 14, 0.09), 0 28px 64px rgba(20, 18, 14, 0.11)',
+  /** Elevated / hovered card. Lifted, attention-drawing. */
+  lg: '0 3px 6px rgba(20, 18, 14, 0.08), 0 18px 44px rgba(20, 18, 14, 0.11), 0 44px 88px rgba(20, 18, 14, 0.14)',
+  /** Modal / overlay. Floating well above the page. */
+  xl: '0 6px 12px rgba(20, 18, 14, 0.10), 0 28px 72px rgba(20, 18, 14, 0.14), 0 68px 132px rgba(20, 18, 14, 0.18)',
+  /** Primary button — sits on a surface, distinctive lift. */
+  button: '0 1px 2px rgba(20, 18, 14, 0.10), 0 6px 14px rgba(20, 18, 14, 0.10), 0 16px 32px rgba(20, 18, 14, 0.08)',
+  /** Primary button hover — pronounced lift. */
+  buttonHover: '0 2px 4px rgba(20, 18, 14, 0.14), 0 10px 24px rgba(20, 18, 14, 0.12), 0 28px 60px rgba(20, 18, 14, 0.12)',
+  /** Inset rim — top-edge highlight that gives a "specular" feel. */
+  rimLight: 'inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+  /** Selected card focus ring + lift. */
+  selected: '0 0 0 1.5px rgba(26, 26, 26, 0.92), 0 6px 16px rgba(20, 18, 14, 0.09), 0 28px 64px rgba(20, 18, 14, 0.13)',
 };
 
 /** Map cost tier to color */

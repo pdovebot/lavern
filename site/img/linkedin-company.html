@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!--
+    LinkedIn COMPANY page banner: 1128 x 191.
+    LinkedIn overlays the company logo (a square ~80px tall) about
+    24px from the left edge, then the company name appears below.
+    So the leftmost ~200px of the banner is at risk of being obscured.
+    Layout puts the visual interest centre-right.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Geist:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    html,body{margin:0;padding:0;background:#FAFAFA;font-family:'Geist',-apple-system,sans-serif}
+    .card{
+      position:relative;
+      width:1128px;height:191px;
+      background:#FAFAFA;
+      overflow:hidden;
+      box-sizing:border-box;
+    }
+    .card::before{
+      content:'';position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 60% 90% at 70% 50%,
+          rgba(255,253,247,0.85) 0%,
+          rgba(252,250,242,0.4) 50%,
+          rgba(250,250,250,0) 90%),
+        linear-gradient(180deg, #FBF9F2 0%, #F4EFE3 100%);
+      pointer-events:none;
+    }
+    .card::after{
+      content:'';position:absolute;inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:240px 240px;opacity:0.03;mix-blend-mode:multiply;pointer-events:none;
+    }
+
+    /* Headline — pushed centre-right so the company logo overlay on
+       the left doesn't crash into it. */
+    .headline{
+      position:absolute;
+      top:50%;left:240px;right:48px;
+      transform:translateY(-50%);
+      font-family:'Newsreader',Georgia,serif;
+      color:#141310;
+      line-height:1;
+      letter-spacing:-0.022em;
+      font-size:62px;
+      font-weight:400;
+      z-index:5;
+    }
+    .headline .punch{font-weight:600}
+
+    /* Tiny wordmark in the top-right corner — signs the banner without
+       competing with LinkedIn's own logo + name overlay on the left. */
+    .wordmark{
+      position:absolute;top:18px;right:28px;
+      font-family:'Geist Mono',ui-monospace,monospace;
+      font-size:12px;font-weight:500;
+      letter-spacing:6px;
+      color:rgba(20,19,16,0.50);
+      text-transform:uppercase;
+      z-index:5;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="wordmark">L A V E R N</div>
+    <h1 class="headline">An Agentic Law Firm. <span class="punch">Free.</span></h1>
+  </div>
+</body>
+</html>

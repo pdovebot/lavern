@@ -1,7 +1,7 @@
 /**
  * Controls — Connection UI and replay controls.
  *
- * Warm editorial design — Inter font, white bar, muted accents.
+ * Warm editorial design — Geist font, white bar, muted accents.
  * In live mode: session selector, connection status.
  * In replay mode: play/pause, speed, seek.
  */

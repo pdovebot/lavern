@@ -548,7 +548,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   disclaimer: {
     fontFamily: fonts.sans, fontSize: 11, color: colors.textDim,
-    lineHeight: 1.5, fontStyle: 'italic',
+    lineHeight: 1.5,
   },
   actions: {
     display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 4,
@@ -619,7 +619,7 @@ const styles: Record<string, React.CSSProperties> = {
   firmTagline: {
     fontFamily: fonts.serif, fontSize: 14,
     color: 'rgba(43,36,24,0.62)',
-    marginTop: 4, fontStyle: 'italic',
+    marginTop: 4,
   },
   firmChapterStandalone: {
     paddingBottom: 12,
@@ -643,7 +643,7 @@ const styles: Record<string, React.CSSProperties> = {
   soulText: {
     fontFamily: fonts.serif, fontSize: 17,
     color: '#F5EFDF',
-    lineHeight: 1.6, fontStyle: 'italic',
+    lineHeight: 1.6,
   },
   // Compact running log — small, technical, secondary
   logTrace: {
@@ -702,7 +702,6 @@ const miniStyles: Record<string, React.CSSProperties> = {
   // This is the headline — the credibility hook.
   receipt: {
     fontFamily: fonts.serif, fontSize: 14,
-    fontStyle: 'italic',
     color: colors.text,
     lineHeight: 1.55,
     paddingBottom: 14,

@@ -139,14 +139,14 @@ function renderShareCardToCanvas(result: ComparisonResult): HTMLCanvasElement {
 
   // Header: LAVERN | THE CHALLENGE
   ctx.fillStyle = 'rgba(250, 249, 246, 0.92)';
-  ctx.font = '400 16px "Cormorant Garamond", Georgia, serif';
+  ctx.font = '400 16px "Newsreader", Georgia, serif';
   ctx.letterSpacing = '6px';
   ctx.textAlign = 'center';
   ctx.fillText('LAVERN', W / 2 - 80, 72);
   ctx.fillStyle = 'rgba(250, 249, 246, 0.35)';
   ctx.fillRect(W / 2 - 18, 60, 1, 16);
   ctx.fillStyle = 'rgba(250, 249, 246, 0.6)';
-  ctx.font = '600 10px Inter, system-ui, sans-serif';
+  ctx.font = '600 10px Geist, system-ui, sans-serif';
   ctx.letterSpacing = '3px';
   ctx.fillText('THE CHALLENGE', W / 2 + 70, 72);
 
@@ -155,7 +155,7 @@ function renderShareCardToCanvas(result: ComparisonResult): HTMLCanvasElement {
     : result.winner === 'human' ? "Credit where it's due."
     : 'Dead heat.';
   ctx.fillStyle = '#B8960B';
-  ctx.font = 'italic 300 42px "Cormorant Garamond", Georgia, serif';
+  ctx.font = '300 42px "Newsreader", Georgia, serif';
   ctx.letterSpacing = '0px';
   ctx.fillText(headline, W / 2, 130);
 
@@ -169,24 +169,24 @@ function renderShareCardToCanvas(result: ComparisonResult): HTMLCanvasElement {
 
   // LAVERN score
   ctx.fillStyle = result.winner === 'lavern' ? '#B8960B' : 'rgba(250, 249, 246, 0.6)';
-  ctx.font = '700 11px Inter, system-ui, sans-serif';
+  ctx.font = '700 11px Geist, system-ui, sans-serif';
   ctx.letterSpacing = '3px';
   ctx.fillText('LAVERN', W / 2 - 160, 200);
-  ctx.font = '300 72px "Cormorant Garamond", Georgia, serif';
+  ctx.font = '300 72px "Newsreader", Georgia, serif';
   ctx.letterSpacing = '0px';
   ctx.fillText(String(mScore), W / 2 - 160, 275);
 
   // vs
   ctx.fillStyle = 'rgba(250, 249, 246, 0.35)';
-  ctx.font = 'italic 16px Inter, system-ui, sans-serif';
+  ctx.font = '400 16px Geist, system-ui, sans-serif';
   ctx.fillText('vs', W / 2, 250);
 
   // CHALLENGER score
   ctx.fillStyle = result.winner === 'human' ? '#B8960B' : 'rgba(250, 249, 246, 0.6)';
-  ctx.font = '700 11px Inter, system-ui, sans-serif';
+  ctx.font = '700 11px Geist, system-ui, sans-serif';
   ctx.letterSpacing = '3px';
   ctx.fillText('CHALLENGER', W / 2 + 160, 200);
-  ctx.font = '300 72px "Cormorant Garamond", Georgia, serif';
+  ctx.font = '300 72px "Newsreader", Georgia, serif';
   ctx.letterSpacing = '0px';
   ctx.fillText(String(cScore), W / 2 + 160, 275);
 
@@ -210,24 +210,24 @@ function renderShareCardToCanvas(result: ComparisonResult): HTMLCanvasElement {
 
     // Dimension name
     ctx.fillStyle = 'rgba(250, 249, 246, 0.6)';
-    ctx.font = '400 13px Inter, system-ui, sans-serif';
+    ctx.font = '400 13px Geist, system-ui, sans-serif';
     ctx.letterSpacing = '0px';
     ctx.fillText(dims[i].name, leftX + 240, y);
 
     // Lavern score
     ctx.fillStyle = mWins ? '#B8960B' : 'rgba(250, 249, 246, 0.6)';
-    ctx.font = '600 14px "SF Mono", "Fira Code", monospace';
+    ctx.font = '600 14px "Geist Mono", "SF Mono", "Fira Code", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(String(dm), leftX + 290, y);
 
     // Dash
     ctx.fillStyle = 'rgba(250, 249, 246, 0.35)';
-    ctx.font = '400 12px Inter, system-ui, sans-serif';
+    ctx.font = '400 12px Geist, system-ui, sans-serif';
     ctx.fillText('\u2013', leftX + 325, y);
 
     // Challenger score
     ctx.fillStyle = !mWins ? '#B8960B' : 'rgba(250, 249, 246, 0.6)';
-    ctx.font = '600 14px "SF Mono", "Fira Code", monospace';
+    ctx.font = '600 14px "Geist Mono", "SF Mono", "Fira Code", monospace';
     ctx.fillText(String(dc), leftX + 360, y);
 
     ctx.textAlign = 'right';
@@ -236,7 +236,7 @@ function renderShareCardToCanvas(result: ComparisonResult): HTMLCanvasElement {
   // Summary (wrap text)
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(250, 249, 246, 0.85)';
-  ctx.font = '400 14px Inter, system-ui, sans-serif';
+  ctx.font = '400 14px Geist, system-ui, sans-serif';
   ctx.letterSpacing = '0px';
   const summary = result.summary;
   const maxLineW = W - 200;
@@ -259,7 +259,7 @@ function renderShareCardToCanvas(result: ComparisonResult): HTMLCanvasElement {
   ctx.fillStyle = 'rgba(250, 249, 246, 0.10)';
   ctx.fillRect(100, H - 55, W - 200, 1);
   ctx.fillStyle = 'rgba(250, 249, 246, 0.35)';
-  ctx.font = '500 10px Inter, system-ui, sans-serif';
+  ctx.font = '500 10px Geist, system-ui, sans-serif';
   ctx.letterSpacing = '2px';
   ctx.fillText('LAVERN.LAW  \u00B7  BLIND AI COMPARISON', W / 2, H - 32);
 
@@ -1140,7 +1140,6 @@ const sty: Record<string, React.CSSProperties> = {
     fontSize: 36,
     fontWeight: 300,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: D.gold,
     margin: 0,
     letterSpacing: 1,
@@ -1233,7 +1232,6 @@ const sty: Record<string, React.CSSProperties> = {
     fontSize: 14,
     fontFamily: fonts.sans,
     color: D.textFaint,
-    fontStyle: 'italic' as const,
     flexShrink: 0,
   },
   uploadLabel: {
@@ -1335,7 +1333,6 @@ const sty: Record<string, React.CSSProperties> = {
   processingStep: {
     fontSize: 15,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: D.text,
     textAlign: 'center' as const,
     minHeight: 24,
@@ -1441,7 +1438,6 @@ const sty: Record<string, React.CSSProperties> = {
     fontSize: 14,
     fontFamily: fonts.sans,
     color: D.textFaint,
-    fontStyle: 'italic' as const,
   },
 
   // Reveal
@@ -1509,8 +1505,7 @@ const sty: Record<string, React.CSSProperties> = {
   resultTitle: {
     fontSize: 36,
     fontFamily: fonts.serif,
-    fontWeight: 300,
-    fontStyle: 'italic' as const,
+    fontWeight: 300 as const,
     color: D.gold,
     marginBottom: 24,
   },
@@ -1546,7 +1541,6 @@ const sty: Record<string, React.CSSProperties> = {
     fontSize: 13,
     fontFamily: fonts.sans,
     color: D.textFaint,
-    fontStyle: 'italic' as const,
   },
   shareDims: {
     display: 'flex',

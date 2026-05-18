@@ -13,51 +13,37 @@ import { buildInterviewSystemPrompt, buildFinalizationSystemPrompt } from '../br
 import { config } from '../../config.js';
 import { createApiKeyAccessor } from '../../utils/ensure-api-key.js';
 import { createLogger } from '../../utils/logger.js';
+import { crossProviderChat } from '../../providers/cross-provider-chat.js';
 
 const logger = createLogger('BRIEFING');
 const API_KEY_LAZY = createApiKeyAccessor('interview calls');
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const INTERVIEW_MODEL = config.routerModel; // Sonnet — old Haiku was too dumb for interviews
+// Streaming model alias — Sonnet 4.5 covers the router tier on Anthropic.
+// Only the Anthropic streaming branch reads this (non-streaming paths use
+// `crossProviderChat({ tier: 'sonnet' })` which resolves the same model).
+const INTERVIEW_MODEL = config.routerModel;
 
 /**
- * Call Anthropic Messages API directly (non-streaming).
+ * Run a multi-turn briefing call against the active provider.
+ *
+ * Used for the non-streaming finalization step. The streaming
+ * conversational turn (below) still hits Anthropic directly when
+ * config.provider === 'anthropic'; other providers fall back to a
+ * one-shot crossProviderChat call wrapped in an SSE envelope so the
+ * route surface stays identical.
  */
-async function callAnthropic(params: {
+async function callProvider(params: {
   system: string;
   messages: Array<{ role: 'user' | 'assistant'; content: string }>;
   maxTokens?: number;
 }): Promise<string> {
-  const maxTokens = params.maxTokens ?? 4096;
-  const res = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'x-api-key': API_KEY_LAZY.value,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: INTERVIEW_MODEL,
-      max_tokens: maxTokens,
-      thinking: { type: 'enabled', budget_tokens: Math.min(1024, Math.floor(maxTokens * 0.25)) },
-      system: params.system,
-      messages: params.messages,
-    }),
+  const { text } = await crossProviderChat({
+    system: params.system,
+    messages: params.messages,
+    tier: 'sonnet', // INTERVIEW_MODEL was config.routerModel — same tier
+    maxTokens: params.maxTokens ?? 4096,
   });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Anthropic API error (${res.status}): ${errText}`);
-  }
-
-  const data = await res.json() as {
-    content: Array<{ type: string; text?: string }>;
-  };
-
-  // Extract only the text block — skip thinking blocks
-  const textBlock = Array.isArray(data.content)
-    ? data.content.find(b => b.type === 'text')
-    : undefined;
-  return textBlock?.text ?? '';
+  return text;
 }
 
 export function registerBriefingRoutes(fastify: FastifyInstance): void {
@@ -114,7 +100,7 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
           .map(m => `${m.role === 'user' ? 'Client' : 'Interviewer'}: ${m.content}`)
           .join('\n\n');
 
-        const text = await callAnthropic({
+        const text = await callProvider({
           system: systemPrompt,
           messages: [{
             role: 'user',
@@ -180,6 +166,34 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
       });
+
+      // ── Non-Anthropic providers: one-shot fallback ──────────────────
+      // Anthropic-native streaming with extended thinking blocks (below)
+      // doesn't translate to Mistral / local Ollama. For those providers
+      // we run a single crossProviderChat call and emit the whole reply
+      // as one SSE text event. Same on-wire envelope, no streaming UX.
+      // The "no model data crosses to api.anthropic.com" guarantee holds.
+      if (config.provider === 'mistral' || config.provider === 'local') {
+        try {
+          const { text } = await crossProviderChat({
+            system: systemPrompt,
+            messages: apiMessages,
+            tier: 'sonnet',
+            maxTokens: 1600,
+          });
+          if (text) {
+            reply.raw.write(`data: ${JSON.stringify({ type: 'text', content: text })}\n\n`);
+          }
+          reply.raw.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+        } catch (err) {
+          reply.raw.write(`data: ${JSON.stringify({
+            type: 'error',
+            content: err instanceof Error ? err.message : String(err),
+          })}\n\n`);
+        }
+        reply.raw.end();
+        return;
+      }
 
       // Stream from Anthropic API using raw fetch + SSE parsing.
       // Enable extended thinking so the model reasons internally (filtered out)

@@ -58,18 +58,20 @@ export default function MyPageView({ onBack }: Props) {
 
   return (
     <div style={styles.page}>
-      {/* Back link */}
-      <button
-        onClick={onBack}
-        style={styles.backLink}
-        onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
-        onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
-      >
-        {'\u2190'} Back to Home
-      </button>
+      {/* Back link \u2014 wrapped so it shares the content column's left edge */}
+      <div style={styles.backLinkRow}>
+        <button
+          onClick={onBack}
+          style={styles.backLink}
+          onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
+          onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
+        >
+          {'\u2190'} Back to Home
+        </button>
+      </div>
 
       {/* Page title */}
-      <h1 style={styles.pageTitle}>Lavern <span style={{ fontStyle: 'italic' }}>Profile</span></h1>
+      <h1 style={styles.pageTitle}>Lavern <span style={{ fontWeight: 500 }}>Profile</span></h1>
       <p style={styles.pageSub}>
         Your preferences persist across engagements. Everything saves automatically.
       </p>
@@ -217,7 +219,7 @@ export default function MyPageView({ onBack }: Props) {
 
           <div style={styles.soulLabel}>Soul</div>
           <h2 style={styles.soulHeading}>
-            What kind of firm<br />is Lavern <em>for you?</em>
+            What kind of firm<br />is Lavern <span style={{ fontWeight: 500 }}>for you?</span>
           </h2>
           <p style={styles.soulSub}>
             Voice. Principles. Values. The character that shapes every decision your agents make.
@@ -664,10 +666,12 @@ const styles: Record<string, React.CSSProperties> = {
     boxSizing: 'border-box',
   },
 
-  backLink: {
-    alignSelf: 'flex-start',
+  backLinkRow: {
+    width: '100%',
     maxWidth: 640,
-    width: 'auto',
+    marginBottom: spacing.xl,
+  },
+  backLink: {
     background: 'none',
     border: `1.5px solid ${colors.text}`,
     borderRadius: radii.sm,
@@ -679,15 +683,13 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase' as const,
     cursor: 'pointer',
     padding: '6px 14px',
-    marginBottom: spacing.xl,
-    marginLeft: 48,
     transition: 'background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease',
   },
 
   pageTitle: {
-    fontFamily: fonts.serif,
-    fontSize: 36,
-    fontWeight: 300,
+    fontFamily: fonts.sans,
+    fontSize: 'clamp(24px, 6vw, 36px)',
+    fontWeight: 400,
     color: colors.text,
     margin: 0,
     letterSpacing: -0.5,
@@ -818,7 +820,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '16px 20px',
     fontSize: 15,
     fontFamily: fonts.serif,
-    fontStyle: 'italic' as const,
     color: 'rgba(250, 249, 246, 0.85)',
     backgroundColor: 'rgba(250, 249, 246, 0.05)',
     border: '1px solid rgba(250, 249, 246, 0.1)',
@@ -1013,7 +1014,6 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 640,
     fontSize: 13,
     color: colors.textDim,
-    fontStyle: 'italic',
     textAlign: 'center',
     padding: `${spacing.xxl}px 0`,
   },

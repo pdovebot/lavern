@@ -78,7 +78,6 @@ const styles: Record<string, React.CSSProperties> = {
   empty: {
     fontSize: 13,
     color: colors.textDim,
-    fontStyle: 'italic' as const,
     padding: `${spacing.md}px 0`,
   },
   result: {

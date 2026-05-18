@@ -457,8 +457,16 @@ export function registerSessionRoutes(
   fastify.get('/api/sessions', async (request, reply) => {
     const userId = (request as typeof request & { userId?: string }).userId;
     const allSessions = sessionManager.getAllSessions();
-    // Filter to only this user's sessions (or show all if no auth — backward compat for CLI)
-    const activeSessions = userId ? allSessions.filter(s => s.userId === userId) : allSessions;
+    // Multi-user installs (auth on): scope the listing to the requester.
+    // LOCAL MODE (the default in v0.15.0): userId is always 'local-user'.
+    // Filtering on it would hide any session whose userId is something
+    // else — historical sessions, CLI-created sessions, integration-test
+    // fixtures — so we show everything instead. The CLI-backward-compat
+    // branch (no userId at all) keeps working untouched.
+    const activeSessions =
+      userId && userId !== 'local-user'
+        ? allSessions.filter(s => s.userId === userId)
+        : allSessions;
     const active = activeSessions.map((s) => ({
       id: s.id,
       currentStep: s.genericWorkflow?.currentStep ?? s.workflow.currentStep,
