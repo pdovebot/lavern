@@ -323,6 +323,7 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
         findingCount={totalFindings}
         sessionStartTime={state.events[0]?.timestamp ?? null}
         lastEventTimestamp={state.lastEventTimestamp}
+        replayEndTime={state.isReplay ? state.lastEventTimestamp : null}
       />
 
       {/* Connection Lost banner — visible when WS drops during an active session */}
