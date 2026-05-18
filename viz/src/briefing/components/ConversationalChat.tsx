@@ -267,7 +267,11 @@ export function ConversationalChat({
 
         <div style={styles.footer}>
           <span style={styles.turnCounter}>
-            Question {turnCount + 1} of {maxTurns}
+            {/* maxTurns is a soft target, not a hard cap. Past that, show
+                an open-ended "Question N" instead of "Question 6 of 5". */}
+            {turnCount + 1 > maxTurns
+              ? `Question ${turnCount + 1}`
+              : `Question ${turnCount + 1} of ${maxTurns}`}
           </span>
 
           {canFinalize && (
