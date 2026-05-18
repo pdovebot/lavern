@@ -63,7 +63,11 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
       const result = await analyzeBriefing(parsed.data);
       return reply.send(result);
     } catch (err) {
-      logger.error('Analysis failed', { error: err });
+      logger.error('Analysis failed', {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        name: err instanceof Error ? err.name : undefined,
+      });
       return reply.status(500).send({
         error: 'Briefing analysis failed',
         message: err instanceof Error ? err.message : String(err),
@@ -118,13 +122,19 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
         const validated = BriefingAnalyzeResponseSchema.safeParse(rawResult);
 
         if (!validated.success) {
-          logger.error('Finalization schema validation failed', { error: validated.error });
+          logger.error('Finalization schema validation failed', {
+            issues: validated.error.issues,
+          });
           throw new Error('Finalization did not return a valid structured response');
         }
 
         return reply.send(validated.data);
       } catch (err) {
-        logger.error('Finalization failed', { error: err });
+        logger.error('Finalization failed', {
+          message: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+          name: err instanceof Error ? err.name : undefined,
+        });
         return reply.status(500).send({
           error: 'Interview finalization failed',
           message: err instanceof Error ? err.message : String(err),
@@ -160,7 +170,7 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
     reply.raw.on('close', () => { clientDisconnected = true; });
 
     try {
-      // Set up SSE response
+      // Set up SSE response (shared by both provider branches)
       reply.raw.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -173,6 +183,8 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
       // we run a single crossProviderChat call and emit the whole reply
       // as one SSE text event. Same on-wire envelope, no streaming UX.
       // The "no model data crosses to api.anthropic.com" guarantee holds.
+      // (`managed` keeps the native streaming path below — it uses the
+      // Anthropic API under the hood.)
       if (config.provider === 'mistral' || config.provider === 'local') {
         try {
           const { text } = await crossProviderChat({
@@ -181,20 +193,28 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
             tier: 'sonnet',
             maxTokens: 1600,
           });
-          if (text) {
-            reply.raw.write(`data: ${JSON.stringify({ type: 'text', content: text })}\n\n`);
+          // Strip any <thinking>…</thinking> tags the model may have
+          // emitted — some local models leak the scratchpad into output.
+          const cleaned = (text ?? '').replace(/<thinking>[\s\S]*?<\/thinking>/g, '').trim();
+          if (!clientDisconnected && cleaned) {
+            reply.raw.write(`data: ${JSON.stringify({ type: 'text', content: cleaned })}\n\n`);
           }
-          reply.raw.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+          if (!clientDisconnected) {
+            reply.raw.write(`data: ${JSON.stringify({ type: 'done', turn: turnNumber + 1 })}\n\n`);
+          }
         } catch (err) {
-          reply.raw.write(`data: ${JSON.stringify({
-            type: 'error',
-            content: err instanceof Error ? err.message : String(err),
-          })}\n\n`);
+          if (!clientDisconnected) {
+            reply.raw.write(`data: ${JSON.stringify({
+              type: 'error',
+              content: err instanceof Error ? err.message : String(err),
+            })}\n\n`);
+          }
         }
         reply.raw.end();
         return;
       }
 
+      // ── Anthropic / managed: native token-by-token SSE streaming ─────
       // Stream from Anthropic API using raw fetch + SSE parsing.
       // Enable extended thinking so the model reasons internally (filtered out)
       // and produces a clean conversational response.
@@ -308,7 +328,11 @@ export function registerBriefingRoutes(fastify: FastifyInstance): void {
       }
       reply.raw.end();
     } catch (err) {
-      logger.error('Interview turn failed', { error: err });
+      logger.error('Interview turn failed', {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        name: err instanceof Error ? err.name : undefined,
+      });
       const errMsg = err instanceof Error ? err.message : String(err);
       if (!reply.raw.headersSent) {
         reply.raw.writeHead(500, { 'Content-Type': 'application/json' });
