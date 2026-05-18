@@ -239,10 +239,12 @@ export default function MyCasesView({ onConnectSession, onConnectReplay, onBack 
 
         <div style={styles.pastGrid}>
           {archivedSessions.slice(0, 20).map((s) => {
-            const tierLabel = s.workflowId ? (WORKFLOW_LABELS[s.workflowId] ?? s.workflowId) : '';
+            const tierLabel = s.workflowId ? (WORKFLOW_LABELS[s.workflowId] ?? s.workflowId) : '—';
             const dateStr = s.completedAt
               ? new Date(s.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-              : '';
+              : 'no date';
+            const findingsStr = s.findingsCount > 0 ? `${s.findingsCount} findings` : 'no findings';
+            const durationStr = s.durationMs > 0 ? formatDuration(s.durationMs) : 'no duration';
             return (
               <div
                 key={s.id}
@@ -252,13 +254,13 @@ export default function MyCasesView({ onConnectSession, onConnectReplay, onBack 
               >
                 <div style={styles.pastCardHeader}>
                   <span style={styles.pastTitle}>{s.title}</span>
-                  {tierLabel && <span style={styles.tierBadge}>{tierLabel}</span>}
+                  <span style={styles.tierBadge}>{tierLabel}</span>
                 </div>
                 <div style={styles.pastMetaRow}>
-                  {s.findingsCount > 0 && <span>{s.findingsCount} findings</span>}
+                  <span>{findingsStr}</span>
                   <span>${s.costUsd.toFixed(2)}</span>
-                  {s.durationMs > 0 && <span>{formatDuration(s.durationMs)}</span>}
-                  {dateStr && <span>{dateStr}</span>}
+                  <span>{durationStr}</span>
+                  <span>{dateStr}</span>
                 </div>
                 <button
                   style={styles.replayButton}

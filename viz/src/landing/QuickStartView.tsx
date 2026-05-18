@@ -20,6 +20,7 @@ import { useDocumentUpload } from '../briefing/hooks/useDocumentUpload.js';
 import { useCoworkFolder } from '../cowork/useCoworkFolder.js';
 import { CoworkFolderPanel } from '../cowork/CoworkFolderPanel.js';
 import { YOLO_CONFIGS, type YoloTier } from './yolo-config.js';
+import { useUserProfile } from '../my-page/hooks/useUserProfile.js';
 import type { FrontendParsedDocument } from '../briefing/hooks/useDocumentUpload.js';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -30,6 +31,18 @@ const TIER_MAP: Record<EngagementTier, YoloTier> = {
   counsel: 'standard',
   review: 'white-shoe',
   'full-bench': 'elite',
+};
+
+// Workflow IDs that have no QuickStart tier collapse onto the closest match.
+// Picked by team size: adversarial/roundtable are mid-size like 'review';
+// pre-engagement is a lightweight intake like 'counsel'.
+const WORKFLOW_TO_TIER: Record<string, EngagementTier> = {
+  counsel: 'counsel',
+  review: 'review',
+  adversarial: 'review',
+  roundtable: 'review',
+  'full-bench': 'full-bench',
+  'pre-engagement': 'counsel',
 };
 
 interface QuickStartProps {
@@ -88,10 +101,13 @@ function ShimmerButton({
 
 export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge }: QuickStartProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { profile } = useUserProfile();
+  const defaultTier: EngagementTier = WORKFLOW_TO_TIER[profile.defaultWorkflowId] ?? 'counsel';
 
   // Core state
   const [question, setQuestion] = useState('');
-  const [tier, setTier] = useState<EngagementTier>('counsel');
+  const [tier, setTier] = useState<EngagementTier>(defaultTier);
+  const userPickedTierRef = useRef(false);
   const [submitting, setSubmitting] = useState(false);
   const submittedRef = useRef(false); // Sync guard against double-click race
   const [instructHovered, setInstructHovered] = useState(false);
@@ -137,10 +153,12 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
   const hasFolder = cowork.status !== 'disconnected';
   const folderHasSelected = cowork.files.some(f => f.selected);
 
-  // Smart defaults
+  // Smart defaults — adapt to whether the user dropped docs in, but never
+  // clobber an explicit pick, and respect their My Page workflow default.
   useEffect(() => {
-    setTier(documents.length > 0 ? 'review' : 'counsel');
-  }, [documents.length]);
+    if (userPickedTierRef.current) return;
+    setTier(documents.length > 0 ? 'review' : defaultTier);
+  }, [documents.length, defaultTier]);
 
   // Auto-focus textarea on mount
   useEffect(() => {
@@ -559,7 +577,7 @@ export default function QuickStartView({ onQuickStart, onGuidedFlow, onChallenge
               return (
                 <button
                   key={t.key}
-                  onClick={() => setTier(t.key)}
+                  onClick={() => { userPickedTierRef.current = true; setTier(t.key); }}
                   className={cn(
                     'relative flex-1 flex flex-col items-start py-2 px-3 rounded-md border cursor-pointer overflow-hidden',
                   )}
