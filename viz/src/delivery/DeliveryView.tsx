@@ -134,7 +134,10 @@ export default function DeliveryView({ onContinue, onBack, onSkip }: Props) {
         {isArchiveView ? (
           <>
             <button
-              onClick={() => { window.location.hash = '#/working'; }}
+              onClick={() => {
+                sessionStorage.setItem('shem-from-archive', 'true');
+                window.location.hash = '#/working';
+              }}
               style={styles.secondaryBtn}
               onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; b.style.transform = 'translateY(-2px)'; b.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)'; }}
               onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; b.style.transform = ''; b.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.5)'; }}

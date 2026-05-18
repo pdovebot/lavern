@@ -342,15 +342,23 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
           <div style={styles.expiredCard}>
             <span style={{ fontFamily: fonts.serif, fontSize: 36, fontWeight: 300, color: colors.text, opacity: 0.5 }}>M</span>
             <h2 style={{ fontFamily: fonts.serif, fontSize: 20, fontWeight: 300, color: colors.text, marginTop: 16 }}>
-              Session Expired
+              {state.isReplay ? 'Event Log Unavailable' : 'Session Expired'}
             </h2>
             <p style={{ fontFamily: fonts.sans, fontSize: 13, color: colors.textSecondary, marginTop: 8, lineHeight: 1.5 }}>
-              This session is no longer available on the server.
-              Sessions are kept for 4 hours after creation.
+              {state.isReplay
+                ? 'No agent-work recording was saved for this case, so there’s nothing to replay. The final deliverable is still available in the case archive.'
+                : 'This session is no longer available on the server. Sessions are kept for 4 hours after creation.'}
             </p>
-            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 }}>
               <button
-                onClick={onBack}
+                onClick={() => {
+                  if (state.isReplay) {
+                    sessionStorage.setItem('shem-from-archive', 'true');
+                    window.location.hash = '#/delivery';
+                  } else {
+                    onBack();
+                  }
+                }}
                 style={{
                   padding: '10px 28px',
                   borderRadius: radii.sm,
@@ -368,7 +376,7 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
                 onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = colors.text; }}
                 onMouseLeave={e => { e.currentTarget.style.backgroundColor = colors.text; e.currentTarget.style.color = '#fff'; }}
               >
-                Start New Session
+                {state.isReplay ? 'Back to Case' : 'Start New Session'}
               </button>
             </div>
           </div>
@@ -390,7 +398,7 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
             <p style={{ fontFamily: fonts.sans, fontSize: 12, color: colors.textDim, marginTop: 8, lineHeight: 1.5 }}>
               Any partial analysis may still be available.
             </p>
-            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 }}>
               <button
                 onClick={onBack}
                 style={{

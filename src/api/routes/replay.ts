@@ -161,9 +161,25 @@ export function registerReplayRoutes(
 function auditEntriesToEvents(entries: unknown[]): ShemEvent[] {
   const events: ShemEvent[] = [];
 
+  // Event types written directly to the audit log by the mistral/local
+  // provider paths (which emit ShemEvents via the event bus rather than
+  // going through the Anthropic SDK's PostToolUse hooks). When we see one,
+  // pass it through unchanged instead of trying to re-derive it from an
+  // `action` string.
+  const passthroughEventTypes = new Set([
+    'agent_start', 'agent_stop', 'tool_used', 'workflow_step',
+    'finding', 'debate', 'gate_pending', 'gate_resolved',
+    'cost_update', 'error',
+  ]);
+
   for (const raw of entries) {
     const entry = raw as Record<string, unknown>;
     const timestamp = (entry.timestamp as string) || new Date().toISOString();
+
+    if (typeof entry.type === 'string' && passthroughEventTypes.has(entry.type)) {
+      events.push(entry as unknown as ShemEvent);
+      continue;
+    }
 
     if (entry.type === 'session_start') {
       events.push({

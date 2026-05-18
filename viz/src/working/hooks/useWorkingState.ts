@@ -295,7 +295,15 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
     if (!sessionId) {
       const storedSessionId = sessionStorage.getItem('shem-session-id');
       if (storedSessionId) {
-        connectToSession(storedSessionId);
+        // Archived cases ("View Agent Work" from Delivery) replay from the audit
+        // log instead of connecting to the live session, which has been evicted
+        // from the server's in-memory store after its 4h TTL.
+        const fromArchive = sessionStorage.getItem('shem-from-archive') === 'true';
+        if (fromArchive) {
+          connectToReplay(storedSessionId);
+        } else {
+          connectToSession(storedSessionId);
+        }
       }
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
