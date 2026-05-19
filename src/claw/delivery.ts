@@ -123,11 +123,7 @@ export class ClawDelivery {
         manifest.outputs.docx = 'deliverable.docx';
       } catch (err) {
         logger.warn('DOCX conversion failed', { error: err });
-        // The markdown deliverable still ships, but a Claw client who asked
-        // for DOCX gets an incomplete bundle with no in-flow error. Report
-        // so we spot systemic conversion regressions (e.g., pandoc missing,
-        // upstream docx lib bug) instead of discovering them document by
-        // document.
+        manifest.outputErrors = { ...manifest.outputErrors, docx: err instanceof Error ? err.message : String(err) };
         captureError(err, { phase: 'claw_docx_conversion', sessionId });
       }
     }
@@ -140,8 +136,16 @@ export class ClawDelivery {
         manifest.outputs.html = 'deliverable.html';
       } catch (err) {
         logger.warn('HTML conversion failed', { error: err });
+        manifest.outputErrors = { ...manifest.outputErrors, html: err instanceof Error ? err.message : String(err) };
         captureError(err, { phase: 'claw_html_conversion', sessionId });
       }
+    }
+
+    // If a requested format failed, mark the delivery partial so callers
+    // can distinguish "you got everything" from "we shipped the markdown
+    // but DOCX is missing." Markdown remains the source of truth.
+    if (manifest.status === 'completed' && manifest.outputErrors) {
+      manifest.status = 'partial';
     }
 
     // Findings JSON
@@ -249,7 +253,11 @@ export class ClawDelivery {
         agentsUsed: ['local-analyst'],
       },
       analysis: {
-        findingsCount: result.clauses.length + result.risks.length,
+        // findingsCount stays the sum of the severity buckets so the home
+        // overview ("N findings") and the delivery card's C/M/m breakdown
+        // can never disagree. Previously this was clauses.length + risks.length,
+        // which silently drifted from the bucketed counts on any edge case.
+        findingsCount: findings.critical + findings.major + findings.minor,
         criticalCount: findings.critical,
         majorCount: findings.major,
         minorCount: findings.minor,
@@ -310,10 +318,13 @@ export class ClawDelivery {
         const docxBuffer = await convertToDocx(markdown, title, clawConfig.style);
         fs.writeFileSync(path.join(deliveryDir, 'deliverable.docx'), docxBuffer);
         manifest.outputs.docx = 'deliverable.docx';
-        writeJsonFileAtomic(path.join(deliveryDir, 'manifest.json'), manifest);
       } catch (err) {
         logger.warn('DOCX conversion failed', { error: err });
+        manifest.outputErrors = { ...manifest.outputErrors, docx: err instanceof Error ? err.message : String(err) };
+        manifest.status = 'partial';
+        captureError(err, { phase: 'claw_local_docx_conversion', sessionId });
       }
+      writeJsonFileAtomic(path.join(deliveryDir, 'manifest.json'), manifest);
     }
 
     return deliveryDir;
@@ -421,7 +432,8 @@ export class ClawDelivery {
         agentsUsed: ['local-analyst', 'frontier-review'],
       },
       analysis: {
-        findingsCount: result.findings.length,
+        // Sum the severity buckets so home overview and delivery card agree.
+        findingsCount: critical + major + minor,
         criticalCount: critical,
         majorCount: major,
         minorCount: minor,
@@ -499,7 +511,8 @@ export class ClawDelivery {
     const resolutions = session.debate?.resolutions?.length ?? 0;
 
     return {
-      findingsCount: findings.length,
+      // Sum the severity buckets so home overview and delivery card agree.
+      findingsCount: counts.critical + counts.major + counts.minor,
       criticalCount: counts.critical,
       majorCount: counts.major,
       minorCount: counts.minor,

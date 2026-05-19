@@ -35,7 +35,7 @@ export const BriefingAnalyzeResponseSchema = z.object({
     id: z.string(),
     text: z.string(),
     hint: z.string(),
-    category: z.enum(['context', 'scope', 'constraints', 'objectives']),
+    category: z.enum(['context', 'scope', 'constraints', 'objectives']).catch('context'),
     required: z.boolean(),
   })),
   engagementBrief: z.object({

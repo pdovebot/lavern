@@ -8,7 +8,7 @@
  * - parsedDocuments[] holds structured ParsedDocument results for session creation
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 export interface UploadedDocument {
   id: string;
@@ -55,6 +55,29 @@ export function useDocumentUpload() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Hydrate any document the user dropped during intake's "Drop & Go" step.
+  // Intake doesn't carry raw File handles forward (sessionStorage can't hold them),
+  // so pdf.js preview won't render — but the doc will appear in the briefing list.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('shem-intake-docs');
+      if (!raw) return;
+      sessionStorage.removeItem('shem-intake-docs');
+      const payload = JSON.parse(raw) as {
+        uploaded?: UploadedDocument[];
+        parsed?: FrontendParsedDocument[];
+      };
+      if (payload.uploaded?.length) {
+        setDocuments(prev => [...prev, ...payload.uploaded!]);
+      }
+      if (payload.parsed?.length) {
+        setParsedDocuments(prev => [...prev, ...payload.parsed!]);
+      }
+    } catch (e) {
+      console.warn('[useDocumentUpload] failed to hydrate intake docs:', e);
+    }
+  }, []);
 
   /**
    * Send a file to the backend for authoritative parsing.

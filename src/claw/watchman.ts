@@ -107,29 +107,40 @@ async function callOllamaWatchman(
   systemPrompt: string,
   userMessage: string,
 ): Promise<string> {
-  const response = await fetch(`${cfg.baseUrl}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: cfg.modelName,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
-      temperature: 0.1,
-      max_tokens: 400,
-      // Force structured JSON. Ollama's OpenAI-compat layer accepts this.
-      response_format: { type: 'json_object' },
-    }),
-    signal: AbortSignal.timeout(cfg.timeoutMs),
-  });
-  if (!response.ok) {
-    const txt = await response.text().catch(() => '');
-    throw new Error(`Watchman local model returned ${response.status}: ${txt.slice(0, 200)}`);
-  }
-  const data = await response.json() as { choices?: Array<{ message: { content: string } }> };
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) throw new Error('Watchman local model returned empty response');
+  // Retry once on empty response. Small models (gemma:e4b et al.) occasionally
+  // return content="" on back-to-back calls, especially when paired with the
+  // response_format=json_object constraint. We don't send that constraint —
+  // safeJsonParse handles raw, fenced, and partial JSON downstream — but the
+  // intermittent empty-content failure mode still happens, so one cheap retry
+  // makes the watchman robust without a meaningful latency hit.
+  const attempt = async (): Promise<string> => {
+    const response = await fetch(`${cfg.baseUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: cfg.modelName,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage },
+        ],
+        temperature: 0.1,
+        // Generous token ceiling — local is free; a 400-token cap risked
+        // mid-JSON truncation on longer rationales.
+        max_tokens: 600,
+      }),
+      signal: AbortSignal.timeout(cfg.timeoutMs),
+    });
+    if (!response.ok) {
+      const txt = await response.text().catch(() => '');
+      throw new Error(`Watchman local model returned ${response.status}: ${txt.slice(0, 200)}`);
+    }
+    const data = await response.json() as { choices?: Array<{ message: { content: string } }> };
+    return data.choices?.[0]?.message?.content ?? '';
+  };
+
+  let content = await attempt();
+  if (!content.trim()) content = await attempt();
+  if (!content.trim()) throw new Error('Watchman local model returned empty response (after 1 retry)');
   return content;
 }
 

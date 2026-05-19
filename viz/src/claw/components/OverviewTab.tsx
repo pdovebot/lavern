@@ -206,7 +206,10 @@ export function OverviewTab({ status, documents, deliveries, demoMode, activityL
       {/* Stats grid */}
       <div className="claw-stats-grid">
         <StatCard label="Documents" value={status.documents.total} />
-        <StatCard label="Reviewed" value={status.documents.reviewed} color={CLAW.success} />
+        {/* "Processed" sums reviewed (clean) + flagged (critical findings). The earlier
+            "Reviewed" label hid flagged work — a doc that ran end-to-end and got 4 critical
+            findings would still show 0 reviewed, which reads as "nothing got reviewed at all". */}
+        <StatCard label="Processed" value={status.documents.reviewed + status.documents.flagged} color={CLAW.text} />
         <StatCard label="Flagged" value={status.documents.flagged} color={CLAW.danger} />
         <StatCard label="Pending" value={status.documents.pending} color="#B8860B" />
         <StatCard label="Errors" value={status.documents.errors} color={status.documents.errors > 0 ? CLAW.danger : CLAW.textMuted} />
