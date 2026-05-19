@@ -131,14 +131,18 @@ export function planWork(
       continue;
     }
 
-    // Cost estimation: local = $0, hybrid = ~30% of frontier, frontier = full
+    // Cost estimation: local = $0, hybrid = ~30% of frontier, frontier = full.
+    // `processing: local` routes every doc through Ollama (processor.ts routeLocally),
+    // so the planner must treat it as free — otherwise non-sensitivity-matched docs
+    // hit the frontier cost gate and get silently skipped before reaching the processor.
     const processingMode = config.profile.processing ?? 'local';
-    const estimated = isConfidential
+    const runsFree = processingMode === 'local' || isConfidential;
+    const estimated = runsFree
       ? (processingMode === 'hybrid' ? estimateCost(doc, config.intensity) * 0.3 : 0)
       : estimateCost(doc, config.intensity);
 
-    // Budget gate — per-document (skip for confidential/free)
-    if (!isConfidential && estimated > config.perDocBudget) {
+    // Budget gate — per-document (skip for free work)
+    if (!runsFree && estimated > config.perDocBudget) {
       skipped.push({
         path: doc.path,
         reason: `Estimated cost $${estimated.toFixed(2)} exceeds per-doc budget $${config.perDocBudget.toFixed(2)}`,
@@ -146,8 +150,8 @@ export function planWork(
       continue;
     }
 
-    // Budget gate — total (skip for confidential/free)
-    if (!isConfidential && estimatedTotal + estimated > registry.budgetRemaining) {
+    // Budget gate — total (skip for free work)
+    if (!runsFree && estimatedTotal + estimated > registry.budgetRemaining) {
       skipped.push({
         path: doc.path,
         reason: `Would exceed remaining budget ($${registry.budgetRemaining.toFixed(2)} left)`,
@@ -230,8 +234,10 @@ export function planSingleJob(
     return null;
   }
 
-  // Confidential documents are free (local); regular need budget checks
-  if (!isConfidential) {
+  // Free work (confidential, or processing=local) skips budget checks.
+  const processingMode = config.profile.processing ?? 'local';
+  const runsFree = processingMode === 'local' || isConfidential;
+  if (!runsFree) {
     const estimated = estimateCost(doc, config.intensity);
     if (estimated > config.perDocBudget) return null;
     if (!registry.canAfford(estimated)) return null;
@@ -281,16 +287,17 @@ export function forecastWork(
       continue;
     }
 
-    const estimated = isConfidential
+    const runsFree = processingMode === 'local' || isConfidential;
+    const estimated = runsFree
       ? (processingMode === 'hybrid' ? estimateCost(doc, intensity) * 0.3 : 0)
       : estimateCost(doc, intensity);
 
-    if (!isConfidential && estimated > perDocBudget) {
+    if (!runsFree && estimated > perDocBudget) {
       skippedCount++;
       continue;
     }
 
-    if (!isConfidential && estimatedTotal + estimated > registry.budgetRemaining) {
+    if (!runsFree && estimatedTotal + estimated > registry.budgetRemaining) {
       skippedCount++;
       continue;
     }
