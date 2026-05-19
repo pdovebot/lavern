@@ -10,7 +10,7 @@ Built by a law firm founder over six months because the prevailing "AI as a juni
 
 > **Disclaimer.** Lavern is **not a law firm** and does **not provide legal advice**. The "agentic law firm" framing in some of the docs is an analogy for the software's architecture — it's not a claim about what Lavern is. **You use it at your own risk.** Have qualified counsel verify anything that matters before relying on it.
 
-> **What is and isn't stress-tested.** The architecture is real and the code is open. The pipeline runs, the agents debate, the verification loops fire, the precedent board persists, the tests pass. What hasn't been independently validated is the *quality bar* — whether all this machinery produces materially better outputs than a well-prompted single LLM on a representative sample of real legal work. We have internal evaluation; we don't have a public benchmark. Treat the engineering as the contribution and the legal-quality claims as a hypothesis.
+> **What is and isn't stress-tested.** The architecture is real and the code is open. The pipeline runs, the agents debate, the verification loops fire, the precedent board persists, the tests pass. What hasn't been independently validated is the *quality bar*: whether all this machinery produces materially better outputs than a well-prompted single LLM on a representative sample of real legal work. We have internal evaluation; we don't have a public benchmark. Treat the engineering as the contribution and the legal-quality claims as a hypothesis.
 
 ## Install
 
