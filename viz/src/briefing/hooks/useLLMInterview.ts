@@ -128,8 +128,11 @@ export function useLLMInterview(
   const isStreamingRef = useRef(false);
   const mountedRef = useRef(true);
 
-  // Abort in-flight requests on unmount to prevent setState on unmounted component
+  // Abort in-flight requests on unmount to prevent setState on unmounted component.
+  // Reset on mount so StrictMode's mount→unmount→mount cycle doesn't leave the
+  // ref stuck at false (which would silently swallow setInterviewResult).
   useEffect(() => {
+    mountedRef.current = true;
     return () => { mountedRef.current = false; abortRef.current?.abort(); };
   }, []);
 

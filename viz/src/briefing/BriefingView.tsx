@@ -192,11 +192,26 @@ export default function BriefingView({ onComplete, onBack, onSkip }: Props) {
   }, [phase, useLLMMode]);
 
   // Context completeness scoring
-  const { breakdown, milestones, newMilestone } = useContextScore(
+  const {
+    breakdown: staticBreakdown,
+    milestones: staticMilestones,
+    newMilestone,
+  } = useContextScore(
     upload.documents,
     qna.questions,
     qna.answers,
   );
+
+  // In conversational LLM mode the user's answers live in interview.messages,
+  // not qna.answers, so the static breakdown is always 0. Once the LLM has
+  // returned a sufficiency score, use it as the meter's total instead.
+  const llmScore = showConversationalChat ? analysis.sufficiency?.score ?? null : null;
+  const breakdown = llmScore != null
+    ? { ...staticBreakdown, total: llmScore }
+    : staticBreakdown;
+  const milestones = llmScore != null
+    ? staticMilestones.map(m => ({ ...m, reached: llmScore >= m.threshold }))
+    : staticMilestones;
 
   // Smart suggestion chips
   const suggestions = useSmartSuggestions(
