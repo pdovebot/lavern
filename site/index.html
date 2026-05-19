@@ -1013,10 +1013,10 @@
       font-size:clamp(44px,5.6vw,92px);
       font-weight:400;line-height:1.05;letter-spacing:-0.01em;
       color:var(--text);margin:0 auto 44px;max-width:980px;
-      /* Balance the wrap so "Legal System." doesn't get stranded on its
-         own line when the headline wraps. The browser picks the most
-         even line lengths. */
-      text-wrap:balance;
+      /* No text-wrap:balance at the desktop tier — at tablet widths
+         (768-1024px) Chrome and Safari over-apply balance and break
+         the headline into one word per line. The mobile media query
+         below re-enables balance only where it's needed. */
     }
     /* Global: emphasis comes from weight + colour, not slant. */
     em, i{font-style:normal}
@@ -1136,11 +1136,14 @@
            System." / "Yours." — and we let text-wrap:balance pick the
            best break so no word gets stranded. Font is tuned so each
            of those three lines reads big and confident on a 375px
-           viewport without spilling. */
+           viewport without spilling. Balance is mobile-only here; the
+           desktop rule above doesn't use it because at tablet widths
+           the browsers over-balance and break each phrase to its own line. */
         font-size:clamp(34px,9.4vw,46px);
         letter-spacing:-0.022em;
         line-height:1.05;
         margin-bottom:28px;
+        text-wrap:balance;
       }
       .hero-deck{margin-bottom:28px}
     }
