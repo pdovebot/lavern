@@ -253,7 +253,11 @@ export class ClawDelivery {
         agentsUsed: ['local-analyst'],
       },
       analysis: {
-        findingsCount: result.clauses.length + result.risks.length,
+        // findingsCount stays the sum of the severity buckets so the home
+        // overview ("N findings") and the delivery card's C/M/m breakdown
+        // can never disagree. Previously this was clauses.length + risks.length,
+        // which silently drifted from the bucketed counts on any edge case.
+        findingsCount: findings.critical + findings.major + findings.minor,
         criticalCount: findings.critical,
         majorCount: findings.major,
         minorCount: findings.minor,
@@ -428,7 +432,8 @@ export class ClawDelivery {
         agentsUsed: ['local-analyst', 'frontier-review'],
       },
       analysis: {
-        findingsCount: result.findings.length,
+        // Sum the severity buckets so home overview and delivery card agree.
+        findingsCount: critical + major + minor,
         criticalCount: critical,
         majorCount: major,
         minorCount: minor,
@@ -506,7 +511,8 @@ export class ClawDelivery {
     const resolutions = session.debate?.resolutions?.length ?? 0;
 
     return {
-      findingsCount: findings.length,
+      // Sum the severity buckets so home overview and delivery card agree.
+      findingsCount: counts.critical + counts.major + counts.minor,
       criticalCount: counts.critical,
       majorCount: counts.major,
       minorCount: counts.minor,

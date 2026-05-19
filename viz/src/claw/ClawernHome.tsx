@@ -272,8 +272,10 @@ export function ClawernHome({
               <div style={styles.statusCard}>
                 <div style={styles.statusLabel}>Today</div>
                 <div style={styles.bigNum}>
-                  {status.documents.reviewed}
-                  <span style={styles.bigNumUnit}>reviewed</span>
+                  {/* "Processed" = reviewed (clean) + flagged (critical). Showing just
+                      reviewed hid all flagged work and read as "nothing got reviewed". */}
+                  {status.documents.reviewed + status.documents.flagged}
+                  <span style={styles.bigNumUnit}>processed</span>
                 </div>
                 <div style={styles.docPills}>
                   {status.documents.flagged > 0 && (

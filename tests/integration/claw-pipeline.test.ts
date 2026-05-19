@@ -51,6 +51,9 @@ function createMockProfile(): ClawProfile {
     createdAt: new Date().toISOString(),
     // Empty array = no sensitivity patterns (avoids default patterns flagging test files)
     sensitivityPatterns: [],
+    // Frontier mode so the planner exercises its budget gates. Local mode
+    // (the default) treats all work as free and bypasses the gates by design.
+    processing: 'frontier',
   };
 }
 

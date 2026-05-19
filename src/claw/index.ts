@@ -68,9 +68,43 @@ export interface ClawCliArgs {
   ethical?: boolean;
 }
 
+const KNOWN_COMMANDS = ['init', 'start', 'status', 'daemon', 'retry', 'validate', 'pause', 'resume'] as const;
+const KNOWN_DAEMON_SUBS = ['install', 'uninstall', 'status', 'logs'] as const;
+// Flags that consume the next positional as their value — so we don't
+// mistake "--dir flerb" for an unknown subcommand "flerb".
+const VALUE_FLAGS = new Set(['--hash', '--dir', '--budget', '--per-doc-budget', '--intensity', '--watch']);
+
+export class UnknownCommandError extends Error {
+  constructor(public readonly attempted: string) {
+    super(`Unknown command: ${attempted}`);
+    this.name = 'UnknownCommandError';
+  }
+}
+
 export function parseClawArgs(args: string[]): ClawCliArgs {
-  // Find the subcommand (init, start, status, daemon)
-  const command = args.find(a => ['init', 'start', 'status', 'daemon', 'retry', 'validate', 'pause', 'resume'].includes(a)) ?? 'start';
+  // Walk positional tokens (skipping flag values) to find the first one.
+  // If it's a known command, use it. If it's a non-flag token that isn't
+  // a known command, surface the typo instead of silently running `start`
+  // — the old `args.find(...) ?? 'start'` made `lavern claw flerb`
+  // launch the watcher, which is a real footgun in cloud mode.
+  const positionals: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a.startsWith('--')) {
+      if (VALUE_FLAGS.has(a)) i++; // skip the value
+      continue;
+    }
+    positionals.push(a);
+  }
+
+  let command: ClawCliArgs['command'];
+  if (positionals.length === 0) {
+    command = 'start';
+  } else if ((KNOWN_COMMANDS as readonly string[]).includes(positionals[0])) {
+    command = positionals[0] as ClawCliArgs['command'];
+  } else {
+    throw new UnknownCommandError(positionals[0]);
+  }
 
   const getFlag = (flag: string): boolean => args.includes(flag);
   const getValue = (flag: string): string | undefined => {
@@ -78,11 +112,16 @@ export function parseClawArgs(args: string[]): ClawCliArgs {
     return idx >= 0 && idx + 1 < args.length ? args[idx + 1] : undefined;
   };
 
-  // For daemon command, capture subcommand (install, uninstall, status, logs)
-  const daemonIdx = args.indexOf('daemon');
-  const daemonSubcommand = daemonIdx >= 0 && daemonIdx + 1 < args.length
-    ? args[daemonIdx + 1]
-    : undefined;
+  // For daemon command, the second positional is the subcommand.
+  let daemonSubcommand: string | undefined;
+  if (command === 'daemon' && positionals.length > 1) {
+    const sub = positionals[1];
+    if ((KNOWN_DAEMON_SUBS as readonly string[]).includes(sub)) {
+      daemonSubcommand = sub;
+    } else {
+      throw new UnknownCommandError(`daemon ${sub}`);
+    }
+  }
 
   return {
     command: command as ClawCliArgs['command'],
@@ -717,7 +756,25 @@ function runRetry(args: ClawCliArgs): void {
 // ── Entry Point ──────────────────────────────────────────────────────────
 
 export async function runClaw(args: string[]): Promise<void> {
-  const parsed = parseClawArgs(args);
+  let parsed: ClawCliArgs;
+  try {
+    parsed = parseClawArgs(args);
+  } catch (err) {
+    if (err instanceof UnknownCommandError) {
+      console.error(`\nUnknown command: \`${err.attempted}\`\n`);
+      console.error('Available:');
+      console.error('  lavern claw init               — create a client profile');
+      console.error('  lavern claw start              — start the firm (watch + process)');
+      console.error('  lavern claw status             — show current state');
+      console.error('  lavern claw validate           — preflight configuration check');
+      console.error('  lavern claw pause | resume     — toggle processing');
+      console.error('  lavern claw retry --hash <h>   — re-process a failed document');
+      console.error('  lavern claw daemon install|uninstall|status|logs');
+      console.error('');
+      process.exit(2);
+    }
+    throw err;
+  }
 
   switch (parsed.command) {
     case 'init':
@@ -736,7 +793,7 @@ export async function runClaw(args: string[]): Promise<void> {
       await runDaemon(parsed.daemonSubcommand ? [parsed.daemonSubcommand] : []);
       break;
     case 'validate':
-      runValidate(parsed);
+      await runValidate(parsed);
       break;
     case 'pause':
       runPauseResume(parsed, true);
@@ -749,7 +806,7 @@ export async function runClaw(args: string[]): Promise<void> {
 
 // ── Validate ────────────────────────────────────────────────────────────
 
-function runValidate(args: ClawCliArgs): void {
+async function runValidate(args: ClawCliArgs): Promise<void> {
   const dir = args.dir ?? config.claw.dir;
   const checks: Array<{ label: string; ok: boolean; detail: string }> = [];
 
@@ -757,9 +814,37 @@ function runValidate(args: ClawCliArgs): void {
   const profile = loadProfile(dir);
   checks.push({ label: 'Profile exists', ok: !!profile, detail: profile ? dir + '/profile.json' : 'Run `lavern claw init` to create' });
 
-  // API key
-  const apiKey = config.anthropic.apiKey;
-  checks.push({ label: 'API key configured', ok: apiKey.length > 0, detail: apiKey.length > 0 ? `${apiKey.slice(0, 8)}...` : 'Set ANTHROPIC_API_KEY' });
+  // Provider readiness — mirror runStart's branch so a working local-only
+  // install doesn't fail validation just because ANTHROPIC_API_KEY is absent.
+  const profileProcessing = profile?.processing ?? 'local';
+  if (profileProcessing === 'local') {
+    const localUrl = (config.claw.localModelUrl || config.local.baseUrl).replace(/\/$/, '');
+    const localModel = config.claw.localModel || config.local.defaultModel;
+    let ok = false; let detail = '';
+    try {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(`${localUrl}/api/tags`, { signal: controller.signal });
+      clearTimeout(t);
+      if (res.ok) {
+        const data = await res.json() as { models?: Array<{ name?: string }> };
+        const names = (data.models ?? []).map(m => m.name ?? '');
+        if (names.some(n => n === localModel || n.startsWith(`${localModel}:`))) {
+          ok = true; detail = `${localModel} ready at ${localUrl}`;
+        } else {
+          detail = `Ollama running but ${localModel} not pulled. Run: ollama pull ${localModel}`;
+        }
+      } else { detail = `Ollama responded HTTP ${res.status} at ${localUrl}`; }
+    } catch { detail = `Ollama unreachable at ${localUrl} — is the menu-bar app running?`; }
+    checks.push({ label: 'Ollama (local model)', ok, detail });
+  } else {
+    const apiKey = config.anthropic.apiKey;
+    checks.push({
+      label: 'API key configured',
+      ok: apiKey.length > 0,
+      detail: apiKey.length > 0 ? `${apiKey.slice(0, 8)}...` : 'Set ANTHROPIC_API_KEY',
+    });
+  }
 
   // Watch paths
   if (profile) {
@@ -770,10 +855,13 @@ function runValidate(args: ClawCliArgs): void {
     }
   }
 
-  // Local model
-  const localModel = config.claw.localModel;
+  // Local model — mirror runStart which falls back to config.local.defaultModel
+  // when LAVERN_LOCAL_MODEL is unset. Reporting only the env-var value hides
+  // the effective model from users on a working default-fallback install.
+  const localModel = config.claw.localModel || config.local.defaultModel;
   if (localModel) {
-    checks.push({ label: 'Local model configured', ok: true, detail: localModel });
+    const source = config.claw.localModel ? 'LAVERN_LOCAL_MODEL' : 'default';
+    checks.push({ label: 'Local model configured', ok: true, detail: `${localModel} (${source})` });
   } else if (profile?.ethicalMode) {
     checks.push({ label: 'Local model (required for ethical mode)', ok: false, detail: 'Set LAVERN_LOCAL_MODEL' });
   }

@@ -29,7 +29,7 @@ import { DocumentRegistry } from './registry.js';
 import { extractSessionFindings } from './types.js';
 import { notify } from './notify.js';
 import { config } from '../config.js';
-import { analyzeLocally, extractLocalFindings } from './local-analysis.js';
+import { analyzeLocally, extractLocalFindings, localResultToFindings } from './local-analysis.js';
 import { getPrecedentBoard } from './precedent-board.js';
 import { loadPreviousFindings, computeDiff, diffSummary, type FindingsDiff } from './diff.js';
 import { clawEventBus } from './events.js';
@@ -194,6 +194,24 @@ export async function processDocument(
 
           registry.markReviewed(documentHash, sessionId, hybridFindings, hybridResult.cost.totalUsd, true);
 
+          // Index local-derived findings into precedent board (frontier
+          // hybrid findings aren't typed as Finding[] so we cover the
+          // local half — the more reusable pattern source anyway).
+          if (hybridBoard) {
+            try {
+              const findings = localResultToFindings(hybridResult.localResult);
+              if (findings.length > 0) {
+                const docType = registry.getDocument(documentHash)?.type ?? hybridResult.localResult.documentType;
+                const indexed = hybridBoard.indexFindings(documentHash, docType, profile.jurisdiction, findings);
+                if (indexed > 0) {
+                  clawEventBus.emitEvent({ type: 'claw_precedent_indexed', precedentId: documentHash, patternName: docType, documentType: docType, timestamp: eventTimestamp() });
+                }
+              }
+            } catch (indexErr) {
+              logger.warn('Precedent indexing (hybrid) failed (non-fatal)', { sessionId, error: indexErr });
+            }
+          }
+
           const durationMs = Date.now() - startTime;
           log(`🔒🌐 Delivered (hybrid) → ${path.relative(clawConfig.dir, deliveryDir)}/`);
           log(`  $${hybridResult.cost.totalUsd.toFixed(2)} · ${(durationMs / 1000).toFixed(0)}s · ${hybridResult.frontierClauseCount}/${hybridResult.totalClauseCount} clauses sent to frontier`);
@@ -238,6 +256,23 @@ export async function processDocument(
         );
 
         registry.markReviewed(documentHash, sessionId, localFindings, 0, true); // $0 — local inference, confidential
+
+        // Index findings into the precedent board so institutional memory
+        // builds up for local-only users (parity with the frontier path).
+        if (localBoard) {
+          try {
+            const findings = localResultToFindings(localResult);
+            if (findings.length > 0) {
+              const docType = registry.getDocument(documentHash)?.type ?? localResult.documentType;
+              const indexed = localBoard.indexFindings(documentHash, docType, profile.jurisdiction, findings);
+              if (indexed > 0) {
+                clawEventBus.emitEvent({ type: 'claw_precedent_indexed', precedentId: documentHash, patternName: docType, documentType: docType, timestamp: eventTimestamp() });
+              }
+            }
+          } catch (indexErr) {
+            logger.warn('Precedent indexing (local) failed (non-fatal)', { sessionId, error: indexErr });
+          }
+        }
 
         const durationMs = Date.now() - startTime;
         log(`🔒 Delivered (local) → ${path.relative(clawConfig.dir, deliveryDir)}/`);

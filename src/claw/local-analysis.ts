@@ -1316,3 +1316,56 @@ export function extractLocalFindings(
 
   return { critical, major, minor };
 }
+
+/**
+ * Convert a LocalAnalysisResult into Finding[] for precedent indexing.
+ * The precedent board only indexes RED/YELLOW findings with confidence >= 0.7
+ * and non-empty evidence, so we map local severities accordingly and assign
+ * a default confidence of 0.8 (local model produced a structured output).
+ */
+export function localResultToFindings(result: LocalAnalysisResult): import('../types/debate.js').Finding[] {
+  const now = new Date().toISOString();
+  const findings: import('../types/debate.js').Finding[] = [];
+
+  for (let i = 0; i < result.clauses.length; i++) {
+    const c = result.clauses[i];
+    const severity: 'RED' | 'YELLOW' | 'GREEN' =
+      c.severity === 'critical' ? 'RED'
+      : c.severity === 'major' ? 'YELLOW'
+      : 'GREEN';
+    if (severity === 'GREEN' || !c.text) continue;
+    findings.push({
+      id: `local-clause-${i}`,
+      agentRole: 'reviewer' as import('../types/index.js').AgentRole,
+      findingType: 'contract-risk',
+      content: c.concern || c.title,
+      severity,
+      evidence: [c.text],
+      confidence: 0.8,
+      timestamp: now,
+      resolved: false,
+    });
+  }
+
+  for (let i = 0; i < result.risks.length; i++) {
+    const r = result.risks[i];
+    const severity: 'RED' | 'YELLOW' | 'GREEN' =
+      r.severity === 'critical' || r.severity === 'high' ? 'RED'
+      : r.severity === 'medium' ? 'YELLOW'
+      : 'GREEN';
+    if (severity === 'GREEN' || !r.citation) continue;
+    findings.push({
+      id: `local-risk-${i}`,
+      agentRole: 'reviewer' as import('../types/index.js').AgentRole,
+      findingType: 'contract-risk',
+      content: r.description,
+      severity,
+      evidence: [r.citation],
+      confidence: 0.8,
+      timestamp: now,
+      resolved: false,
+    });
+  }
+
+  return findings;
+}
