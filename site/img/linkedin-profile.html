@@ -4,12 +4,13 @@
   <meta charset="UTF-8" />
   <!--
     LinkedIn PERSONAL profile banner: 1584 x 396.
-    The profile picture (a ~152px circle on web, ~96px on mobile) is
-    pinned to the lower-left of the visible banner area, centred on
-    the bottom edge of the banner. The middle bottom strip is at
-    risk of being covered. Layout keeps the picture area clear:
-    headline goes on the LEFT, iMac on the RIGHT, both vertically
-    centred so they sit comfortably above the profile pic.
+    Layout pattern (after the "prompted" book banner reference):
+      · LEFT (x 0-280):     reserved — avatar overlay lives here
+      · CENTRE (x 320-900): the product, iMac, real soft shadow
+      · RIGHT  (x 940-1488): tagline + dark-pill CTA + wordmark stamp
+
+    The avatar provides the human anchor. The iMac provides the product
+    proof. The right column carries the message and the URL.
   -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,9 +27,9 @@
     .card::before{
       content:'';position:absolute;inset:0;
       background:
-        radial-gradient(ellipse 70% 80% at 50% 35%,
-          rgba(255,253,247,0.85) 0%,
-          rgba(252,250,242,0.4) 50%,
+        radial-gradient(ellipse 70% 80% at 55% 40%,
+          rgba(255,253,247,0.92) 0%,
+          rgba(252,250,242,0.5) 50%,
           rgba(250,250,250,0) 90%),
         linear-gradient(180deg, #FBF9F2 0%, #F4EFE3 100%);
       pointer-events:none;
@@ -39,10 +40,10 @@
       background-size:240px 240px;opacity:0.03;mix-blend-mode:multiply;pointer-events:none;
     }
 
-    /* Wordmark — small mono, top-centred */
+    /* Wordmark — top-right, small editorial brand stamp.
+       Mirrors the "RO" mark in the reference banner. */
     .wordmark{
-      position:absolute;top:34px;left:0;right:0;
-      text-align:center;
+      position:absolute;top:34px;right:80px;
       font-family:'Geist Mono',ui-monospace,monospace;
       font-size:16px;font-weight:500;
       letter-spacing:9px;
@@ -51,46 +52,45 @@
       z-index:5;
     }
 
-    /* Headline — left side, vertically centred, sits clear of the
-       profile-picture overlay zone (which is centre-bottom). */
-    .headline{
-      position:absolute;
-      top:50%;left:96px;right:760px;
-      transform:translateY(-50%);
-      font-family:'Newsreader',Georgia,serif;
-      color:#141310;
-      line-height:0.96;
-      letter-spacing:-0.022em;
-      z-index:5;
-    }
-    .headline .l1{display:block;font-size:74px;font-weight:400;margin-top:18px}
-    .headline .l2{display:block;font-size:96px;font-weight:600;margin-top:6px}
-
-    /* iMac — right half, vertically centred, real soft drop-shadow. */
+    /* iMac — slightly smaller so the text column has clear breathing
+       room between the product and the headline. */
     .imac{
+      position:absolute;
+      top:50%;left:340px;
+      transform:translateY(-50%);
+      width:440px;
+      filter:drop-shadow(0 26px 32px rgba(20,19,16,0.22)) drop-shadow(0 10px 16px rgba(20,19,16,0.10));
+      z-index:3;
+    }
+    .imac img{display:block;width:100%;height:auto;border-radius:14px}
+
+    /* Tagline — teaser version. Pulled right so there is a clear
+       ~100px gap between the iMac and the headline. */
+    .tagline{
       position:absolute;
       top:50%;right:96px;
       transform:translateY(-50%);
       width:580px;
-      margin-top:18px;
-      filter:drop-shadow(0 24px 30px rgba(20,19,16,0.20)) drop-shadow(0 8px 14px rgba(20,19,16,0.08));
-      z-index:3;
+      font-family:'Newsreader',Georgia,serif;
+      color:#141310;
+      line-height:0.98;
+      letter-spacing:-0.018em;
+      z-index:5;
     }
-    .imac img{display:block;width:100%;height:auto;border-radius:14px}
+    .tagline .l1{display:block;font-size:40px;font-weight:400;white-space:nowrap}
+    .tagline .l2{display:block;font-size:74px;font-weight:600;margin-top:8px;letter-spacing:-0.022em}
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="wordmark">L A V E R N</div>
-
-    <h1 class="headline">
-      <span class="l1">An Agentic Law Firm.</span>
-      <span class="l2">Free.</span>
-    </h1>
-
     <div class="imac">
       <img src="imac-hero.jpg" alt="" />
     </div>
+
+    <h1 class="tagline">
+      <span class="l1">A Multi-Agent Legal System.</span>
+      <span class="l2">Dropping soon.</span>
+    </h1>
   </div>
 </body>
 </html>

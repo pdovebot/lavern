@@ -47,29 +47,37 @@
       color:#141310;
       line-height:1;
       letter-spacing:-0.022em;
-      font-size:62px;
+      font-size:44px;
       font-weight:400;
       z-index:5;
     }
     .headline .punch{font-weight:600}
 
-    /* Tiny wordmark in the top-right corner — signs the banner without
-       competing with LinkedIn's own logo + name overlay on the left. */
+    /* Wordmark — top-right corner. LinkedIn already shows the company
+       logo overlay on the left so we sign the banner on the opposite
+       corner, with the URL stacked underneath. */
     .wordmark{
-      position:absolute;top:18px;right:28px;
+      position:absolute;top:20px;right:28px;
       font-family:'Geist Mono',ui-monospace,monospace;
-      font-size:12px;font-weight:500;
-      letter-spacing:6px;
-      color:rgba(20,19,16,0.50);
+      font-size:13px;font-weight:500;
+      letter-spacing:7px;
+      color:rgba(20,19,16,0.55);
       text-transform:uppercase;
+      z-index:5;
+    }
+    .url{
+      position:absolute;bottom:18px;right:28px;
+      font-family:'Geist Mono',ui-monospace,monospace;
+      font-size:13px;font-weight:500;letter-spacing:0.5px;
+      color:rgba(20,19,16,0.42);
       z-index:5;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="wordmark">L A V E R N</div>
-    <h1 class="headline">An Agentic Law Firm. <span class="punch">Free.</span></h1>
+    <div class="url">www.lavern.ai</div>
+    <h1 class="headline">A Multi-Agent Legal System. <span class="punch">Free.</span></h1>
   </div>
 </body>
 </html>

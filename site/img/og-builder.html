@@ -60,9 +60,11 @@
     /* Headline — centered, BIG, two lines.
        Upper half of the card. The eye reads the type first, then the
        product underneath confirms what it is. */
+    /* Headline — anchored to the top with generous breathing room so
+       the eye lands on the statement first, then drops to the iMac. */
     .headline{
       position:absolute;
-      top:78px;left:0;right:0;
+      top:48px;left:0;right:0;
       text-align:center;
       font-family:'Newsreader',Georgia,serif;
       color:#141310;
@@ -72,35 +74,36 @@
     }
     .headline .l1{
       display:block;
-      font-size:78px;
+      font-size:54px;
       font-weight:400;
     }
     .headline .l2{
       display:block;
-      font-size:96px;
+      font-size:88px;
       font-weight:600;
-      margin-top:10px;
+      margin-top:6px;
+      letter-spacing:-0.028em;
     }
 
-    /* iMac hero — visual proof. Anchored bottom-centre, sized so it
-       sits cleanly below the headline with breathing room on all sides.
-       Aspect ratio of the source is ~1.72 so width 430 gives height ~250. */
+    /* iMac hero — the product. Bigger now that the wordmark is gone:
+       the iMac is the entire visual story, sized like an Apple product
+       shot at ~48% of canvas width. Aspect ratio ~1.72, so width 580
+       gives height ~338. Real soft drop-shadow underneath. */
     .imac{
       position:absolute;
-      bottom:62px;
+      bottom:60px;
       left:50%;
       transform:translateX(-50%);
-      width:430px;
-      filter:drop-shadow(0 22px 30px rgba(20,19,16,0.18)) drop-shadow(0 8px 14px rgba(20,19,16,0.08));
+      width:560px;
+      filter:drop-shadow(0 28px 36px rgba(20,19,16,0.22)) drop-shadow(0 10px 16px rgba(20,19,16,0.08));
       z-index:3;
     }
     .imac img{
       display:block;width:100%;height:auto;
-      border-radius:12px;
+      border-radius:14px;
     }
 
-    /* Footer — domain. Lowercase, mono, tight letter-spacing so it
-       reads as a URL not a wordmark variant. */
+    /* Domain — lowercase mono, sits comfortably below the iMac. */
     .domain{
       position:absolute;bottom:24px;left:0;right:0;
       text-align:center;
@@ -113,10 +116,8 @@
 </head>
 <body>
   <div class="card">
-    <div class="wordmark">L A V E R N</div>
-
     <h1 class="headline">
-      <span class="l1">An Agentic Law Firm.</span>
+      <span class="l1">A Multi-Agent Legal System.</span>
       <span class="l2">Free.</span>
     </h1>
 

@@ -3,33 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lavern — an agentic law firm. Yours.</title>
+  <title>Lavern — a multi-agent legal system. Yours.</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="canonical" href="https://lavern.ai/">
-  <meta name="description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate, institutional memory. Runs locally on a Mac Mini or against frontier models. Helsinki. Apache 2.0.">
-  <meta name="keywords" content="agentic law firm, legal AI, multi-agent legal system, contract review AI, open source legal tech, Lavern, Clawern, Apache 2.0">
+  <meta name="description" content="An open-source multi-agent legal system. 67 specialist agents, evidence-backed debate, institutional memory. Runs locally or against frontier models. Helsinki. Apache 2.0. Use at your own risk; not legal advice.">
+  <meta name="keywords" content="multi-agent legal system, legal AI, agentic AI, contract review AI, open source legal tech, Lavern, Clawern, Apache 2.0">
   <meta name="author" content="Lavern">
   <meta name="theme-color" content="#FAFAFA">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Lavern — an agentic law firm. Yours.">
-  <meta property="og:description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate, institutional memory. Apache 2.0.">
+  <meta property="og:title" content="Lavern — a multi-agent legal system. Yours.">
+  <meta property="og:description" content="An open-source multi-agent legal system. 67 specialist agents, evidence-backed debate, institutional memory. Apache 2.0. Use at your own risk; not legal advice.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://lavern.ai/">
   <meta property="og:site_name" content="Lavern">
   <meta property="og:locale" content="en_US">
-  <meta property="og:image" content="/img/og.png?v=2">
+  <meta property="og:image" content="/img/og.png?v=3">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Lavern. An Agentic Law Firm. Free. Open source, Apache 2.0.">
+  <meta property="og:image:alt" content="Lavern. A multi-agent legal system. Free. Open source, Apache 2.0.">
 
   <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Lavern — an agentic law firm. Yours.">
-  <meta name="twitter:description" content="An open-source agentic law firm. 67 specialist agents, evidence-backed debate. Apache 2.0.">
-  <meta name="twitter:image" content="/img/og.png?v=2">
-  <meta name="twitter:image:alt" content="Lavern. An Agentic Law Firm. Free. Open source, Apache 2.0.">
+  <meta name="twitter:title" content="Lavern — a multi-agent legal system. Yours.">
+  <meta name="twitter:description" content="An open-source multi-agent legal system. 67 specialist agents, evidence-backed debate. Apache 2.0. Use at your own risk; not legal advice.">
+  <meta name="twitter:image" content="/img/og.png?v=3">
+  <meta name="twitter:image:alt" content="Lavern. A multi-agent legal system. Free. Open source, Apache 2.0.">
 
   <!-- Structured data — helps Google understand what Lavern is. -->
   <script type="application/ld+json">
@@ -42,7 +42,7 @@
         "name": "Lavern",
         "url": "https://lavern.ai/",
         "logo": "https://lavern.ai/favicon.svg",
-        "description": "An open-source agentic law firm. Multi-agent legal system with 67 specialist agents.",
+        "description": "An open-source multi-agent legal system with 67 specialist agents. Use at your own risk; not legal advice.",
         "sameAs": [
           "https://github.com/AnttiHero/lavern"
         ],
@@ -1012,7 +1012,11 @@
       font-family:var(--serif);
       font-size:clamp(44px,5.6vw,92px);
       font-weight:400;line-height:1.05;letter-spacing:-0.01em;
-      color:var(--text);margin:0 auto 44px;max-width:980px
+      color:var(--text);margin:0 auto 44px;max-width:980px;
+      /* Balance the wrap so "Legal System." doesn't get stranded on its
+         own line when the headline wraps. The browser picks the most
+         even line lengths. */
+      text-wrap:balance;
     }
     /* Global: emphasis comes from weight + colour, not slant. */
     em, i{font-style:normal}
@@ -1025,6 +1029,15 @@
       max-width:580px;line-height:1.5;margin:0 auto 32px
     }
     .hero-deck strong{color:var(--text);font-weight:600}
+    /* Small mono disclaimer line right under the hero deck — keeps the
+       "this is not actually a law firm, and you use it at your own
+       risk" message visible from the first paint. */
+    .hero-disclaimer{
+      display:inline-block;margin-top:14px;
+      font-family:var(--mono);font-size:clamp(10px,1.05vw,12px);
+      letter-spacing:1.6px;text-transform:uppercase;
+      color:var(--dim);font-weight:500;
+    }
 
     /* Hero CTAs */
     .cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center}
@@ -1118,14 +1131,16 @@
       /* Hero — slight breathing-room tweaks */
       .hero{padding:96px 22px 56px}
       .hero h1{
-        /* Smaller min-size + slightly tighter spacing so the desktop
-           composition ("An agentic law firm." / "Yours.") survives on
-           narrow viewports as two lines instead of wrapping to three.
-           At 375px viewport this resolves to ~32-34px. */
-        font-size:clamp(30px,8.4vw,42px);
-        letter-spacing:-0.02em;
-        line-height:1.08;
-        margin-bottom:32px;
+        /* On mobile the headline "A Multi-Agent Legal System. / Yours."
+           wraps to three lines naturally — "A Multi-Agent" / "Legal
+           System." / "Yours." — and we let text-wrap:balance pick the
+           best break so no word gets stranded. Font is tuned so each
+           of those three lines reads big and confident on a 375px
+           viewport without spilling. */
+        font-size:clamp(34px,9.4vw,46px);
+        letter-spacing:-0.022em;
+        line-height:1.05;
+        margin-bottom:28px;
       }
       .hero-deck{margin-bottom:28px}
     }
@@ -1238,6 +1253,20 @@
         transform:none !important
       }
       .feature:hover{transform:none !important}
+      /* Force the inner mockup content visible in carousel mode. The
+         desktop "build on scroll" animation is driven by an
+         IntersectionObserver watching vertical scroll, which never
+         fires when the cards are in a horizontal scroll-snap carousel,
+         so on mobile they would stay at opacity:0 forever. */
+      .feature .feature-body > *,
+      .feature .feature-body > .m-bubble.you,
+      .feature .feature-body > .m-bubble.them,
+      .feature .m-avatar,
+      .feature .m-avatar-img{
+        opacity:1 !important;
+        transform:none !important;
+        animation:none !important;
+      }
     }
 
     /* ─── Hide the Stack section entirely on mobile. The 3D perspective
@@ -1272,41 +1301,43 @@
       .feature-mockup .m-card .m-tag{font-size:8px;padding:1px 5px;letter-spacing:.3px}
       .feature-mockup .m-card .m-row > span[style]:last-child{font-size:10.5px !important;line-height:1.3 !important}
       .feature-mockup .m-quote{font-size:10px;line-height:1.4}
-      .feature-mockup .feature-body{padding:30px 16px}
+      .feature-mockup .feature-body{padding:18px 14px}
+      /* Delivery and Briefing cards push the body padding even tighter
+         because their content has the most lines. */
+      .feature-mockup:has(.m-doc-large) .feature-body,
+      .briefing-card .feature-body{padding:12px 14px !important}
 
-      /* ─── Delivery card (#07) doc — shrink so all three findings +
-         header + title + footer fit cleanly in the 173px mockup body.
-         Otherwise the bottom cuts mid-sentence ("…tolling provision
-         missing;") which reads as a layout bug, not a designed crop. ─── */
-      .feature-mockup .m-doc-large{padding:10px 12px 9px;gap:5px}
-      .feature-mockup .m-doc-large-title{font-size:13px;padding-bottom:3px}
-      .feature-mockup .m-doc-large-tag{font-size:7.5px;padding:2px 6px}
-      .feature-mockup .m-doc-large-meta{font-size:7.5px}
-      .feature-mockup .m-doc-large-body{font-size:10px;line-height:1.45}
-      .feature-mockup .m-doc-large-body p{margin-bottom:5px}
-      .feature-mockup .m-doc-large-body ul{gap:3px}
-      .feature-mockup .m-doc-large-body li{font-size:9.5px;padding-left:10px}
-      .feature-mockup .m-doc-large-body li::before{top:5px;width:3px;height:3px}
-      .feature-mockup .m-doc-large-footer{font-size:7.5px;padding-top:4px}
+      /* ─── Delivery card (#07) doc — has to fit a header + title +
+         intro paragraph + 3-item bullet list + footer inside a ~173px
+         mockup body. Every line is dialled tight; the content reads
+         like a memo, just at a smaller scale. ─── */
+      .feature-mockup .m-doc-large{padding:7px 10px 6px;gap:3px;border-radius:8px}
+      .feature-mockup .m-doc-large-title{font-size:11.5px;padding-bottom:2px;line-height:1.15}
+      .feature-mockup .m-doc-large-tag{font-size:7px;padding:1.5px 5px;letter-spacing:1px}
+      .feature-mockup .m-doc-large-meta{font-size:7px;letter-spacing:0.8px}
+      .feature-mockup .m-doc-large-body{font-size:9px;line-height:1.32}
+      .feature-mockup .m-doc-large-body p{margin-bottom:3px}
+      .feature-mockup .m-doc-large-body ul{gap:1.5px}
+      .feature-mockup .m-doc-large-body li{font-size:8.5px;padding-left:8px;line-height:1.3}
+      .feature-mockup .m-doc-large-body li::before{top:4px;width:3px;height:3px}
+      .feature-mockup .m-doc-large-footer{font-size:6.5px;padding-top:3px;letter-spacing:0.8px}
+      .feature-mockup .m-doc-stamp{width:6px;height:6px}
 
-      /* ─── Briefing card (#08) bubbles — bump the available width
-         and shrink the font so the longest reply
-         ("What's your risk appetite. Strict or pragmatic?") wraps
-         to a tidy 2-line bubble that sits comfortably inside the
-         265px-wide mockup body, with the avatar to the left and a
-         visible right margin. Without this the line breaks awkwardly
-         (Safari sometimes splits 'appetite' across the right edge,
-         which reads as a clipping bug). ─── */
-      .feature-mockup .m-bubble{
-        font-size:11px;
-        line-height:1.4;
-        padding:7px 11px;
+      /* ─── Briefing card (#08) bubbles — fit 4 bubbles inside a 173px
+         mockup body by shrinking type, tightening padding, hiding the
+         typing-dots flourish. The `.briefing-card` class lives on the
+         <article>, so it's the ancestor of `.feature-mockup`, not its
+         child — that's why these selectors lead with `.briefing-card`. */
+      .briefing-card .feature-body{gap:4px !important}
+      .briefing-card .m-row{gap:5px !important}
+      .briefing-card .m-bubble{
+        font-size:10px;
+        line-height:1.3;
+        padding:4px 8px;
         max-width:92%;
+        border-radius:10px;
       }
-      /* Pin the briefing m-typing indicator so it doesn't run off
-         the mockup bottom — keeps the "agent is composing" affordance
-         visible at the natural reading rhythm. */
-      .feature-mockup .m-typing{padding:7px 11px}
+      .briefing-card .m-typing{display:none}
     }
     /* ↑ Close of @media(max-width:480px). Without this `}`, every
        rule that follows — .feature, .feature-mockup, .mac-chrome,
@@ -2305,7 +2336,7 @@
     <div class="hero-mist" aria-hidden="true"><span></span><span></span><span></span></div>
     <h1 class="word-reveal" id="heroHeadline"
         data-goblin="A scrappy law goblin.<br><span>Yours.</span>">
-      An agentic law firm.<br>
+      A Multi-Agent Legal System.<br>
       <em>Yours.</em>
     </h1>
     <p class="hero-deck r r2 v" style="text-wrap:balance">
@@ -2313,6 +2344,7 @@
       <strong>Free</strong> for you to use and build.
       <strong style="white-space:nowrap">Open source.</strong>
       Built by a <strong style="white-space:nowrap">law firm founder.</strong>
+      <br><span class="hero-disclaimer">Use at your own risk. Not legal advice. Not a real law firm.</span>
     </p>
     <div class="cta-row r r3 v">
       <a class="btn btn-primary" href="https://github.com/AnttiHero/lavern" rel="noopener">
@@ -2620,7 +2652,7 @@
           <div class="codex-slab" data-i="0">
             <span class="codex-slab-num">01 / Architecture</span>
             <h4 class="codex-slab-title">A multi-agent legal system, not a chatbot.</h4>
-            <p class="codex-slab-body">Architecture borrowed from law firms. Partners, associates, debate rooms, institutional memory. Sixty-seven specialist agents organised to do the work the way a firm does it.</p>
+            <p class="codex-slab-body">Architecture borrowed from law firms as an analogy. Partners, associates, debate rooms, institutional memory. Sixty-seven specialist agents organised the way a firm would organise itself, in software. Lavern itself is not a law firm.</p>
             <span class="codex-slab-tag">src/agents/ · 67 specialists</span>
           </div>
           <div class="codex-slab" data-i="1">
@@ -2644,7 +2676,7 @@
           <div class="codex-slab" data-i="4">
             <span class="codex-slab-num">05 / Providers</span>
             <h4 class="codex-slab-title">Claude. Mistral. Or local.</h4>
-            <p class="codex-slab-body">Runs on Anthropic or Mistral for EU data sovereignty. Optional on-device mode means confidential documents never leave your machine. The firm follows your jurisdiction.</p>
+            <p class="codex-slab-body">Runs on Anthropic or Mistral for EU data sovereignty. Optional on-device mode means confidential documents never leave your machine. The system follows your jurisdiction.</p>
             <span class="codex-slab-tag">src/providers/ · Claude · Mistral · Ollama</span>
           </div>
           <div class="codex-slab" data-i="5">
@@ -2698,7 +2730,7 @@
        ═══════════════════════════════════════════════════════════════════ -->
   <section class="billboard" id="billboard">
     <div class="billboard-frame">
-      <img src="img/billboard.jpg" alt="A Lavern billboard at Times Square: the crab mark above 'Lavern', then 'An agentic law firm. Yours.' and 'Sixty-seven specialist agents. Free for you to use and build. Open source.' with www.lavern.ai at the foot." loading="lazy" decoding="async">
+      <img src="img/billboard.jpg" alt="A Lavern billboard at Times Square: the crab mark above 'Lavern', then 'A multi-agent legal system. Yours.' and 'Sixty-seven specialist agents. Free for you to use and build. Open source.' with www.lavern.ai at the foot." loading="lazy" decoding="async">
     </div>
     <p class="billboard-cap">Helsinki built. <span>The world reads.</span></p>
   </section>
@@ -2716,7 +2748,17 @@
 
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false"><span>Is this <em>legal advice?</em></span><span class="faq-toggle">+</span></button>
-          <div class="faq-a"><p><strong>No.</strong> Lavern assists with document design, review, and accessibility. It does not constitute legal advice and does not replace a qualified lawyer. Outputs are dual-artifact for a reason. One document for the operator, one for the counsel who'll check it.</p></div>
+          <div class="faq-a"><p><strong>No.</strong> Lavern assists with document design, review, and accessibility. It does not constitute legal advice and does not replace a qualified lawyer. Lavern is also not a real law firm. It is an analogy we used for building it.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Are these <em>really agents?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p>There are many definitions of an agent. The agents in Lavern are real agents in the sense that they debate each other, challenge findings, and verify claims. On the other hand, they may not be agents in the sense of carrying out complex tasks fully independently. The value is in orchestrating LLMs, not in heroically autonomous workflows.</p></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Is this a <em>product?</em></span><span class="faq-toggle">+</span></button>
+          <div class="faq-a"><p><strong>No, not in a traditional sense.</strong> You could build a product on top of this, and we would be delighted if you did. But it is best understood as a working demo. We tried to make it as safe as we could, and you should understand that you are using it at your own risk.</p></div>
         </div>
 
         <div class="faq-item">
@@ -2726,7 +2768,7 @@
 
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false"><span>Where does my <em>document go?</em></span><span class="faq-toggle">+</span></button>
-          <div class="faq-a"><p>You choose. Frontier mode sends document text to Anthropic or Mistral (EU sovereign). Local mode runs on-device via Ollama. The document never leaves the machine. Hybrid mode runs a local pass first, anonymizes flagged clauses, then dispatches only those to a frontier model. Provenance is tracked per finding.</p></div>
+          <div class="faq-a"><p>Lavern communicates with frontier models such as Claude and Mistral. Local mode runs on-device. Hybrid mode runs a local pass first and then dispatches only flagged questions to a frontier model. As with all legal work, you have to be conscious of client privilege and privacy.</p></div>
         </div>
 
         <div class="faq-item">
@@ -2741,7 +2783,7 @@
 
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false"><span>Can I run it <em>on my own laptop?</em></span><span class="faq-toggle">+</span></button>
-          <div class="faq-a"><p>Yes. The CLI runs anywhere Node 20+ runs. Frontier mode needs API keys (Anthropic or Mistral). Local mode needs Ollama and a model like Llama 3 or Qwen 2.5. Clawern is a macOS LaunchAgent / Linux systemd daemon. Point it at a folder and walk away.</p></div>
+          <div class="faq-a"><p>Yes. The CLI runs anywhere Node 22+ runs. Frontier mode needs API keys (Anthropic or Mistral). Local mode needs Ollama and a model like Llama 3 or Qwen 2.5. Clawern is a macOS LaunchAgent / Linux systemd daemon.</p></div>
         </div>
 
         <div class="faq-item">
@@ -2763,7 +2805,7 @@
        ═══════════════════════════════════════════════════════════════════ -->
   <section class="closing" id="install-bottom">
     <div class="container-narrow">
-      <h2 class="closing-h2" data-goblin="Don't build a wrapper.<br><span>Build a goblin.</span>">Don't build a wrapper.<br><em>Build a firm.</em></h2>
+      <h2 class="closing-h2" data-goblin="Don't build a wrapper.<br><span>Build a goblin.</span>">Don't build a wrapper.<br><em>Build a system.</em></h2>
       <p class="closing-deck r r1">Claude for Law is already here. <em>We need to build different.</em></p>
       <div class="cta-row r r2">
         <a class="btn btn-primary" href="https://github.com/AnttiHero/lavern" rel="noopener">
@@ -2789,7 +2831,6 @@
     <div class="footer-grid">
       <div class="footer-mark" data-goblin="Lavern · Cave · Sewer">Lavern · Helsinki</div>
       <div class="footer-links">
-        <a href="/writing/">Writing</a>
         <a href='/architecture/'>Architecture</a>
         <a href="/terms/">Terms</a>
         <a href="/privacy/">Privacy</a>

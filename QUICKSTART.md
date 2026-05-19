@@ -1,8 +1,8 @@
 # Quick Start
 
-**60 seconds.** From clone to a law firm running on your laptop.
+**60 seconds.** From clone to a multi-agent legal system running on your laptop.
 
-> **Disclaimer:** Lavern assists with document analysis and legal design. It does not provide legal advice. Always verify outputs with qualified legal professionals.
+> **Disclaimer.** Lavern is **not a law firm** and does **not provide legal advice**. The "agentic law firm" framing used in places throughout these docs is an analogy for the software's architecture, not a description of what Lavern is. Lavern is software that assists with document analysis and legal design. **You use it at your own risk.** Always have qualified legal counsel verify anything that matters before relying on it.
 
 ## Run it locally
 
@@ -122,7 +122,7 @@ For maximum-confidentiality engagements, run `claw start --ethical` — Mistral 
 
 ## What you're installing
 
-Lavern is a firm, not a tool. When it boots:
+Lavern is a multi-agent system, not a single tool. When it boots:
 
 - A team of **67 agents** is staffed (you pick the team, or accept the default).
 - A **soul** — voice, principles, style — shapes how the team communicates.

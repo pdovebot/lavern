@@ -54,7 +54,8 @@ step() { printf '\n%s%s%s\n' "$BOLD" "$*" "$RESET"; }
 cat <<EOF
 
   ${BOLD}LAVERN${RESET}
-  an agentic law firm. yours.
+  a multi-agent legal system. yours.
+  not a law firm. not legal advice. use at your own risk.
   https://lavern.ai
 
 EOF
