@@ -58,7 +58,7 @@ Demo mode runs the dashboard, the Clawern view, and the cinematic guided tour wi
 
 ## What "67 agents" actually means
 
-Honest answer, because this is the first question every engineer asks. Each agent is a specialised system prompt with its own role, MCP tool permissions, and slot in the debate protocol. All 67 run on the same underlying frontier LLM (Claude or Mistral, your choice), so yes — at the bottom of the stack, it's an LLM. Anyone can prompt one.
+Each agent is a specialised system prompt with its own role, MCP tool permissions, and slot in the debate protocol. All 67 run on the same underlying frontier LLM (Claude or Mistral, your choice), so yes — at the bottom of the stack, it's an LLM. 
 
 The work isn't the prompts. The work is the four things wrapped around them:
 
