@@ -56,6 +56,8 @@ interface InferredData {
 export function QuickDropZone({ onSubmit, loading }: Props) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [inferred, setInferred] = useState<InferredData | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingPasteText, setPendingPasteText] = useState<string>('');
   const [pasteMode, setPasteMode] = useState(false);
   const [pasteText, setPasteText] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -63,6 +65,8 @@ export function QuickDropZone({ onSubmit, loading }: Props) {
   const processFile = useCallback((file: File) => {
     const title = humanizeFilename(file.name);
     const typeInfo = inferMatterType(file.name);
+    setPendingFile(file);
+    setPendingPasteText('');
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -123,6 +127,8 @@ export function QuickDropZone({ onSubmit, loading }: Props) {
 
   const handlePasteSubmit = useCallback(() => {
     if (!pasteText.trim()) return;
+    setPendingFile(null);
+    setPendingPasteText(pasteText);
     const typeInfo = inferMatterType(pasteText);
     const firstLine = pasteText.split('\n')[0]?.trim().slice(0, 80) || 'Pasted matter';
     setInferred({
@@ -152,8 +158,99 @@ export function QuickDropZone({ onSubmit, loading }: Props) {
     if (inputRef.current) inputRef.current.value = '';
   }, [processFile]);
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(async () => {
     if (!inferred) return;
+
+    // Persist the dropped/pasted document so briefing's useDocumentUpload can hydrate it.
+    try {
+      const docId = (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
+        ? crypto.randomUUID()
+        : `doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const now = new Date().toISOString();
+
+      let uploaded: { id: string; name: string; size: number; type: string; content: string; uploadedAt: string } | null = null;
+      let parsed: Record<string, unknown> | null = null;
+
+      if (pendingFile) {
+        // Backend parse for authoritative fullText/sections (handles PDF/DOCX).
+        try {
+          const formData = new FormData();
+          formData.append('file', pendingFile);
+          const res = await fetch('/api/documents/parse', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData,
+          });
+          if (res.ok) {
+            const backend = await res.json() as Record<string, unknown>;
+            parsed = { ...backend, id: docId };
+          }
+        } catch {
+          // Backend unreachable — fall back to client-side content below.
+        }
+
+        // Read file content for the UploadedDocument shape briefing expects.
+        const content: string = await new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+          reader.onerror = () => resolve('');
+          if (
+            pendingFile.type.startsWith('text/') ||
+            pendingFile.name.endsWith('.md') ||
+            pendingFile.name.endsWith('.txt') ||
+            pendingFile.name.endsWith('.rtf')
+          ) {
+            reader.readAsText(pendingFile);
+          } else {
+            reader.readAsDataURL(pendingFile);
+          }
+        });
+
+        uploaded = {
+          id: docId,
+          name: pendingFile.name,
+          size: pendingFile.size,
+          type: pendingFile.type,
+          content,
+          uploadedAt: now,
+        };
+      } else if (pendingPasteText.trim()) {
+        const text = pendingPasteText;
+        const name = `${inferred.matterTitle || 'Pasted text'}.md`;
+        uploaded = {
+          id: docId,
+          name,
+          size: new Blob([text]).size,
+          type: 'text/markdown',
+          content: text,
+          uploadedAt: now,
+        };
+        parsed = {
+          id: docId,
+          name,
+          mimeType: 'text/markdown',
+          size: uploaded.size,
+          pageCount: 1,
+          wordCount: text.split(/\s+/).filter(Boolean).length,
+          fullText: text,
+          sections: [],
+          tables: [],
+          definedTerms: [],
+          parseMethod: 'paste',
+          parsedAt: now,
+        };
+      }
+
+      if (uploaded) {
+        sessionStorage.setItem(
+          'shem-intake-docs',
+          JSON.stringify({ uploaded: [uploaded], parsed: parsed ? [parsed] : [] }),
+        );
+      }
+    } catch (e) {
+      console.warn('[QuickDropZone] failed to persist intake docs:', e);
+    }
+
     onSubmit({
       clientName: inferred.clientName,
       matterTitle: inferred.matterTitle,
@@ -163,7 +260,7 @@ export function QuickDropZone({ onSubmit, loading }: Props) {
       estimatedBudgetUsd: inferred.estimatedBudgetUsd,
       feeStructure: inferred.feeStructure,
     });
-  }, [inferred, onSubmit]);
+  }, [inferred, pendingFile, pendingPasteText, onSubmit]);
 
   const updateField = useCallback((key: keyof InferredData, value: string) => {
     setInferred(prev => prev ? { ...prev, [key]: value } : prev);
