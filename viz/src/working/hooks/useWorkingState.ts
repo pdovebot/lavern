@@ -89,9 +89,6 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
   const sessionEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Timestamp when 'delivered' step was first detected (for assembly wait timeout). */
   const deliveredAtRef = useRef<number | null>(null);
-  /** Stable ref for current sessionId (accessible inside handleEvent without deps). */
-  const sessionIdRef = useRef<string | undefined>(undefined);
-  const isReplayRef = useRef(false);
   // Stable ref for onSessionEnd to avoid restarting effects when callback identity changes
   const onSessionEndRef = useRef(onSessionEnd);
   onSessionEndRef.current = onSessionEnd;
@@ -105,6 +102,14 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
   const [isReplay, setIsReplay] = useState(false);
   const [replayPaused, setReplayPaused] = useState(false);
   const [replaySpeed, setReplaySpeed] = useState(1);
+
+  // Refs mirror state so handleEvent (stable, [] deps) can read the latest
+  // value without stale closures. Synced after every render so the ref and
+  // state can never drift apart.
+  const sessionIdRef = useRef<string | undefined>(undefined);
+  const isReplayRef = useRef(false);
+  useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
+  useEffect(() => { isReplayRef.current = isReplay; }, [isReplay]);
 
   // Workflow
   const [currentStep, setCurrentStep] = useState<WorkflowStep>('intake');
@@ -241,12 +246,10 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
 
   const connectToSession = useCallback((id: string) => {
     setSessionId(id);
-    sessionIdRef.current = id;
     deliveredAtRef.current = null;
     setSessionExpired(false);
     setSessionFailed(false);
     setIsAssemblyReady(false);
-    isReplayRef.current = false;
     setIsReplay(false);
     setEvents([]);
     setCurrentStep('intake');
@@ -267,8 +270,6 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
 
   const connectToReplay = useCallback((id: string) => {
     setSessionId(id);
-    sessionIdRef.current = id;
-    isReplayRef.current = true;
     setIsReplay(true);
     setEvents([]);
     setCurrentStep('intake');
@@ -286,7 +287,6 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
   const disconnect = useCallback(() => {
     wsClientRef.current?.disconnect();
     setSessionId(undefined);
-    sessionIdRef.current = undefined;
     deliveredAtRef.current = null;
     setConnectionStatus('disconnected');
     setEvents([]);
