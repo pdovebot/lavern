@@ -90,7 +90,7 @@ The team picks itself, opens a debate, runs three-layer verification, and lands 
 4. Accept the suggested team and workflow, or customize.
 5. Watch the **Working** view. Agents analyze, post findings, debate, and resolve disputes in real time.
 6. When a gate fires, approve or reject the team's critical findings.
-7. Read the **Delivery** view: the user-facing document, the legal review package, the scorecard, the full audit trail.
+7. Read the **Delivery** view: the user-facing document, the structured findings, the scorecard, and the audit trail.
 
 ## Who are you? Where to start.
 
@@ -128,7 +128,7 @@ Lavern is a multi-agent system, not a single tool. When it boots:
 - A **soul** — voice, principles, style — shapes how the team communicates.
 - A **debate protocol** is enforced; specialists challenge each other before findings ship.
 - A **human gate** fires before critical decisions. The system raises concerns; you decide.
-- A **dual artifact** is produced for every engagement: user-facing deliverable + legal review package with the full chain of reasoning.
+- An **audit bundle** ships with every engagement: the user-facing deliverable plus structured findings, debate resolutions, verification results, and a cost log.
 
 Customize:
 - **Personality** — edit [SOUL.md](SOUL.md) (CLI/Claw mode), or set it in My Page → Lavern's Soul (browser).
@@ -137,7 +137,7 @@ Customize:
 
 ## What's in the box
 
-**67 agents** · **21 MCP tools** · **9 workflows** · **6 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · ContractNLI · LEDGAR) · **3 inference providers** (Local Ollama · Anthropic · Mistral EU) · **1,620 tests** across 105 files.
+**67 agent prompts** · **21 MCP tools** · **9 workflows** · **6 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · ContractNLI · LEDGAR) · **3 inference providers** (Local Ollama · Anthropic · Mistral EU) · **1,677 tests** across 105 files.
 
 Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/architecture/](https://lavern.ai/architecture/).
 

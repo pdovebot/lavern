@@ -17,7 +17,7 @@ The product is called "Lavern". These names are interchangeable in internal docs
 2. Every finding must cite specific text as evidence
 3. Debate is a feature, not a bug — agents should challenge each other
 4. Human gates are mandatory, never skip them
-5. Dual artifacts are always required (user-facing + legal review package)
+5. Every engagement ships with an audit bundle alongside the deliverable: structured findings, debate resolutions, verification results, and cost log. (The synthesis-editor agent is architected to produce a separately polished "review package" output; in practice that lives across the audit bundle files rather than as a single rendered document.)
 
 ## Non-Negotiable Preservation Categories
 
