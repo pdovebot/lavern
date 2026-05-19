@@ -120,6 +120,8 @@ export interface DaemonStatus {
   installed: boolean;
   running: boolean;
   pid?: number;
+  /** Non-zero exit code when the service is loaded but not currently running. */
+  lastExitStatus?: number;
   label: string;
   plistPath: string;
   logDir: string;
@@ -212,15 +214,20 @@ export function getDaemonStatus(): DaemonStatus {
   if (status.installed) {
     try {
       const output = execSync(`launchctl list ${LABEL} 2>/dev/null`, { encoding: 'utf-8' });
-      status.running = true;
-
-      // Parse PID from output
+      // "Present in launchctl" is not the same as "running" — a crash-looping
+      // service appears here too. Distinguish: a live PID means actually running;
+      // no PID with a non-zero LastExitStatus means loaded-but-failing.
       const pidMatch = output.match(/"PID"\s*=\s*(\d+)/);
+      const exitMatch = output.match(/"LastExitStatus"\s*=\s*(-?\d+)/);
       if (pidMatch) {
         status.pid = parseInt(pidMatch[1], 10);
+        status.running = true;
+      } else if (exitMatch) {
+        status.lastExitStatus = parseInt(exitMatch[1], 10);
+        status.running = false;
       }
     } catch {
-      // Not running or not loaded
+      // Not loaded
     }
   }
 
@@ -232,7 +239,13 @@ export function printDaemonStatus(): void {
 
   console.log(`\n  Service: ${status.label}`);
   console.log(`  Installed: ${status.installed ? 'yes' : 'no'}`);
-  console.log(`  Running: ${status.running ? `yes (PID ${status.pid ?? 'unknown'})` : 'no'}`);
+  if (status.running) {
+    console.log(`  Running: yes (PID ${status.pid})`);
+  } else if (status.installed && status.lastExitStatus !== undefined && status.lastExitStatus !== 0) {
+    console.log(`  Running: no — loaded but failing (last exit code ${status.lastExitStatus}, see logs)`);
+  } else {
+    console.log(`  Running: no`);
+  }
   console.log(`  Plist: ${status.plistPath}`);
   console.log(`  Logs: ${status.logDir}/\n`);
 
