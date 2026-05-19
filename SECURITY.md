@@ -6,7 +6,7 @@ Thank you for taking the time to look at Lavern's security.
 
 **Do not file public GitHub issues for security bugs.**
 
-Email **security@lavern.ai** with:
+Email **hello@lavern.ai** with:
 - A description of the issue
 - Steps to reproduce (or a proof-of-concept)
 - The version / commit hash you tested against

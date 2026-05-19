@@ -137,7 +137,7 @@ Customize:
 
 ## What's in the box
 
-**67 agent prompts** · **21 MCP tools** · **9 workflows** · **6 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · ContractNLI · LEDGAR) · **3 inference providers** (Local Ollama · Anthropic · Mistral EU) · **1,677 tests** across 105 files.
+**67 agent prompts** · **21 MCP tools** · **9 workflows** · **5 legal datasets** (CUAD · MAUD · ACORD · UNFAIR-ToS · LEDGAR) · **3 inference providers** (Local Ollama · Anthropic · Mistral EU) · **1,677 tests** across 105 files.
 
 Full reference: [README.md](README.md) · architecture deep-dive at [lavern.ai/architecture/](https://lavern.ai/architecture/).
 

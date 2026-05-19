@@ -150,13 +150,13 @@ React single-page app with editorial design language (Inter + Cormorant Garamond
 - `src/assembly/` — Document assembly and format conversion (HTML, DOCX)
 - `src/documents/` — Document parser (PDF, DOCX, Markdown, plain text) + SMAC-L1 input sanitization
 - `src/utils/logger.ts` — Structured logging utility
-- Legal dataset seeder (`scripts/seed-knowledge-base.ts`, 6 datasets):
+- Legal dataset seeder (`scripts/seed-knowledge-base.ts`, 5 datasets):
   - CUAD (510 contracts, 41 clause types, CC BY 4.0)
   - MAUD (152 merger agreements, 92 deal points, CC BY 4.0)
   - ACORD (126K+ clause retrieval pairs, CC BY 4.0)
   - UNFAIR-ToS (5.5K sentences, 8 unfair clause types, CC BY-SA 4.0)
-  - ContractNLI (10K+ premise/hypothesis NLI pairs, CC BY-NC-SA 4.0)
   - LEDGAR (60K SEC provisions, 98 clause types, CC BY-SA 4.0)
+  - (ContractNLI was removed; its CC BY-NC-SA 4.0 license is incompatible with Apache 2.0 distribution.)
 
 ### Marketing Site (`site/`)
 Static single-page site deployed via Netlify drag-and-drop. Dark cinematic design (Cormorant Garamond + Inter, #080808 background, #E8845C accent).
@@ -184,7 +184,7 @@ Native macOS SwiftUI status bar app for monitoring Clawern. Polls Claw API every
 ### Scripts
 - `scripts/smoke-test.sh` — API end-to-end lifecycle smoke test (health → create → verify → delete)
 - `scripts/load-test.ts` — 50-user concurrent load test (auth → sessions → WebSocket → poll → teardown, p50/p95 latencies)
-- `scripts/seed-knowledge-base.ts` — Legal dataset seeder (6 datasets)
+- `scripts/seed-knowledge-base.ts` — Legal dataset seeder (5 datasets)
 
 ### Tests
 - `tests/` — 1,677 tests across 109 files. Coverage spans the engine, dashboard hooks, Claw, MCP bridge, auth-gate route registration, and the broader API surface. `npm test` is green.

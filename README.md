@@ -8,7 +8,11 @@ Built by a law firm founder over six months because the prevailing "AI as a juni
 
 [**Watch the demo →**](https://lavern.ai/demo/) · [**lavern.ai**](https://lavern.ai) · [**Architecture deep-dive →**](https://lavern.ai/architecture/) · [**Quick Start →**](QUICKSTART.md)
 
-> **Disclaimer.** Lavern is **not a law firm** and does **not provide legal advice**. The "agentic law firm" framing in some of the docs is an analogy for the software's architecture — it's not a claim about what Lavern is. **You use it at your own risk.** Have qualified counsel verify anything that matters before relying on it.
+> **This is not a product.** Lavern is best understood as a collection of ideas in one repo. A polished demo of how we could build in the future.
+>
+> You can criticise it for not working as a product. That misses the mark. It is not meant to be a product. It is a source of inspiration.
+>
+> It is at least ten things, several of which are, on their own, products somebody could build a company around. They are sitting in the repo. Take whichever ones you want.
 
 > **What is and isn't stress-tested.** The architecture is real and the code is open. The pipeline runs, the agents debate, the verification loops fire, the precedent board persists, the tests pass. What hasn't been independently validated is the *quality bar*: whether all this machinery produces materially better outputs than a well-prompted single LLM on a representative sample of real legal work. We have internal evaluation; we don't have a public benchmark. Treat the engineering as the contribution and the legal-quality claims as a hypothesis.
 
@@ -41,10 +45,10 @@ Demo mode runs the dashboard, the Clawern view, and the cinematic guided tour wi
 
 ## What's in the box
 
-- **67 agent prompts** (59 specialists, 7 orchestrators, 1 base)
+- **67 agent prompts**: 59 specialists, 7 workflow-specific orchestrators (`orchestrator-{adversarial,counsel,full-bench,review,roundtable,tabulate,verification}.ts`), and 1 generic base orchestrator (`orchestrator.ts`)
 - **21 MCP tools** for debate, scoring, verification, grounding, memory, knowledge base, quality checks
 - **9 workflows** from a single-specialist counsel call to a full adversarial review
-- **6 seeded legal datasets**: CUAD, MAUD, ACORD, UNFAIR-ToS, ContractNLI, LEDGAR (each under its own license; see NOTICE)
+- **5 seeded legal datasets**: CUAD, MAUD, ACORD, UNFAIR-ToS, LEDGAR (each under its own license; see NOTICE). ContractNLI was previously included; it was removed because its CC BY-NC-SA 4.0 license is incompatible with Apache 2.0. Fetch it yourself if you need it.
 - **3 inference providers**: Anthropic Claude (US), Mistral AI (EU), or local via Ollama
 - **1,677 tests** across 105 files. Clean `tsc --noEmit` on backend and frontend.
 
@@ -54,33 +58,20 @@ Demo mode runs the dashboard, the Clawern view, and the cinematic guided tour wi
 
 **Clawern (autonomous).** Point it at a folder. Clawern processes new documents on a 30-minute heartbeat, accumulates a precedent board across past reviews, and pushes findings to Telegram, email, or macOS notifications. Includes weekly digest, multi-client isolation, audit trail, cost forecasting, hybrid local-plus-frontier processing.
 
-**EU mode.** Set `LAVERN_PROVIDER=mistral` and the orchestrator, agents, debate, verification, briefing analyser, and Clawern processing all route through Mistral AI in Paris instead of Anthropic. A few non-essential streaming paths still touch Anthropic at the moment; closing them is tracked in the repo as issue #7. Use `claw start --ethical` to enforce Mistral-only with conservative risk posture.
+**EU mode.** Set `LAVERN_PROVIDER=mistral` and the orchestrator, agents, debate, verification, briefing analyser, partner consult, agent-builder, and Clawern processing all route through Mistral AI in Paris instead of Anthropic. One feature, the Lavern Challenge (blind document comparison) at `src/api/routes/challenge.ts`, still instantiates the Anthropic client directly and will hit Anthropic even when Mistral is selected. If you need a strict EU boundary, avoid that feature for now. Use `claw start --ethical` to enforce Mistral-only with conservative risk posture across the rest of the pipeline.
 
 ## What "67 agents" actually means
 
-Each agent is a specialised system prompt with its own role, MCP tool permissions, and slot in the debate protocol. All 67 run on the same underlying frontier LLM (Claude or Mistral, your choice), so yes — at the bottom of the stack, it's an LLM. 
+Each agent is a specialised system prompt with its own role, MCP tool permissions, and slot in the debate protocol. All 67 run on the same underlying frontier LLM (Claude or Mistral, your choice), so yes, at the bottom of the stack it's an LLM.
 
 The work isn't the prompts. The work is the four things wrapped around them:
 
 - **The debate protocol.** Agents must cite specific text from the parsed document. Findings without citations don't enter the board. Agents can challenge each other; the challenger has to cite text too.
-- **Three-layer verification.** Evaluator gate (drops weak findings) → adversarial debate (red team / blue team) → 10-pass verification pipeline (mechanical cross-checks: clause grounding, defined-term integrity, monetary preservation, jurisdiction integrity, etc.). Each layer fails closed independently.
+- **Three-layer verification.** Evaluator gate (drops weak findings) → adversarial debate (red team / blue team) → 10-pass verification pipeline (`src/workflows/templates/verification.ts`). The 10 passes are: `context`, `ux`, `clarity`, `structure`, `accuracy`, `completeness`, `risk`, `formatting`, `legal_design`, `delivery` (see `src/types/verification.ts` for the full pass definitions). Each layer fails closed independently. Separate from this pipeline, the mechanical grounding verifier in `src/mcp/tools/grounding-verifier.ts` cross-checks every cited quote against the parsed document via string matching.
 - **Human gates.** Critical findings don't auto-deliver. The orchestrator surfaces the call and waits for a human to approve or override.
 - **Precedent Board.** Persistent memory across engagements. Findings that recur across documents get reinforced; stale ones decay. A new pattern enters as "tentative" and gets promoted to "confirmed" once it recurs enough times with consistent verdicts.
 
 Whether all of that actually adds up to materially better outputs than a single well-prompted LLM is an open empirical question. We have structures in place to test it; we don't claim to have settled it.
-
-## How Lavern relates to Claude for Legal
-
-Anthropic recently released [`claude-for-legal`](https://github.com/anthropics/claude-for-legal), a suite of practice-area plugins that ship inside Claude Cowork and Claude Code. If you want drop-in AI skills inside the tools you already use, start there.
-
-Lavern is a different shape of thing. Not a plugin pack — a multi-agent system that borrows the structure of a law firm as its architectural analogy. End-to-end engagements with a team of agents, a debate protocol, a human gate before critical decisions, and an audit trail of how the output was reached. You don't invoke a skill; you brief a team.
-
-The split, as honestly as we can put it:
-
-- **Use Claude for Legal** if you want task-specific AI skills inside an existing workflow.
-- **Use Lavern** if you want to experiment with an autonomous multi-agent legal system end-to-end, with a continuous-practice mode (Clawern) that watches folders and an EU-sovereign mode. Still software; still your responsibility to verify outputs.
-
-They're compatible. Lavern runs on Claude (or Mistral) — the same models Claude for Legal runs on. A future release will let Lavern's orchestrator dispatch to `claude-for-legal` plugins as installable specialists.
 
 ## LOCAL MODE (the default in v0.15.0)
 
@@ -168,11 +159,11 @@ menubar/                macOS menu bar app (SwiftUI)
 tests/                  1,677 tests across 105 files
 ```
 
-Full architectural detail in [CLAUDE.md](CLAUDE.md) — the same context Claude Code reads when working on this repo.
+Full architectural detail in [CLAUDE.md](CLAUDE.md), the same context Claude Code reads when working on this repo.
 
 ## Connectors
 
-The 21 MCP tools, 6 bundled legal datasets, 2 LLM providers, and the remote MCP bridge are documented in [CONNECTORS.md](CONNECTORS.md).
+The 21 MCP tools, 5 bundled legal datasets, 3 inference providers (Anthropic, Mistral, Ollama), and the remote MCP bridge are documented in [CONNECTORS.md](CONNECTORS.md).
 
 ## Status and known limitations
 
@@ -181,9 +172,9 @@ Lavern is at **v0.15.0**, the initial public open-source release. The engine, Cl
 Known limitations we're not hiding:
 
 - **No public benchmark.** Internal evaluation only. The quality-of-output claim is a hypothesis; we'd welcome help building a defensible benchmark.
-- **Multi-agent debate is imperfect.** Agents sometimes don't listen to each other. Sometimes one dominates. Sometimes they swing to the opposite extreme when challenged — not because the challenge was stronger, only newer. We've built structure around the problem (evidence requirements, confidence thresholds, adversarial roles, escalation protocols), not solved it.
+- **Multi-agent debate is imperfect.** Agents sometimes don't listen to each other. Sometimes one dominates. Sometimes they swing to the opposite extreme when challenged, not because the challenge was stronger but because it was newer. We've built structure around the problem (evidence requirements, confidence thresholds, adversarial roles, escalation protocols), not solved it.
 - **67 agents is probably more than needed.** Started with about a dozen, kept finding gaps. If you fork it and find that 20 of them do 90% of the work, please tell us which 20.
-- **EU mode has a known gap.** Three streaming paths still touch Anthropic; tracked as issue #7.
+- **EU mode has one known gap.** The Lavern Challenge route (`src/api/routes/challenge.ts`) still instantiates Anthropic directly even when `LAVERN_PROVIDER=mistral`. The rest of the pipeline routes through Mistral. If you need strict EU boundary, avoid that feature until it's ported.
 - **Remote MCP bridge is preview.** Gated behind a feature flag.
 - **The HTTP API is evolving.** Expect non-breaking additions before a v1.0 freeze; pin a tag if you depend on it.
 
@@ -193,7 +184,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). New agents, new MCP tools, new workflow 
 
 ## Security
 
-Found a vulnerability? See [SECURITY.md](SECURITY.md). Email `security@lavern.ai`. Please don't file public GitHub issues for security bugs.
+Found a vulnerability? See [SECURITY.md](SECURITY.md). Email `hello@lavern.ai`. Please don't file public GitHub issues for security bugs.
 
 ## License
 
