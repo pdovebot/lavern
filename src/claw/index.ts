@@ -736,7 +736,7 @@ export async function runClaw(args: string[]): Promise<void> {
       await runDaemon(parsed.daemonSubcommand ? [parsed.daemonSubcommand] : []);
       break;
     case 'validate':
-      runValidate(parsed);
+      await runValidate(parsed);
       break;
     case 'pause':
       runPauseResume(parsed, true);
@@ -749,7 +749,7 @@ export async function runClaw(args: string[]): Promise<void> {
 
 // ── Validate ────────────────────────────────────────────────────────────
 
-function runValidate(args: ClawCliArgs): void {
+async function runValidate(args: ClawCliArgs): Promise<void> {
   const dir = args.dir ?? config.claw.dir;
   const checks: Array<{ label: string; ok: boolean; detail: string }> = [];
 
@@ -757,9 +757,37 @@ function runValidate(args: ClawCliArgs): void {
   const profile = loadProfile(dir);
   checks.push({ label: 'Profile exists', ok: !!profile, detail: profile ? dir + '/profile.json' : 'Run `lavern claw init` to create' });
 
-  // API key
-  const apiKey = config.anthropic.apiKey;
-  checks.push({ label: 'API key configured', ok: apiKey.length > 0, detail: apiKey.length > 0 ? `${apiKey.slice(0, 8)}...` : 'Set ANTHROPIC_API_KEY' });
+  // Provider readiness — mirror runStart's branch so a working local-only
+  // install doesn't fail validation just because ANTHROPIC_API_KEY is absent.
+  const profileProcessing = profile?.processing ?? 'local';
+  if (profileProcessing === 'local') {
+    const localUrl = (config.claw.localModelUrl || config.local.baseUrl).replace(/\/$/, '');
+    const localModel = config.claw.localModel || config.local.defaultModel;
+    let ok = false; let detail = '';
+    try {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(`${localUrl}/api/tags`, { signal: controller.signal });
+      clearTimeout(t);
+      if (res.ok) {
+        const data = await res.json() as { models?: Array<{ name?: string }> };
+        const names = (data.models ?? []).map(m => m.name ?? '');
+        if (names.some(n => n === localModel || n.startsWith(`${localModel}:`))) {
+          ok = true; detail = `${localModel} ready at ${localUrl}`;
+        } else {
+          detail = `Ollama running but ${localModel} not pulled. Run: ollama pull ${localModel}`;
+        }
+      } else { detail = `Ollama responded HTTP ${res.status} at ${localUrl}`; }
+    } catch { detail = `Ollama unreachable at ${localUrl} — is the menu-bar app running?`; }
+    checks.push({ label: 'Ollama (local model)', ok, detail });
+  } else {
+    const apiKey = config.anthropic.apiKey;
+    checks.push({
+      label: 'API key configured',
+      ok: apiKey.length > 0,
+      detail: apiKey.length > 0 ? `${apiKey.slice(0, 8)}...` : 'Set ANTHROPIC_API_KEY',
+    });
+  }
 
   // Watch paths
   if (profile) {
