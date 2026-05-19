@@ -3406,9 +3406,18 @@
       }, 120);
     })();
 
-    // Copy install command
+    // Copy install command — host is derived from where the page is served,
+    // so this Just Works on lavern.ai, the Netlify preview, or any future domain.
     (function(){
-      var cmd = 'curl -fsSL https://lavern.ai/install.sh | sh';
+      var host = (location && location.hostname) ? location.hostname : '';
+      // Fall back to canonical domain when opened off-network (file://, localhost, IPs).
+      if (!host || host === 'localhost' || host === '127.0.0.1' || /^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+        host = 'lavern.ai';
+      }
+      var displayCmd = 'curl -fsSL ' + host + '/install.sh | sh';
+      var cmd = 'curl -fsSL https://' + host + '/install.sh | sh';
+      var cmdNodes = document.querySelectorAll('.install .install-cmd');
+      for (var i = 0; i < cmdNodes.length; i++) cmdNodes[i].textContent = displayCmd;
       function bind(btn){
         if (!btn) return;
         btn.addEventListener('click', function(){
