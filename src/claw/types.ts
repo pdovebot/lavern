@@ -277,6 +277,9 @@ export interface ClawManifest {
     findings: string;
   };
 
+  /** Requested formats that failed to materialize. Keyed by format name. */
+  outputErrors?: Record<string, string>;
+
   /** Change detection: diff against previous review (if re-reviewed). */
   diff?: {
     added: number;

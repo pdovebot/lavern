@@ -13,6 +13,39 @@
 
 import OpenAI from 'openai';
 import { config } from '../config.js';
+import { createLogger } from '../utils/logger.js';
+
+const logger = createLogger('MISTRAL');
+
+const RETRYABLE_STATUS_CODES = new Set([429, 500, 502, 503, 529]);
+const MAX_RETRIES = 3;
+const MAX_DELAY_MS = 8000;
+const DEFAULT_TIMEOUT_MS = 120_000;
+
+function getErrorStatus(error: unknown): number | undefined {
+  if (error && typeof error === 'object' && 'status' in error) {
+    const status = (error as { status: unknown }).status;
+    if (typeof status === 'number') return status;
+  }
+  return undefined;
+}
+
+function isRetryable(error: unknown): boolean {
+  const status = getErrorStatus(error);
+  if (status && RETRYABLE_STATUS_CODES.has(status)) return true;
+  if (!(error instanceof Error)) return false;
+  const msg = error.message.toLowerCase();
+  return (
+    msg.includes('rate limit') ||
+    msg.includes('overloaded') ||
+    msg.includes('timeout') ||
+    msg.includes('econnreset') ||
+    msg.includes('econnrefused') ||
+    msg.includes('fetch failed') ||
+    msg.includes('network') ||
+    msg.includes('socket hang up')
+  );
+}
 
 // ── Pricing (per million tokens) ────────────────────────────────────────
 // Source: Mistral AI pricing as of 2025.
@@ -68,6 +101,8 @@ export interface MistralChatOptions {
   toolChoice?: 'auto' | 'none' | 'required';
   temperature?: number;
   maxTokens?: number;
+  /** Per-request timeout in ms. Defaults to 120s. */
+  timeoutMs?: number;
 }
 
 export interface MistralChatResult {
@@ -89,15 +124,44 @@ export interface MistralChatResult {
  */
 export async function mistralChat(options: MistralChatOptions): Promise<MistralChatResult> {
   const client = getMistralClient();
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
-  const response = await client.chat.completions.create({
+  const request = {
     model: options.model,
     messages: options.messages,
     tools: options.tools as OpenAI.Chat.Completions.ChatCompletionTool[] | undefined,
     tool_choice: options.toolChoice ?? (options.tools ? 'auto' : undefined),
     temperature: options.temperature ?? 0.1,
     max_tokens: options.maxTokens ?? 8192,
-  });
+  };
+
+  let lastError: unknown;
+  let response: OpenAI.Chat.Completions.ChatCompletion | undefined;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      response = await client.chat.completions.create(request, { signal: controller.signal });
+      break;
+    } catch (error) {
+      lastError = error;
+      if (!isRetryable(error) || attempt >= MAX_RETRIES) {
+        throw error;
+      }
+      const delay = Math.min(1000 * Math.pow(2, attempt), MAX_DELAY_MS);
+      const status = getErrorStatus(error);
+      const reason = status ? `API ${status}` : (error instanceof Error ? error.message : 'unknown');
+      logger.warn('mistralChat failed, retrying', { reason, delayMs: delay, attempt: attempt + 1, maxRetries: MAX_RETRIES });
+      await new Promise(resolve => setTimeout(resolve, delay));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  if (!response) {
+    throw lastError ?? new Error('Mistral request failed without a response.');
+  }
 
   if (!response.choices || response.choices.length === 0) {
     throw new Error('Mistral returned no choices — response may have been filtered or empty.');
