@@ -770,10 +770,13 @@ function runValidate(args: ClawCliArgs): void {
     }
   }
 
-  // Local model
-  const localModel = config.claw.localModel;
+  // Local model — mirror runStart which falls back to config.local.defaultModel
+  // when LAVERN_LOCAL_MODEL is unset. Reporting only the env-var value hides
+  // the effective model from users on a working default-fallback install.
+  const localModel = config.claw.localModel || config.local.defaultModel;
   if (localModel) {
-    checks.push({ label: 'Local model configured', ok: true, detail: localModel });
+    const source = config.claw.localModel ? 'LAVERN_LOCAL_MODEL' : 'default';
+    checks.push({ label: 'Local model configured', ok: true, detail: `${localModel} (${source})` });
   } else if (profile?.ethicalMode) {
     checks.push({ label: 'Local model (required for ethical mode)', ok: false, detail: 'Set LAVERN_LOCAL_MODEL' });
   }
