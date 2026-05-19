@@ -42,6 +42,11 @@ export function CommandStrip({ lastScan, scanning, budget, onScan, paused, onTog
         <span style={styles.scanTime}>
           Last scan: {timeAgo(lastScan)}
         </span>
+        {demoMode && (
+          <span style={styles.demoBadge} aria-label="Showing demo data — not real documents">
+            {'●'} DEMO DATA
+          </span>
+        )}
         {ethicalMode && (
           <span style={styles.ethicalBadge}>
             {'\uD83D\uDEE1\uFE0F'} ETHICAL
@@ -174,6 +179,18 @@ const styles: Record<string, React.CSSProperties> = {
     color: EU_COLOR,
     backgroundColor: 'rgba(46, 93, 156, 0.08)',
     border: `1px solid rgba(46, 93, 156, 0.2)`,
+    borderRadius: radii.sm,
+    padding: '3px 8px',
+    whiteSpace: 'nowrap' as const,
+  },
+  demoBadge: {
+    fontSize: 9,
+    fontFamily: fonts.sans,
+    fontWeight: 700,
+    letterSpacing: 1,
+    color: CLAW.amber,
+    backgroundColor: 'rgba(232, 132, 92, 0.12)',
+    border: `1px solid ${CLAW.amber}`,
     borderRadius: radii.sm,
     padding: '3px 8px',
     whiteSpace: 'nowrap' as const,

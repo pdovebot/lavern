@@ -512,14 +512,31 @@ export default function WorkingView({ onComplete, onBack, onSkip }: WorkingViewP
           as a failsafe in case auto-navigation doesn't fire */}
       {state.currentStep === 'delivered' && (
         <div style={styles.deliveredBanner}>
-          <span style={styles.deliveredText}>Your results are ready</span>
+          <span style={styles.deliveredText}>
+            {state.isAssemblyReady
+              ? 'Your results are ready'
+              : 'Almost ready \u2014 assembling your final document\u2026'}
+          </span>
           <button
             onClick={onComplete}
-            style={styles.deliveredBtn}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = colors.text; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = colors.text; e.currentTarget.style.color = '#fff'; }}
+            disabled={!state.isAssemblyReady}
+            style={{
+              ...styles.deliveredBtn,
+              cursor: state.isAssemblyReady ? 'pointer' : 'wait',
+              opacity: state.isAssemblyReady ? 1 : 0.5,
+            }}
+            onMouseEnter={e => {
+              if (!state.isAssemblyReady) return;
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = colors.text;
+            }}
+            onMouseLeave={e => {
+              if (!state.isAssemblyReady) return;
+              e.currentTarget.style.backgroundColor = colors.text;
+              e.currentTarget.style.color = '#fff';
+            }}
           >
-            View Results {'\u2192'}
+            {state.isAssemblyReady ? `View Results ${'\u2192'}` : 'Assembling\u2026'}
           </button>
         </div>
       )}

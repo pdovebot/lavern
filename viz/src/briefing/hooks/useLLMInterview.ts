@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Sufficiency, FollowUpQuestion, EngagementBrief } from './useBriefingAnalysis.js';
+import { dispatchApiError } from '../../hooks/useApiFetch.js';
 
 /** Mirrors the backend InterviewResult shape. */
 export interface InterviewResult {
@@ -258,6 +259,9 @@ export function useLLMInterview(
         });
         setFallbackToStatic(true);
         setError(errorMessage);
+        // Surface the real reason — the static-questions banner alone hides
+        // *why* the interview failed (e.g. missing key, wrong provider).
+        dispatchApiError('server-error', `Interview unavailable: ${errorMessage}`, 0);
       } else if (retryAttempt < MAX_RETRIES) {
         // Mid-conversation failure: retry before giving up
         // Remove the empty assistant message (we'll re-add it on retry)
@@ -288,6 +292,7 @@ export function useLLMInterview(
       } else {
         // All retries exhausted — clean up and show error
         setError(errorMessage);
+        dispatchApiError('server-error', `Interview failed: ${errorMessage}`, 0);
         setMessages(prev => {
           let cleaned = prev;
           // Remove empty assistant message

@@ -41,7 +41,7 @@ function shouldDispatch(type: ApiErrorType, status: number): boolean {
 
 // ── Event dispatch ────────────────────────────────────────────────────
 
-function dispatchApiError(type: ApiErrorType, message: string, status: number): void {
+export function dispatchApiError(type: ApiErrorType, message: string, status: number): void {
   if (!shouldDispatch(type, status)) return;
   window.dispatchEvent(
     new CustomEvent<ApiErrorEvent>('shem:api-error', {
@@ -99,7 +99,22 @@ async function interceptResponse(res: Response, url: string): Promise<void> {
   }
 
   if (res.status >= 500) {
-    dispatchApiError('server-error', 'Something went wrong on our end. Please try again.', res.status);
+    // Try to extract a specific message from the JSON body so users see what
+    // actually failed (e.g. "Briefing analysis failed — ANTHROPIC_API_KEY is
+    // not configured") instead of the generic fallback.
+    let message = 'Something went wrong on our end. Please try again.';
+    try {
+      const cloned = res.clone();
+      const body = await cloned.json();
+      if (body && typeof body === 'object') {
+        const error = typeof body.error === 'string' ? body.error : undefined;
+        const detail = typeof body.message === 'string' ? body.message : undefined;
+        if (error && detail) message = `${error}: ${detail}`;
+        else if (error) message = error;
+        else if (detail) message = detail;
+      }
+    } catch { /* non-JSON 5xx — keep generic message */ }
+    dispatchApiError('server-error', message, res.status);
   }
 }
 
