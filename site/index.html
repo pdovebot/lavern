@@ -313,38 +313,11 @@
           residual transition at the very top is imperceptible.
        The `.cleared` class still hides the fog when the footer scrolls
        into view, so the bottom of the page reads crisp. */
+    /* Mobile: hide the bottom scroll-fog entirely. It's a desktop-only
+       DOF nicety; on a narrow viewport it clutters the screen and the
+       blur strip eats vertical real estate the page needs more. */
     @media(max-width:760px){
-      .scroll-fog.bottom{
-        height:45vh;
-        backdrop-filter:blur(2px);
-        -webkit-backdrop-filter:blur(2px);
-        mask-image:linear-gradient(to top,
-          #000 0%,
-          rgba(0,0,0,0.96) 12%,
-          rgba(0,0,0,0.86) 25%,
-          rgba(0,0,0,0.70) 38%,
-          rgba(0,0,0,0.50) 52%,
-          rgba(0,0,0,0.30) 68%,
-          rgba(0,0,0,0.14) 82%,
-          rgba(0,0,0,0.05) 92%,
-          transparent 100%);
-        -webkit-mask-image:linear-gradient(to top,
-          #000 0%,
-          rgba(0,0,0,0.96) 12%,
-          rgba(0,0,0,0.86) 25%,
-          rgba(0,0,0,0.70) 38%,
-          rgba(0,0,0,0.50) 52%,
-          rgba(0,0,0,0.30) 68%,
-          rgba(0,0,0,0.14) 82%,
-          rgba(0,0,0,0.05) 92%,
-          transparent 100%);
-        background:linear-gradient(to top,
-          rgba(250,250,250,0.20) 0%,
-          rgba(250,250,250,0.14) 30%,
-          rgba(250,250,250,0.07) 60%,
-          rgba(250,250,250,0.02) 85%,
-          transparent 100%)
-      }
+      .scroll-fog.bottom{display:none}
     }
 
     /* ═══════════════════════════════════════════════════════════════════

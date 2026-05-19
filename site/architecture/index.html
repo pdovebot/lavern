@@ -102,9 +102,35 @@
     .stats-hero{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 20px;box-shadow:0 4px 24px rgba(0,0,0,0.06)}
     .cta-btn{display:inline-block;padding:18px 56px;background:#1a1a1a;color:#e8e0d4;text-decoration:none;font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:2px;text-transform:uppercase;border-radius:60px;border:1.5px solid rgba(232,132,92,0.3);transition:all 0.3s}
     .cta-btn:hover{background:#E8845C;color:#fff;border-color:#E8845C;transform:translateY(-1px);box-shadow:0 4px 20px rgba(232,132,92,0.3)}
+
+    /* Fixed top-left "back to lavern.ai" affordance so a reader who
+       lands here from a deep link has a one-click way out. Sits over
+       the page corner; cream pill, subtle shadow, hover tightens. */
+    .back-link{
+      position:fixed;top:20px;left:20px;z-index:50;
+      display:inline-flex;align-items:center;gap:8px;
+      padding:9px 16px;border-radius:999px;
+      background:rgba(255,255,255,0.92);
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      border:1px solid rgba(20,19,16,0.10);
+      font-family:var(--sans);font-size:13px;font-weight:500;
+      color:var(--text);text-decoration:none;
+      box-shadow:0 1px 0 rgba(255,255,255,0.6) inset,0 2px 8px rgba(20,19,16,0.06);
+      transition:transform .2s ease,border-color .2s ease;
+    }
+    .back-link:hover{border-color:rgba(20,19,16,0.28);transform:translateY(-1px)}
+    .back-link .arrow{font-size:14px;display:inline-block;transition:transform .2s ease}
+    .back-link:hover .arrow{transform:translateX(-2px)}
+    @media(max-width:600px){
+      .back-link{top:14px;left:14px;padding:7px 13px;font-size:12px}
+    }
   </style>
 </head>
 <body>
+  <a class="back-link" href="/" aria-label="Back to lavern.ai">
+    <span class="arrow" aria-hidden="true">←</span> lavern.ai
+  </a>
+
   <div class="container">
 
     <div class="header">

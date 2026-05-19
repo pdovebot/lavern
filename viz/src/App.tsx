@@ -1063,7 +1063,11 @@ export function App() {
         {cursor}
         <Suspense fallback={<div style={{ position: 'fixed', inset: 0, backgroundColor: '#080808' }} />}>
           <DemoTourView
-            onExit={() => { window.location.hash = '#/'; }}
+            // Demo lives at lavern.ai/demo/. Exit should leave the SPA
+            // entirely and return to the marketing homepage, not flip
+            // the hash to '#/' which would render the foyer view
+            // ("Your firm is ready") inside /demo/.
+            onExit={() => { window.location.href = '/'; }}
             onLaunchDemo={(caseId) => {
               sessionStorage.setItem('shem-session-id', `demo-session-${caseId}-${Date.now()}`);
               window.location.hash = '#/working';
