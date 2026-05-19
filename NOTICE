@@ -45,14 +45,14 @@ LEGAL DATASETS (seeded via scripts/seed-knowledge-base.ts)
 
   ContractNLI — NOT INCLUDED
   Its CC BY-NC-SA 4.0 license (non-commercial + share-alike) is incompatible
-  with Lavern's permissive (MIT) distribution license. The seeder no longer
-  fetches ContractNLI. Users who specifically want it can pull it directly
-  from https://stanfordnlp.github.io/contract-nli/ and accept its terms
-  separately.
+  with Lavern's permissive (Apache 2.0) distribution license. The seeder no
+  longer fetches ContractNLI. Users who specifically want it can pull it
+  directly from https://stanfordnlp.github.io/contract-nli/ and accept its
+  terms separately.
 
   Note on CC BY-SA 4.0: The two ShareAlike datasets above are usable inside
   Lavern, but anyone redistributing those specific datasets in a modified
-  form inherits ShareAlike obligations. Lavern's own code remains MIT.
+  form inherits ShareAlike obligations. Lavern's own code remains Apache 2.0.
 
 ────────────────────────────────────────────────────────────────────────────
 FONTS
@@ -93,7 +93,7 @@ THIRD-PARTY CODE
   Lavern depends on a number of npm packages, each carrying its own license.
   See package.json + package-lock.json (and viz/package.json + viz/package-
   lock.json) for the authoritative list. Every dependency is OSI-approved
-  and compatible with MIT distribution. No GPL or AGPL code is bundled.
+  and compatible with Apache 2.0 distribution. No GPL or AGPL code is bundled.
 
 ────────────────────────────────────────────────────────────────────────────
 DISCLAIMER

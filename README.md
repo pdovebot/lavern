@@ -173,7 +173,9 @@ Known limitations we're not hiding:
 
 - **No public benchmark.** Internal evaluation only. The quality-of-output claim is a hypothesis. We'd welcome help building a defensible benchmark.
 - **Multi-agent debate is imperfect.** Agents sometimes don't listen to each other. Sometimes one dominates. Sometimes they swing to the opposite extreme when challenged, not because the challenge was stronger but because it was newer. We've built structure around the problem (evidence requirements, confidence thresholds, adversarial roles, escalation protocols), not solved it.
-- **67 agents is probably more than needed.** Started with about a ten, just kept adding. There is also the agent builder mode if you want to build more. And Jude Claw. 
+- **67 agents is probably more than needed.** Started with about a ten, just kept adding. There is also the agent builder mode if you want to build more. And Jude Claw.
+- **No dense or vector retrieval.** The knowledge base uses BM25-style full-text search (SQLite FTS5). There's no embedding layer, no hybrid retrieval, no semantic precedent search. For high-recall retrieval across large document sets, that's the obvious next move; we haven't done it yet.
+- **No durable task queue.** Long-running work flows through an in-process event bus and the Clawern daemon, not a Redis-backed queue with retry, dead-letter, and priority semantics. Session state persists (archive, precedent board), but if the server restarts mid-engagement the work needs to be re-kicked. Fine for the demo demonstrating the ideas; you'd want a real queue before running this at volume.
 - **EU mode has one known gap.** The Lavern Challenge route (`src/api/routes/challenge.ts`) still instantiates Anthropic directly even when `LAVERN_PROVIDER=mistral`. The rest of the pipeline routes through Mistral. If you need strict EU boundary, avoid that feature until it's ported.
 - **Remote MCP bridge is preview.** Gated behind a feature flag.
 - **The HTTP API is evolving.** Expect non-breaking additions before a v1.0 freeze; pin a tag if you depend on it.
