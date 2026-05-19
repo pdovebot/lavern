@@ -10,7 +10,7 @@ Built by a law firm founder over six months because the prevailing "AI as a juni
 
 > **This is not a product.** Lavern is best understood as a collection of ideas in one repo. A polished demo of how we could build in the future.
 >
-> You can criticise it for not working as a product. That misses the mark. It is not meant to be a product. It is a source of inspiration.
+> You can criticise it for not working as a "product". That misses the mark. It is not meant to be a product. It is a source of inspiration.
 >
 > It is at least ten things, several of which are, on their own, products somebody could build a company around. They are sitting in the repo. Take whichever ones you want.
 
@@ -171,9 +171,9 @@ Lavern is at **v0.15.0**, the initial public open-source release. The engine, Cl
 
 Known limitations we're not hiding:
 
-- **No public benchmark.** Internal evaluation only. The quality-of-output claim is a hypothesis; we'd welcome help building a defensible benchmark.
+- **No public benchmark.** Internal evaluation only. The quality-of-output claim is a hypothesis. We'd welcome help building a defensible benchmark.
 - **Multi-agent debate is imperfect.** Agents sometimes don't listen to each other. Sometimes one dominates. Sometimes they swing to the opposite extreme when challenged, not because the challenge was stronger but because it was newer. We've built structure around the problem (evidence requirements, confidence thresholds, adversarial roles, escalation protocols), not solved it.
-- **67 agents is probably more than needed.** Started with about a dozen, kept finding gaps. If you fork it and find that 20 of them do 90% of the work, please tell us which 20.
+- **67 agents is probably more than needed.** Started with about a ten, just kept adding. There is also the agent builder mode if you want to build more. And Jude Claw. 
 - **EU mode has one known gap.** The Lavern Challenge route (`src/api/routes/challenge.ts`) still instantiates Anthropic directly even when `LAVERN_PROVIDER=mistral`. The rest of the pipeline routes through Mistral. If you need strict EU boundary, avoid that feature until it's ported.
 - **Remote MCP bridge is preview.** Gated behind a feature flag.
 - **The HTTP API is evolving.** Expect non-breaking additions before a v1.0 freeze; pin a tag if you depend on it.
