@@ -68,9 +68,43 @@ export interface ClawCliArgs {
   ethical?: boolean;
 }
 
+const KNOWN_COMMANDS = ['init', 'start', 'status', 'daemon', 'retry', 'validate', 'pause', 'resume'] as const;
+const KNOWN_DAEMON_SUBS = ['install', 'uninstall', 'status', 'logs'] as const;
+// Flags that consume the next positional as their value — so we don't
+// mistake "--dir flerb" for an unknown subcommand "flerb".
+const VALUE_FLAGS = new Set(['--hash', '--dir', '--budget', '--per-doc-budget', '--intensity', '--watch']);
+
+export class UnknownCommandError extends Error {
+  constructor(public readonly attempted: string) {
+    super(`Unknown command: ${attempted}`);
+    this.name = 'UnknownCommandError';
+  }
+}
+
 export function parseClawArgs(args: string[]): ClawCliArgs {
-  // Find the subcommand (init, start, status, daemon)
-  const command = args.find(a => ['init', 'start', 'status', 'daemon', 'retry', 'validate', 'pause', 'resume'].includes(a)) ?? 'start';
+  // Walk positional tokens (skipping flag values) to find the first one.
+  // If it's a known command, use it. If it's a non-flag token that isn't
+  // a known command, surface the typo instead of silently running `start`
+  // — the old `args.find(...) ?? 'start'` made `lavern claw flerb`
+  // launch the watcher, which is a real footgun in cloud mode.
+  const positionals: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a.startsWith('--')) {
+      if (VALUE_FLAGS.has(a)) i++; // skip the value
+      continue;
+    }
+    positionals.push(a);
+  }
+
+  let command: ClawCliArgs['command'];
+  if (positionals.length === 0) {
+    command = 'start';
+  } else if ((KNOWN_COMMANDS as readonly string[]).includes(positionals[0])) {
+    command = positionals[0] as ClawCliArgs['command'];
+  } else {
+    throw new UnknownCommandError(positionals[0]);
+  }
 
   const getFlag = (flag: string): boolean => args.includes(flag);
   const getValue = (flag: string): string | undefined => {
@@ -78,11 +112,16 @@ export function parseClawArgs(args: string[]): ClawCliArgs {
     return idx >= 0 && idx + 1 < args.length ? args[idx + 1] : undefined;
   };
 
-  // For daemon command, capture subcommand (install, uninstall, status, logs)
-  const daemonIdx = args.indexOf('daemon');
-  const daemonSubcommand = daemonIdx >= 0 && daemonIdx + 1 < args.length
-    ? args[daemonIdx + 1]
-    : undefined;
+  // For daemon command, the second positional is the subcommand.
+  let daemonSubcommand: string | undefined;
+  if (command === 'daemon' && positionals.length > 1) {
+    const sub = positionals[1];
+    if ((KNOWN_DAEMON_SUBS as readonly string[]).includes(sub)) {
+      daemonSubcommand = sub;
+    } else {
+      throw new UnknownCommandError(`daemon ${sub}`);
+    }
+  }
 
   return {
     command: command as ClawCliArgs['command'],
@@ -717,7 +756,25 @@ function runRetry(args: ClawCliArgs): void {
 // ── Entry Point ──────────────────────────────────────────────────────────
 
 export async function runClaw(args: string[]): Promise<void> {
-  const parsed = parseClawArgs(args);
+  let parsed: ClawCliArgs;
+  try {
+    parsed = parseClawArgs(args);
+  } catch (err) {
+    if (err instanceof UnknownCommandError) {
+      console.error(`\nUnknown command: \`${err.attempted}\`\n`);
+      console.error('Available:');
+      console.error('  lavern claw init               — create a client profile');
+      console.error('  lavern claw start              — start the firm (watch + process)');
+      console.error('  lavern claw status             — show current state');
+      console.error('  lavern claw validate           — preflight configuration check');
+      console.error('  lavern claw pause | resume     — toggle processing');
+      console.error('  lavern claw retry --hash <h>   — re-process a failed document');
+      console.error('  lavern claw daemon install|uninstall|status|logs');
+      console.error('');
+      process.exit(2);
+    }
+    throw err;
+  }
 
   switch (parsed.command) {
     case 'init':
