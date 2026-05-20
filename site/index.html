@@ -3384,16 +3384,29 @@
 
     // Copy install command — host is derived from where the page is served,
     // so this Just Works on lavern.ai, the Netlify preview, or any future domain.
+    // Windows visitors get the PowerShell one-liner; everyone else gets curl|sh.
     (function(){
       var host = (location && location.hostname) ? location.hostname : '';
       // Fall back to canonical domain when opened off-network (file://, localhost, IPs).
       if (!host || host === 'localhost' || host === '127.0.0.1' || /^\d+\.\d+\.\d+\.\d+$/.test(host)) {
         host = 'lavern.ai';
       }
-      var displayCmd = 'curl -fsSL ' + host + '/install.sh | sh';
-      var cmd = 'curl -fsSL https://' + host + '/install.sh | sh';
+      var uaPlatform = (navigator.userAgentData && navigator.userAgentData.platform) || '';
+      var isWindows = /win/i.test(uaPlatform) || /Windows/i.test(navigator.userAgent || '');
+      var displayCmd, cmd, prompt;
+      if (isWindows) {
+        prompt = 'PS>';
+        displayCmd = 'irm ' + host + '/install.ps1 | iex';
+        cmd = 'powershell -ExecutionPolicy Bypass -Command "irm https://' + host + '/install.ps1 | iex"';
+      } else {
+        prompt = '$';
+        displayCmd = 'curl -fsSL ' + host + '/install.sh | sh';
+        cmd = 'curl -fsSL https://' + host + '/install.sh | sh';
+      }
       var cmdNodes = document.querySelectorAll('.install .install-cmd');
       for (var i = 0; i < cmdNodes.length; i++) cmdNodes[i].textContent = displayCmd;
+      var promptNodes = document.querySelectorAll('.install .install-prompt');
+      for (var j = 0; j < promptNodes.length; j++) promptNodes[j].textContent = prompt;
       function bind(btn){
         if (!btn) return;
         btn.addEventListener('click', function(){
