@@ -18,11 +18,19 @@ Built by a law firm founder over six months because the prevailing "AI as a juni
 
 ## Install
 
+macOS / Linux:
+
 ```bash
 curl -fsSL lavern.ai/install.sh | sh
 ```
 
-Clones the repo, installs backend and frontend dependencies, and gives you a `lavern` command. The 60-second walkthrough is in [QUICKSTART.md](QUICKSTART.md).
+Windows (PowerShell):
+
+```powershell
+irm lavern.ai/install.ps1 | iex
+```
+
+Either script clones the repo, installs backend and frontend dependencies, and gives you a `lavern` command. The 60-second walkthrough is in [QUICKSTART.md](QUICKSTART.md).
 
 By hand:
 
