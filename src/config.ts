@@ -88,14 +88,15 @@ export const config = {
 
   // ── Local (On-device via Ollama) ────────────────────────────────────
   // Zero-egress path for confidential / privilege-sensitive matters.
-  // Default model is gemma4:e4b (8B parameters, ~9.6 GB Q4_K_M, fits a stock
-  // 16 GB Macbook). Power users can upgrade to gemma4:26b (17 GB) by setting
-  // LAVERN_LOCAL_DEFAULT_MODEL — needs ~32 GB unified memory to run well.
+  // Default fallback is gemma3:4b — a canonical Ollama tag that fits a
+  // stock 16 GB Macbook. Override with LAVERN_LOCAL_DEFAULT_MODEL.
+  // Quality is materially lower than Claude; use Anthropic for serious
+  // matters.
   local: {
     baseUrl: process.env.LAVERN_LOCAL_URL ?? 'http://localhost:11434',
-    defaultModel: process.env.LAVERN_LOCAL_DEFAULT_MODEL ?? 'gemma4:e4b',
-    routerModel: process.env.LAVERN_LOCAL_ROUTER_MODEL ?? 'gemma4:e4b',
-    assemblyModel: process.env.LAVERN_LOCAL_ASSEMBLY_MODEL ?? 'gemma4:e4b',
+    defaultModel: process.env.LAVERN_LOCAL_DEFAULT_MODEL ?? 'gemma3:4b',
+    routerModel: process.env.LAVERN_LOCAL_ROUTER_MODEL ?? 'gemma3:4b',
+    assemblyModel: process.env.LAVERN_LOCAL_ASSEMBLY_MODEL ?? 'gemma3:4b',
   },
 
   // ── API ────────────────────────────────────────────────────────────────

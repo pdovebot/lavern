@@ -33,8 +33,8 @@ The setup prompts you to choose one:
 
 | Provider | What it is | Cost | Needs |
 |---|---|---|---|
-| **Local (Ollama)** *(default)* | On-device inference via `gemma4:e4b`. Nothing leaves the host. | $0 | Ollama installed; setup will offer to `brew install` (macOS) or `curl \| sh` (Linux). ~3 GB model pull. |
-| **Anthropic Cloud** | Claude via Anthropic API. Best capability. | Paid per call | `sk-ant-...` key from [console.anthropic.com](https://console.anthropic.com/settings/keys) |
+| **Anthropic Cloud** *(default, recommended)* | Claude via Anthropic API. Best capability. The agents, debate, and verification loop were tuned for Claude. | Paid per call | `sk-ant-...` key from [console.anthropic.com](https://console.anthropic.com/settings/keys) |
+| **Local (Ollama)** | On-device inference via `gemma3:4b` (or any model you pull). Nothing leaves the host. Quality drops noticeably vs Claude — use for offline tinkering and privacy demos, not serious matters. | $0 | Ollama installed; setup will offer to `brew install` (macOS) or `curl \| sh` (Linux). ~3 GB model pull. |
 | **Mistral (EU Sovereign)** | EU-hosted inference for GDPR-bound matters. | Paid per call | Key from [console.mistral.ai](https://console.mistral.ai/api-keys) |
 
 To change provider later: edit `.env` or re-run `npm run setup`.

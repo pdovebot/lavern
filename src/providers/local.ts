@@ -20,10 +20,12 @@ import { config } from '../config.js';
 // uniformly across providers (useful for showing "would have cost
 // $X via Anthropic" comparisons).
 export const LOCAL_PRICING: Record<string, { input: number; output: number }> = {
-  'gemma4:26b':       { input: 0, output: 0 },
-  'gemma4:31b':       { input: 0, output: 0 },
-  'gemma4:e4b':       { input: 0, output: 0 },
-  'gemma4:e2b':       { input: 0, output: 0 },
+  'gemma3:27b':       { input: 0, output: 0 },
+  'gemma3:12b':       { input: 0, output: 0 },
+  'gemma3:4b':        { input: 0, output: 0 },
+  'gemma3:1b':        { input: 0, output: 0 },
+  'gemma2:2b':        { input: 0, output: 0 },
+  'llama3.2:3b':      { input: 0, output: 0 },
 };
 const DEFAULT_LOCAL_PRICING = { input: 0, output: 0 };
 

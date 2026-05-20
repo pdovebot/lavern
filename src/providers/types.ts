@@ -35,9 +35,9 @@ export interface LocalConfig {
  * providers without modification.
  */
 export const LOCAL_MODELS = {
-  opus: 'gemma4:26b',
-  sonnet: 'gemma4:26b',
-  haiku: 'gemma4:e4b',
+  opus: 'gemma3:27b',
+  sonnet: 'gemma3:12b',
+  haiku: 'gemma3:4b',
 } as const;
 
 export interface MistralConfig {

@@ -133,7 +133,7 @@ async function ollamaHasModel(name: string, url = 'http://localhost:11434'): Pro
 
 async function setupLocal(): Promise<Record<string, string>> {
   log.step('Local provider (Ollama · on-device)');
-  const model = 'gemma4:e4b';
+  const model = 'gemma3:4b';
 
   if (!hasBin('ollama')) {
     log.warn('Ollama not detected on this machine.');
@@ -336,14 +336,14 @@ async function main() {
     message: 'How do you want to run inference?',
     choices: [
       {
-        title: 'Local (Ollama)  · on-device, free, private',
-        description: 'Runs gemma4:e4b locally. ~3 GB download, no API key.',
-        value: 'local',
+        title: 'Anthropic Cloud · best capability, paid     [recommended]',
+        description: 'Claude via Anthropic. Fastest path to a working install. Requires an API key.',
+        value: 'anthropic',
       },
       {
-        title: 'Anthropic Cloud · best capability, paid',
-        description: 'Claude via Anthropic. Requires an API key.',
-        value: 'anthropic',
+        title: 'Local (Ollama)  · on-device, free, private',
+        description: 'Runs gemma3:4b locally. ~3 GB download, no API key. Lower quality than Claude.',
+        value: 'local',
       },
       {
         title: 'Mistral (EU Sovereign) · GDPR-friendly, paid',
