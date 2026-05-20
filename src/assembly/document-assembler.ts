@@ -389,7 +389,12 @@ export async function assembleDocument(
         user: assemblyContext,
         tier: 'opus',
         maxTokens: 16384,
-        timeoutMs: 90_000,
+        // 5 min per attempt — Opus generating a 16K-token polished legal
+        // doc non-streaming genuinely takes 3-5 minutes. Original 90s was
+        // killing the call before it could finish. Outer for-loop still
+        // retries up to MAX_ASSEMBLY_ATTEMPTS on real failure.
+        timeoutMs: 300_000,
+        maxRetries: 0,
       });
 
       // Post-process: strip any preamble that leaked through despite instructions
@@ -678,7 +683,10 @@ Output the cleaned memo as markdown. No commentary, no "here is the cleaned vers
     user: input,
     tier: 'sonnet',
     maxTokens: 16_384,
-    timeoutMs: 120_000,
+    // 5 min — Sonnet cleaning 27K chars non-streaming can take 2-3 min.
+    // Caller's try/catch handles real failure → raw extraction.
+    timeoutMs: 300_000,
+    maxRetries: 0,
   });
   const cleaned = rawCleaned.trim();
 
