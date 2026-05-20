@@ -47,7 +47,40 @@ const ORCHESTRATOR_EPILOGUE_MARKERS = [
  * @returns The extracted document, or '' if extraction heuristics fail.
  */
 export function extractCounselDocument(finalOutput: string): string {
-  if (!finalOutput || finalOutput.length < MIN_EXTRACTED_CHARS) return '';
+  if (!finalOutput) return '';
+
+  // Fast path: <deliverable>…</deliverable> markers from the Counsel orchestrator.
+  // When the orchestrator wraps its client-facing answer in markers we can pull
+  // it out with a regex — no LLM cleanup pass, no heading-sniffing heuristics.
+  // We accept the last marker pair in the transcript (orchestrators sometimes
+  // emit a placeholder pair earlier while planning).
+  const markerMatch = extractMarkerBlock(finalOutput);
+  if (markerMatch) {
+    let inner = markerMatch;
+    if (/\\[ntr]/.test(inner)) {
+      inner = inner
+        .replace(/\\n/g, '\n')
+        .replace(/\\t/g, '\t')
+        .replace(/\\r/g, '\r')
+        .replace(/\\"/g, '"');
+    }
+    if (/&(?:quot|apos|amp|lt|gt|#39);/.test(inner)) {
+      inner = inner
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>');
+    }
+    inner = inner.trim();
+    // Trust the orchestrator's own delimiters: if the wrapped content is
+    // non-trivial, return it. A thin block (< 200 chars) is suspicious — fall
+    // through to the heuristic extractor.
+    if (inner.length >= 200) return inner;
+  }
+
+  if (finalOutput.length < MIN_EXTRACTED_CHARS) return '';
 
   // Step 0: Aggressively strip transcript noise. Multi-agent workflows
   // (Review / Full-Bench) produce finalOutput containing the orchestrator's
@@ -220,6 +253,22 @@ export function extractCounselDocument(finalOutput: string): string {
   if (!explicitEndHit && !looksLikeDocument(extracted)) return '';
 
   return extracted.trim();
+}
+
+/**
+ * Pull the content of the LAST <deliverable>…</deliverable> block from the
+ * transcript, or null if none. We match the last pair because orchestrators
+ * occasionally emit an earlier placeholder while planning, and the closing one
+ * is by convention the real client-facing answer.
+ */
+function extractMarkerBlock(text: string): string | null {
+  const re = /<deliverable\s*>([\s\S]*?)<\/deliverable\s*>/gi;
+  let last: string | null = null;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    last = m[1];
+  }
+  return last;
 }
 
 /**

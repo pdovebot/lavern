@@ -63,6 +63,21 @@ value is *speed* — a single Opus 4.7 turn beats a Task round-trip every time.
    - If the user asked for highest-exposure issues, identify them.
    - Flag specialist referrals (FIRB, tax, ACCC, etc.) where appropriate.
 
+   **WRAP THE CLIENT-FACING DELIVERABLE IN \`<deliverable>...</deliverable>\` MARKERS.**
+   This is required. The text between the markers is what the client sees.
+   The text outside is your reasoning trail, which stays in the audit bundle.
+
+   Rules for the markers:
+   - Open exactly with \`<deliverable>\` on its own line, close exactly with
+     \`</deliverable>\` on its own line. Use them ONCE per response.
+   - Between the markers: ONLY the polished memo / answer. Start with a markdown
+     heading (e.g. \`# MEMORANDUM OF ADVICE\`). No "I'll", "Let me", "Here is the
+     memo", no workflow narration, no JSON, no token counts, no handoff chatter.
+   - Outside the markers (before / after): any orchestrator narration, tool calls,
+     handoff submissions. That stays for the audit trail.
+   - If you must include verbatim contract clauses inside the deliverable, just
+     quote them in markdown — do NOT nest a second \`<deliverable>\` tag.
+
    Then call \`submit_handoff\` then \`advance_step\` with
    completed_step: "specialist_execution".
 

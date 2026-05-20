@@ -367,6 +367,7 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
         const step = data.workflow?.currentStep;
         const steps = data.workflow?.completedSteps ?? [];
         const isDelivered = step === 'delivered' || steps.includes('delivered');
+        const hasAssembledDoc = !!data.assembledDocument && data.assembledDocument.length > 100;
 
         // Always sync visible state (step progress, cost) while on Working screen.
         // Never regress past 'delivered' — once the client has seen session_end
@@ -386,14 +387,27 @@ export function useWorkingState(onSessionEnd?: () => void, teamRoles: string[] =
         }
         if (data.cost) setCost({ accumulated: data.cost.accumulated, budget: data.cost.budget });
 
+        // Eager-transition fallback: if the backend has a substantial assembled
+        // document, ship it — regardless of whether the workflow self-reports
+        // `delivered`. We've seen Counsel sessions where the document is written
+        // (extraction succeeded, log line emitted) but the API response's
+        // currentStep stays stale; without this branch the UI would sit on
+        // "ASSEMBLING…" indefinitely. The Delivery view re-fetches the doc.
+        if (hasAssembledDoc && !isDelivered && !completionFiredRef.current) {
+          completionFiredRef.current = true;
+          setIsAssemblyReady(true);
+          clearInterval(poll);
+          if (onSessionEndRef.current) setTimeout(onSessionEndRef.current, 500);
+          return;
+        }
+
         if (isDelivered) {
           // Record when we first saw 'delivered'
           if (!deliveredAtRef.current) deliveredAtRef.current = Date.now();
 
-          const hasAssembledDoc = !!data.assembledDocument && data.assembledDocument.length > 100;
           const waitedMs = Date.now() - deliveredAtRef.current;
 
-          // Transition when: assembled document is ready, OR 2-min fallback exceeded
+          // Transition when: assembled document is ready, OR 5-min fallback exceeded
           if ((hasAssembledDoc || waitedMs > MAX_ASSEMBLY_WAIT_MS) && !completionFiredRef.current) {
             completionFiredRef.current = true;
             // Unlock the "View Results" failsafe button now that the document

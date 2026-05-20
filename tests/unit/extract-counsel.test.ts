@@ -138,6 +138,55 @@ describe('extractCounselDocument', () => {
     expect(extractCounselDocument(twoHeadings)).toBe('');
   });
 
+  describe('<deliverable> marker fast path', () => {
+    it('extracts content between markers and ignores surrounding narration', () => {
+      const inner = '# MEMORANDUM\n\n' + 'Substantive legal advice with enough body. '.repeat(20);
+      const input = [
+        "I'll handle this Counsel workflow. No prior precedent. Proceeding.",
+        '{"agentId":"abc","totalDurationMs":12345,"usage":{}}',
+        '<deliverable>',
+        inner,
+        '</deliverable>',
+        'Workflow complete. Final spend: $0.12.',
+      ].join('\n');
+
+      const result = extractCounselDocument(input);
+      expect(result).toContain('# MEMORANDUM');
+      expect(result).not.toContain("I'll handle");
+      expect(result).not.toContain('agentId');
+      expect(result).not.toContain('Workflow complete');
+      expect(result).not.toContain('<deliverable>');
+    });
+
+    it('uses the LAST marker pair when multiple exist', () => {
+      const placeholder = '# DRAFT\n\nthinking out loud about the structure';
+      const real = '# FINAL MEMO\n\n' + 'Polished client-facing advice. '.repeat(30);
+      const input = [
+        '<deliverable>', placeholder, '</deliverable>',
+        'On reflection, let me redraft.',
+        '<deliverable>', real, '</deliverable>',
+      ].join('\n');
+
+      const result = extractCounselDocument(input);
+      expect(result).toContain('# FINAL MEMO');
+      expect(result).not.toContain('# DRAFT');
+    });
+
+    it('falls through to heuristic extractor when marker block is too thin', () => {
+      const thin = '<deliverable>tiny</deliverable>\n\n' + makeToS();
+      const result = extractCounselDocument(thin);
+      // Heuristic path kicks in and extracts the ToS instead.
+      expect(result).toContain('# LoveNow Terms of Service');
+    });
+
+    it('decodes escaped newlines inside the marker block', () => {
+      const inner = '# MEMO\\n\\n' + 'Body content with escaped newlines. '.repeat(20);
+      const input = `<deliverable>${inner}</deliverable>`;
+      const result = extractCounselDocument(input);
+      expect(result).toMatch(/^# MEMO\n\n/);
+    });
+  });
+
   it('preserves the document structure verbatim', () => {
     const doc = makeToS();
     const input = 'Preamble.\n\n' + doc;
