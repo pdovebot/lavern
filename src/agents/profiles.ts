@@ -1175,9 +1175,9 @@ export const agentProfiles: Record<string, AgentProfile> = {
     personality: {
       archetype: 'The Advocate',
       traits: {
-        'conservative-vs-creative': 4,
+        'conservative-vs-creative': 7,
         'thorough-vs-fast': 4,
-        'risk-averse-vs-tolerant': 3,
+        'risk-averse-vs-tolerant': 7,
         'formal-vs-approachable': 7,
         'adversarial-vs-collaborative': 7,
       },

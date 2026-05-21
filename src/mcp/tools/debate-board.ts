@@ -360,11 +360,13 @@ export function createDebateBoardTools(session: SessionState) {
 
   const getFindings = tool(
     'get_findings',
-    'Get all findings on the debate board, optionally filtered by agent or severity.',
+    'Get all findings on the debate board, optionally filtered by agent or severity. Use content_limit to cap per-finding content length (default 1200 chars) and avoid context overflow on large sessions. Use summary_only=true to get just IDs and headlines before diving into detail.',
     {
       filter_by_agent: z.string().optional().describe('Filter by agent role'),
       filter_by_severity: z.enum(['RED', 'YELLOW', 'GREEN']).optional().describe('Filter by severity'),
       unresolved_only: z.boolean().optional().describe('Only return unresolved findings'),
+      content_limit: z.number().int().min(100).max(10000).optional().describe('Max characters to include per finding content (default: 1200). Use a smaller value for overview passes, larger for deep-dive on specific findings.'),
+      summary_only: z.boolean().optional().describe('If true, return only finding ID, severity, agent, confidence, and first 200 chars — useful for a quick overview before requesting full content.'),
     },
     async (args) => {
       let results = [...state.findings];
@@ -372,12 +374,22 @@ export function createDebateBoardTools(session: SessionState) {
       if (args.filter_by_severity) results = results.filter(f => f.severity === args.filter_by_severity);
       if (args.unresolved_only) results = results.filter(f => !f.resolved);
 
-      const summary = results.map(f =>
-        `${f.id} [${f.severity}] (${f.agentRole}) [${(f.confidence * 100).toFixed(0)}%]: ${f.content}\n  Evidence: ${f.evidence.join('; ')}`
-      ).join('\n\n');
+      const limit = args.summary_only ? 200 : (args.content_limit ?? 1200);
+
+      const summary = results.map(f => {
+        const truncated = f.content.length > limit
+          ? f.content.slice(0, limit) + `… [+${f.content.length - limit} chars — use filter_by_agent="${f.agentRole}" or content_limit=${f.content.length} to see full finding]`
+          : f.content;
+        const evidenceLine = args.summary_only ? '' : `\n  Evidence: ${f.evidence.join('; ')}`;
+        return `${f.id} [${f.severity}] (${f.agentRole}) [${(f.confidence * 100).toFixed(0)}%]: ${truncated}${evidenceLine}`;
+      }).join('\n\n');
+
+      const header = results.length > 0
+        ? `${results.length} finding(s) returned (content capped at ${limit} chars each):\n\n`
+        : '';
 
       return {
-        content: [{ type: 'text' as const, text: results.length > 0 ? summary : 'No findings match the criteria.' }],
+        content: [{ type: 'text' as const, text: results.length > 0 ? header + summary : 'No findings match the criteria.' }],
       };
     },
     { annotations: { readOnly: true } }

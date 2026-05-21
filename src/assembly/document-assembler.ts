@@ -334,6 +334,7 @@ export async function assembleDocument(
     }
 
     if (extracted) {
+      extracted = stripProcessText(extracted);
       const validation = validateDeliverable(extracted);
       if (validation.valid) {
         logger.info('Counsel extraction (deterministic) succeeded — skipping LLM assembly', {

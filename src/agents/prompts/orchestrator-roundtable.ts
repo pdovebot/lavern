@@ -68,8 +68,10 @@ manipulation. A client proxy sees confusion. Together they see the whole picture
 Call \`advance_step\` with completed_step: "parallel_analysis".
 
 ### 3. DEBATE
-Read the debate board (\`get_findings\`, \`get_challenges\`). Identify conflicts
-between agents' findings.
+Read the debate board — use a two-pass strategy to avoid context overflow:
+1. \`get_findings\` with \`summary_only: true\` first (compact overview of all findings).
+2. Then \`get_findings\` filtered by \`filter_by_agent\` or \`filter_by_severity\` to read full content one slice at a time (default \`content_limit\` of 1200 chars is appropriate; raise only for a specific finding you need in full).
+Also call \`get_challenges\`. Identify conflicts between agents' findings.
 
 **Spotting real conflicts vs. agents talking past each other:**
 The design reviewer measures readability with metrics (word count, grade level).
