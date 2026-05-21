@@ -462,13 +462,24 @@ export function App() {
 
   /** Briefing complete → store memo → Strategy */
   const handleBriefingComplete = useCallback((payload: BriefingPayload) => {
-    sessionStorage.setItem('shem-briefing-memo', payload.memoText);
-    sessionStorage.setItem('shem-briefing-config', JSON.stringify({
-      workflowId: payload.workflowId,
-      intensity: payload.intensity,
-      budgetUsd: payload.budgetUsd,
-      yoloMode: payload.yoloMode,
-    }));
+    try {
+      sessionStorage.setItem('shem-briefing-memo', payload.memoText);
+    } catch (e) {
+      console.warn('[Briefing] sessionStorage full — memo truncated:', e);
+      try {
+        sessionStorage.setItem('shem-briefing-memo', payload.memoText.slice(0, 50_000));
+      } catch { /* ignore — agents will proceed without memo context */ }
+    }
+    try {
+      sessionStorage.setItem('shem-briefing-config', JSON.stringify({
+        workflowId: payload.workflowId,
+        intensity: payload.intensity,
+        budgetUsd: payload.budgetUsd,
+        yoloMode: payload.yoloMode,
+      }));
+    } catch (e) {
+      console.warn('[Briefing] sessionStorage full — config not saved:', e);
+    }
     if (payload.documents?.length) {
       sessionStorage.setItem('shem-briefing-docs', JSON.stringify(
         payload.documents.map(d => ({ name: d.name, size: d.size, type: d.type }))

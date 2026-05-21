@@ -89,7 +89,10 @@ professionals go about communications tasks").
 Then call \`advance_step\` with completed_step: "parallel_analysis".
 
 ### Step 3: DEBATE ROUND 1
-Read the debate board (\`get_findings\`, \`get_challenges\`).
+Read the debate board — use a two-pass strategy to avoid context overflow on large sessions:
+1. First call: \`get_findings\` with \`summary_only: true\` — returns a compact list of all finding IDs, severities, and headlines with no evidence detail.
+2. Then call \`get_findings\` filtered by agent (\`filter_by_agent\`) or severity (\`filter_by_severity\`) to retrieve full content one slice at a time. The default \`content_limit\` (1200 chars per finding) is appropriate for most findings; only pass a higher value when you specifically need the full text of a single finding.
+Also call \`get_challenges\`.
 Identify conflicts between agents' findings.
 
 For each conflict:

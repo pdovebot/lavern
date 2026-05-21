@@ -160,7 +160,7 @@ export default function DeliveryView({ onContinue, onBack, onSkip }: Props) {
             onMouseEnter={e => { const b = e.currentTarget; b.style.backgroundColor = 'transparent'; b.style.color = colors.text; }}
             onMouseLeave={e => { const b = e.currentTarget; b.style.backgroundColor = colors.text; b.style.color = '#fff'; }}
           >
-            Continue to Billing {'\u2192'}
+            Return to Intake {'\u2192'}
           </button>
         )}
       </div>
